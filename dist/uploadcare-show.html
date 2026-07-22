@@ -437,6 +437,23 @@
   }
   .hb-outro-sub{font-size:40px;font-weight:500;color:var(--ink-dim);margin-top:28px}
 
+  /* ---- shared heading type (from Figma spec) — one place to tweak every
+     slide's headline. Placed after the individual heading rules so it wins
+     the shared props while their per-class color/margins stay intact.
+     Inter 580 · 88px · line-height 106.5% · letter-spacing -1.5% ---- */
+  :root{ --h-size:72px; --h-weight:580; --h-lh:1.065; --h-ls:-.015em; }
+  /* .hd is the single, naturally-wrapping headline used by statement / mockup /
+     upload. code, reveal and the board titles share the same type spec. */
+  .hd,.cd-line,.rv-line,.hb-title,.hb-outro-line{
+    font-family:var(--sans);
+    font-weight:var(--h-weight);
+    font-size:var(--h-size);
+    line-height:var(--h-lh);
+    letter-spacing:var(--h-ls);
+  }
+  .hd{color:var(--ink)}
+  .hd.mono{ font-family:var(--mono);font-weight:500 }
+
   /* ================= EDITOR ================= */
   #gear{
     position:fixed;right:20px;bottom:20px;z-index:50;
@@ -653,24 +670,24 @@ const DEFAULT_DECK = {
       textFx:'stagger' },
     // 3 — problem: anyone can build a simple uploader
     { type:'mockup', duration:8,
-      kicker:'', line1:'Everyone can build', line2:'a file uploader.',
+      kicker:'', heading:'Everyone can build a file uploader.',
       kind:'uploader', textFx:'weight' },
     // 3.5 — live demo: drag a file in, watch it upload
     { type:'upload', duration:13,
-      kicker:'', line1:'As simple as', line2:'drag and drop.',
-      line1b:'Then it becomes a side project', line2b:'that never ends.',
+      kicker:'', heading:'As simple as drag and drop.',
+      heading2:'Then it becomes a side project that never ends.',
       progressMs:3000, textFx:'weight' },
     // 4 — escalation: it grows into an unending side project
     { type:'mockup', duration:9,
-      kicker:'', line1:'Then it becomes a side project', line2:'that never ends.',
+      kicker:'', heading:'Then it becomes a side project that never ends.',
       kind:'complexity', textFx:'stagger' },
     // 5 — resolve: 15 years of infra, shown as a pipeline
     { type:'statement', duration:9,
-      kicker:'', line1:'We\u2019ve spent 15 years making sure', line2:'it doesn\u2019t have to be.',
+      kicker:'', heading:'We\u2019ve spent 15 years making sure it doesn\u2019t have to be.',
       line2mono:false, pipeline:true, textFx:'weight' },
     // 6.1 — platform framing, same pipeline
     { type:'statement', duration:9,
-      kicker:'', line1:'The infrastructure behind', line2:'every line.',
+      kicker:'', heading:'The infrastructure behind every line.',
       line2mono:false, pipeline:true, textFx:'weight' },
     // 6.2 — brand beat: the mark, breathing
     { type:'logoAnim', duration:8,
@@ -721,6 +738,10 @@ addEventListener('resize', fit); fit();
 /* ---------------- renderers ---------------- */
 function esc(s){ return String(s??'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 function multiline(s){ return esc(s).replace(/\n/g,'<br>'); }
+/* single-field headline, with a fallback that merges the old dimmed line1 +
+   bright line2 into one flowing string so existing decks keep working. */
+function headText(s){ return s.heading!=null ? s.heading : [s.line1,s.line2].filter(v=>v).join(' '); }
+function headText2(s){ return s.heading2!=null ? s.heading2 : [s.line1b,s.line2b].filter(v=>v).join(' '); }
 
 /* ---------------- shared "text animation" system ----------------
    One control (see fieldsFor) drives how every .reveal element on a slide
@@ -787,8 +808,7 @@ const R = {
   statement(s){
     return `<div class="st-wrap">
       ${s.kicker?`<div class="kicker reveal">${esc(s.kicker)}</div>`:''}
-      <div class="st-line1 reveal d1">${multiline(s.line1)}</div>
-      <div class="st-line2 ${s.line2mono?'mono':''} reveal d2">${multiline(s.line2)}</div>
+      <div class="hd ${s.line2mono?'mono':''} reveal d1">${multiline(headText(s))}</div>
       ${s.pipeline?pipelineHTML():''}
     </div>`;
   },
@@ -865,8 +885,7 @@ const R = {
     return `<div class="mk-wrap">
       <div class="mk-left">
         ${s.kicker?`<div class="kicker reveal">${esc(s.kicker)}</div>`:''}
-        <div class="mk-line1 reveal d1">${multiline(s.line1||'')}</div>
-        <div class="mk-line2 reveal d2">${multiline(s.line2||'')}</div>
+        <div class="hd reveal d1">${multiline(headText(s))}</div>
       </div>
       <div class="mk-visual reveal d3">
         ${kind==='complexity' ? mockupOverlaySVG() : ''}
@@ -885,15 +904,12 @@ const R = {
     </div>`;
   },
   upload(s){
-    const l1b = s.line1b || 'Then it becomes a side project';
-    const l2b = s.line2b || 'that never ends.';
     return `<div class="up-wrap">
       <img class="up-nodes" src="${UPLOADER.nodes}" alt="">
       <div class="up-phase1">
         <div class="up-left">
           ${s.kicker?`<div class="kicker reveal">${esc(s.kicker)}</div>`:''}
-          <div class="up-line1 reveal d1">${multiline(s.line1||'')}</div>
-          <div class="up-line2 reveal d2">${multiline(s.line2||'')}</div>
+          <div class="hd reveal d1">${multiline(headText(s))}</div>
         </div>
         <div class="up-stage reveal d3">
           <img class="up-base up-static" src="${UPLOADER.static}" alt="">
@@ -908,8 +924,7 @@ const R = {
       </div>
       <div class="up-phase2">
         <div class="up-after">
-          <div class="up-after-line1">${multiline(l1b)}</div>
-          <div class="up-after-line2">${multiline(l2b)}</div>
+          <div class="hd">${multiline(headText2(s) || 'Then it becomes a side project that never ends.')}</div>
         </div>
         <img class="up-tag" src="${UPLOADER.tag}" alt="File uploaded">
       </div>
@@ -1592,7 +1607,7 @@ const VARIANT_LABEL = {
 };
 function slideTitle(s){
   switch(s.type){
-    case 'statement': return (s.line1||'')+' '+(s.line2||'');
+    case 'statement': return headText(s);
     case 'number': return (s.prefix||'')+s.value+(s.suffix||'');
     case 'chart': return s.big+' · '+(s.label||'');
     case 'stats': return (s.items||[]).map(i=>i.value).join(' · ');
@@ -1600,9 +1615,9 @@ function slideTitle(s){
     case 'logoAnim': return VARIANT_LABEL[s.variant]||s.variant;
     case 'board': return (s.title||'').replace(/\n/g,' ');
     case 'reveal': return (s.line||'').replace(/\n/g,' ');
-    case 'mockup': return ((s.line1||'')+' '+(s.line2||'')).trim();
+    case 'mockup': return headText(s).replace(/\n/g,' ');
     case 'code': return (s.line||'').replace(/\n/g,' ');
-    case 'upload': return ((s.line1||'')+' '+(s.line2||'')).trim();
+    case 'upload': return headText(s).replace(/\n/g,' ');
   }
   return '';
 }
@@ -1627,9 +1642,8 @@ function fieldsFor(s, i){
   switch(s.type){
     case 'statement': return dur+`
       <label class="f"><span>Kicker (optional small label)</span><input type="text" data-f="kicker" value="${esc(s.kicker||'')}"></label>
-      <label class="f"><span>Line 1 — dimmed</span><textarea data-f="line1">${esc(s.line1||'')}</textarea></label>
-      <label class="f"><span>Line 2 — bright</span><textarea data-f="line2">${esc(s.line2||'')}</textarea></label>
-      <label class="chk"><input type="checkbox" data-f="line2mono" ${s.line2mono?'checked':''}> Render line 2 in mono (terminal style)</label>
+      <label class="f"><span>Heading</span><textarea data-f="heading">${esc(headText(s))}</textarea></label>
+      <label class="chk"><input type="checkbox" data-f="line2mono" ${s.line2mono?'checked':''}> Render heading in mono (terminal style)</label>
       <label class="chk"><input type="checkbox" data-f="pipeline" ${s.pipeline?'checked':''}> Show Upload → Store → Transform → Deliver pipeline chips</label>`;
     case 'number': return dur+`
       <label class="f"><span>Kicker (optional)</span><input type="text" data-f="kicker" value="${esc(s.kicker||'')}"></label>
@@ -1711,8 +1725,7 @@ function fieldsFor(s, i){
       const opts = kinds.map(([v,l])=>`<option value="${v}" ${s.kind===v?'selected':''}>${l}</option>`).join('');
       return dur+`
         <label class="f"><span>Kicker (optional)</span><input type="text" data-f="kicker" value="${esc(s.kicker||'')}"></label>
-        <label class="f"><span>Line 1 — dimmed</span><textarea data-f="line1">${esc(s.line1||'')}</textarea></label>
-        <label class="f"><span>Line 2 — bright</span><textarea data-f="line2">${esc(s.line2||'')}</textarea></label>
+        <label class="f"><span>Heading</span><textarea data-f="heading">${esc(headText(s))}</textarea></label>
         <label class="f"><span>UI card</span><select data-f="kind">${opts}</select></label>`;
     }
     case 'code': return dur+`
@@ -1722,13 +1735,11 @@ function fieldsFor(s, i){
       <label class="f"><span>Typing speed (ms per character — lower is faster)</span><input type="number" min="4" max="80" step="1" data-f="typeSpeed" value="${s.typeSpeed||22}"></label>`;
     case 'upload': return dur+`
       <label class="f"><span>Kicker (optional)</span><input type="text" data-f="kicker" value="${esc(s.kicker||'')}"></label>
-      <label class="f"><span>Line 1 — dimmed</span><textarea data-f="line1">${esc(s.line1||'')}</textarea></label>
-      <label class="f"><span>Line 2 — bright</span><textarea data-f="line2">${esc(s.line2||'')}</textarea></label>
-      <label class="f"><span>After upload — line 1 (dimmed)</span><textarea data-f="line1b">${esc(s.line1b||'')}</textarea></label>
-      <label class="f"><span>After upload — line 2 (bright)</span><textarea data-f="line2b">${esc(s.line2b||'')}</textarea></label>
+      <label class="f"><span>Heading</span><textarea data-f="heading">${esc(headText(s))}</textarea></label>
+      <label class="f"><span>After-upload heading</span><textarea data-f="heading2">${esc(headText2(s))}</textarea></label>
       <label class="f"><span>Progress duration (ms — how slowly the bar fills)</span><input type="number" min="800" max="12000" step="100" data-f="progressMs" value="${s.progressMs||3000}"></label>
       <button class="btn sm" data-act="replay" style="margin-top:14px">↻ Replay animation</button>
-      <p style="font-size:12px;color:#7a7a82;margin-top:14px;line-height:1.5">Cursor drags the photo into the dropzone (static → hover → uploading), then the progress bar fills. When it completes, the headline cross-fades to the "after upload" lines with a File-uploaded tag, and 2s later the maintenance-nodes network blooms in behind them. Assets come from assets/photos.</p>`;
+      <p style="font-size:12px;color:#7a7a82;margin-top:14px;line-height:1.5">Cursor drags the photo into the dropzone (static → hover → uploading), then the progress bar fills. When it completes, the headline cross-fades to the after-upload heading with a File-uploaded tag, and 2s later the maintenance-nodes network blooms in behind them. Assets come from assets/photos.</p>`;
   }
   return dur;
 }
@@ -1809,7 +1820,7 @@ gLogo.onchange = ()=>{ deck.settings.watermark=gLogo.checked; enter(idx); };
 
 /* add menu */
 const NEW = {
-  statement:{type:'statement',duration:8,kicker:'',line1:'New dimmed line',line2:'New bright line.',line2mono:false},
+  statement:{type:'statement',duration:8,kicker:'',heading:'Your headline goes here.',line2mono:false},
   number:{type:'number',duration:8,kicker:'',prefix:'',value:100,decimals:0,suffix:'+',label:'describe the number'},
   chart:{type:'chart',duration:11,big:'10X',label:'what grew',startLabel:'1%',endLabel:'10%',points:'1,2,2.5,4,6,7,9,10'},
   stats:{type:'stats',duration:9,kicker:'',items:[{value:'1',label:'one'},{value:'2',label:'two'},{value:'3',label:'three'}]},
@@ -1817,9 +1828,9 @@ const NEW = {
   logoAnim:{type:'logoAnim',duration:10,variant:'assemble',tagline:'uploadcare.com',tagmono:true},
   board:{type:'board',duration:11,layout:'hero',title:'Complete upload\nand delivery platform',foot:'© 2011–2026 UPLOADCARE INC.',globe:true,float:true,typing:true,typeSpeed:16},
   reveal:{type:'reveal',duration:8,kicker:'',line:'Every image starts with an upload.',photo:''},
-  mockup:{type:'mockup',duration:8,kicker:'',line1:'Everyone can build',line2:'a file uploader.',kind:'uploader'},
+  mockup:{type:'mockup',duration:8,kicker:'',heading:'Everyone can build a file uploader.',kind:'uploader'},
   code:{type:'code',duration:10,kicker:'',line:'Ask your coding\nagent about us.',lines:'$ npx uploadcare init\nDetecting project... Next.js\nInstalling @uploadcare/upload-client\nDone. Ready to upload.',typeSpeed:22},
-  upload:{type:'upload',duration:13,kicker:'',line1:'As simple as',line2:'drag and drop.',line1b:'Then it becomes a side project',line2b:'that never ends.',progressMs:3000,textFx:'weight'}
+  upload:{type:'upload',duration:13,kicker:'',heading:'As simple as drag and drop.',heading2:'Then it becomes a side project that never ends.',progressMs:3000,textFx:'weight'}
 };
 const addBtn=document.getElementById('addBtn'), addList=document.getElementById('addlist');
 addBtn.onclick=()=>addList.classList.toggle('open');
