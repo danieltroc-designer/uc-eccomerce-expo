@@ -22,6 +22,15 @@
     --mono:'JetBrains Mono', ui-monospace, monospace;
     --cmono:'Commit Mono', 'JetBrains Mono', ui-monospace, monospace;
     --sans:'Inter', system-ui, sans-serif;
+
+    /* ---- Swiss grid (invisible layout scaffold on the 1920x1080 stage) ----
+       Every slide is authored against this: a 75px margin all round and a 4x4
+       module grid. The grid itself never renders (toggle with "g" for design
+       checks); it exists so headlines, cards and the glyph share one rhythm. */
+    --gm:75px;                                   /* margin (also col/row 1 start) */
+    --gcol:calc((1920px - 2*var(--gm)) / 4);     /* 442.5px column module */
+    --grow:calc((1080px - 2*var(--gm)) / 4);     /* 232.5px row module */
+    --g2:calc(var(--gcol) * 2);                  /* 2-column span for headlines */
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
@@ -51,12 +60,23 @@
   }
   .slide.active{opacity:1;visibility:visible}
 
-  .watermark{
-    position:absolute;top:72px;left:88px;height:40px;z-index:5;
-    opacity:0;transition:opacity 900ms ease;pointer-events:none;
+  /* invisible Swiss-grid scaffold — hidden by default, toggle with "g" */
+  #gridOverlay{position:absolute;inset:0;z-index:40;pointer-events:none;opacity:0;transition:opacity .12s ease}
+  #gridOverlay.show{opacity:1}
+  #gridOverlay .gi{
+    position:absolute;left:var(--gm);right:var(--gm);top:var(--gm);bottom:var(--gm);
+    display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(4,1fr);
   }
-  .watermark svg{height:100%;width:auto;display:block}
-  .watermark.show{opacity:.92}
+  #gridOverlay .gi > i{border:1px solid rgba(255,45,60,.55);margin:-.5px 0 0 -.5px}
+
+  /* Uploadcare glyph — a fixed brand mark anchored to the bottom-right grid
+     corner, present on every slide for a consistent signature. */
+  .watermark{
+    position:absolute;right:56px;bottom:50px;width:34px;height:auto;z-index:35;
+    opacity:0;transition:opacity 600ms ease;pointer-events:none;
+  }
+  .watermark svg{width:100%;height:auto;display:block}
+  .watermark.show{opacity:1}
 
   /* progress hairline */
   #progress{
@@ -123,7 +143,7 @@
   .slide.active .reveal.fx-clip .cl{transform:none}
 
   /* ---- statement slide ---- */
-  .st-wrap{text-align:center;max-width:1560px;padding:0 80px}
+  .st-wrap{text-align:center;max-width:1560px;padding:0 var(--gm)}
   .st-line1{
     font-size:104px;font-weight:600;letter-spacing:-0.025em;line-height:1.12;
     color:var(--ink-dim);
@@ -157,8 +177,56 @@
   .pl-row.pl-anim .pl-line span{transform:scaleX(0);transform-origin:left;transition:transform .4s cubic-bezier(.16,1,.3,1);transition-delay:calc(var(--grp,0ms) + var(--pi,0)*90ms + .14s)}
   .slide.active .pl-row.pl-anim .pl-line span{transform:scaleX(1)}
 
+  /* mono subtitle under the platform headline; text after "|" glows */
+  .st-sub{
+    font-family:var(--mono);font-size:26px;letter-spacing:.02em;color:var(--ink-dim);
+    margin-top:22px;
+  }
+  .st-sub-hi{color:var(--brand)}
+
+  /* shining pipeline — a brand-yellow highlight sweeps the chips once they've
+     settled, then the row keeps a soft glow (slide 6). */
+  .pl-shine .pl-pill{position:relative;overflow:hidden}
+  .slide.active .pl-shine .pl-pill{
+    border-color:rgba(255,207,62,.35);
+    box-shadow:0 0 0 1px rgba(255,207,62,.06),0 8px 30px rgba(255,207,62,.05);
+    transition:border-color .6s ease,box-shadow .6s ease;transition-delay:1s;
+  }
+  .pl-shine .pl-pill::after{
+    content:'';position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(115deg,transparent 35%,rgba(255,207,62,.45) 50%,transparent 65%);
+    transform:translateX(-160%);
+  }
+  .slide.active .pl-shine .pl-pill::after{
+    animation:plShine 2.6s cubic-bezier(.16,1,.3,1) 1.1s infinite;
+  }
+  @keyframes plShine{0%{transform:translateX(-160%)}55%,100%{transform:translateX(160%)}}
+
+  /* ---- chaos slide: the endless, self-tangling feature graph ----
+     a "File uploaded" node lands first, then the whole maintenance web blooms
+     in around it. The headline rides on top behind a soft left scrim. */
+  .ch2-wrap{position:absolute;inset:0;overflow:hidden}
+  .ch2-lines{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;
+    opacity:0;transition:opacity 1.3s ease;transition-delay:.6s}
+  .slide.active .ch2-lines{opacity:1}
+  .ch2-lines path{fill:none;stroke:#34343c;stroke-width:1.1}
+  .ch2-lines circle{fill:#45454e}
+  .ch2-node{
+    position:absolute;transform:translate(-50%,-50%) scale(.88);
+    font-family:var(--mono);font-size:15px;letter-spacing:.05em;color:#6d6d77;white-space:nowrap;
+    border:1px solid #26262c;background:rgba(15,15,18,.72);border-radius:8px;padding:7px 13px;z-index:2;
+    opacity:0;transition:opacity .5s ease,transform .6s cubic-bezier(.16,1,.3,1);transition-delay:var(--d,0ms);
+  }
+  .slide.active .ch2-node{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  .ch2-node.em{color:var(--ink);border-color:#54545c;background:rgba(24,24,28,.94);font-size:16px;z-index:3}
+  .ch2-node.up{border-color:rgba(255,207,62,.55);color:#fff;background:rgba(28,26,18,.95)}
+  .slide.active .ch2-node.up{box-shadow:0 0 0 1px rgba(255,207,62,.22),0 12px 44px rgba(255,207,62,.10)}
+  .ch2-scrim{position:absolute;inset:0;z-index:4;pointer-events:none;
+    background:linear-gradient(90deg,rgba(9,9,9,.97) 0%,rgba(9,9,9,.84) 27%,rgba(9,9,9,0) 52%)}
+  .ch2-left{position:absolute;left:var(--gm);top:50%;transform:translateY(-50%);z-index:5;max-width:var(--g2)}
+
   /* ---- number slide ---- */
-  .num-wrap{text-align:center;padding:0 80px}
+  .num-wrap{text-align:center;padding:0 var(--gm)}
   .num-big{
     font-size:340px;font-weight:700;letter-spacing:-0.04em;line-height:1;
     font-variant-numeric:tabular-nums;
@@ -171,7 +239,7 @@
 
   /* ---- chart slide ---- */
   .ch-wrap{position:absolute;inset:0}
-  .ch-head{position:absolute;top:170px;left:150px;max-width:760px}
+  .ch-head{position:absolute;top:170px;left:var(--gm);max-width:760px}
   .ch-big{font-size:300px;font-weight:700;letter-spacing:-0.04em;line-height:.95}
   .ch-label{font-size:46px;font-weight:500;color:var(--ink-dim);margin-top:28px;letter-spacing:-0.01em}
   .ch-svg{position:absolute;inset:0;width:100%;height:100%}
@@ -181,21 +249,26 @@
   .ch-line,.ch-dot,.ch-val{opacity:0}
   .slide.active .ch-line{opacity:1}
   .ch-quote{
-    position:absolute;left:150px;bottom:110px;max-width:760px;
+    position:absolute;left:var(--gm);bottom:110px;max-width:760px;
     font-size:32px;font-weight:500;color:var(--ink-dim);line-height:1.4;
   }
   .ch-quote span{display:block;margin-top:14px;font-family:var(--mono);font-size:20px;color:var(--ink-faint);letter-spacing:.04em}
 
   /* ---- stats trio ---- */
-  .tr-wrap{display:flex;gap:130px;align-items:flex-start;padding:0 80px}
+  .tr-wrap{display:flex;gap:130px;align-items:flex-start;padding:0 var(--gm)}
   .tr-item{text-align:left}
   .tr-val{font-size:128px;font-weight:700;letter-spacing:-0.035em;line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap}
   .tr-lab{font-size:34px;color:var(--ink-dim);margin-top:24px;font-weight:500}
   .tr-rule{width:64px;height:4px;background:var(--brand);margin-bottom:36px}
   .tr-kicker{text-align:center;margin-bottom:90px}
+  /* customer quote sitting under the metrics */
+  .tr-quote{max-width:1180px;margin:96px auto 0;text-align:center}
+  .tr-quote-line{font-size:46px;font-weight:600;letter-spacing:-0.02em;line-height:1.28;color:var(--ink)}
+  .tr-quote-by{margin-top:30px;font-family:var(--mono);font-size:20px;letter-spacing:.02em;color:var(--ink-dim)}
+  .tr-quote-by b{color:var(--ink);font-weight:500}
 
   /* ---- animated logo slide ---- */
-  .la-wrap{text-align:center;padding:0 80px}
+  .la-wrap{text-align:center;padding:0 var(--gm)}
   .la-logo{display:flex;justify-content:center}
   .la-logo svg{height:170px;width:auto;overflow:visible}
   .la-logo.mark svg{height:430px}
@@ -208,7 +281,7 @@
 
   /* ---- logo slide ---- */
   .lg-wrap{position:absolute;inset:0;display:flex;align-items:center}
-  .lg-left{padding-left:150px;z-index:2;max-width:900px}
+  .lg-left{padding-left:var(--gm);z-index:2;max-width:900px}
   .lg-logo svg{height:96px;width:auto;display:block}
   .lg-tag{
     font-size:76px;font-weight:600;letter-spacing:-0.02em;line-height:1.22;
@@ -222,31 +295,36 @@
 
   /* ---- reveal slide (mosaic -> photo) ---- */
   .rv-wrap{position:absolute;inset:0;display:flex;align-items:center}
-  .rv-left{padding-left:150px;z-index:2;max-width:820px}
+  .rv-left{padding-left:var(--gm);z-index:2;max-width:var(--g2)}
   .rv-line{
     font-size:92px;font-weight:600;letter-spacing:-0.02em;line-height:1.2;
     color:var(--ink);max-width:760px;
   }
-  .rv-visual{position:absolute;right:0;top:0;height:100%;width:52%;overflow:hidden}
-  .rv-visual canvas{position:absolute;inset:0;width:100%;height:100%}
-  .rv-photo{position:absolute;inset:0;opacity:0;overflow:hidden;transition:opacity .5s ease}
-  .slide.active .rv-photo{opacity:1;transition-delay:.5s}
+  /* photo card — a portrait plate parked on the right, its vertical centre locked
+     to the stage middle so it lines up with the headline (sits inside the grid;
+     the dark gap on its right holds the brand glyph). */
+  .rv-visual{position:absolute;left:1096px;top:50%;transform:translateY(-50%);width:688px;height:848px;overflow:hidden;border-radius:4px}
+  .rv-visual canvas{position:absolute;inset:0;width:100%;height:100%;z-index:2}
+  /* the photo sits UNDER the halftone canvas; JS adds .shown right as the dots
+     dissolve, so the pixels appear to resolve straight into the real image. */
+  .rv-photo{position:absolute;inset:0;opacity:0;overflow:hidden;transition:opacity .7s ease;z-index:1}
+  .rv-photo.shown{opacity:1}
   .rv-photo img{
     display:block;width:100%;height:100%;object-fit:cover;
-    transform:scale(1.06);transition:transform .9s cubic-bezier(.16,1,.3,1);transition-delay:.5s;
+    transform:scale(1.06);transition:transform 1.1s cubic-bezier(.16,1,.3,1);
   }
-  .slide.active .rv-photo img{transform:scale(1)}
+  .rv-photo.shown img{transform:scale(1)}
   /* a single soft diagonal sheen sweeps across once the photo settles in */
   .rv-photo::after{
     content:'';position:absolute;inset:0;pointer-events:none;
     background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.32) 50%,transparent 65%);
-    transform:translateX(-120%);transition:transform .85s ease;transition-delay:.7s;
+    transform:translateX(-120%);transition:transform .85s ease;transition-delay:.35s;
   }
-  .slide.active .rv-photo::after{transform:translateX(120%)}
+  .rv-photo.shown::after{transform:translateX(120%)}
 
   /* ---- mockup slide (fake UI card) ---- */
   .mk-wrap{position:absolute;inset:0;display:flex;align-items:center}
-  .mk-left{padding-left:150px;z-index:2;max-width:820px}
+  .mk-left{padding-left:var(--gm);z-index:2;max-width:var(--g2)}
   .mk-line1{font-size:88px;font-weight:600;letter-spacing:-0.02em;line-height:1.18;color:var(--ink-dim)}
   .mk-line2{font-size:88px;font-weight:600;letter-spacing:-0.02em;line-height:1.18;color:var(--ink);margin-top:6px}
   .mk-visual{position:absolute;right:150px;top:50%;transform:translateY(-50%);width:520px}
@@ -283,8 +361,9 @@
      later the maintenance-nodes network blooms in behind everything. */
   .up-wrap{position:absolute;inset:0}
   .up-nodes{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;z-index:0;pointer-events:none}
-  .up-phase1{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:56px;z-index:2}
-  .up-left{text-align:center;max-width:1200px}
+  /* phase 1 — headline on the left, live uploader on the right */
+  .up-phase1{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;gap:40px;padding:0 var(--gm);z-index:2}
+  .up-left{text-align:left;max-width:var(--g2);flex:none}
   .up-line1{font-size:88px;font-weight:600;letter-spacing:-0.02em;line-height:1.18;color:var(--ink-dim)}
   .up-line2{font-size:88px;font-weight:600;letter-spacing:-0.02em;line-height:1.18;color:var(--ink);margin-top:6px}
   /* the demo box is authored at a fixed 600×520 px inside the 1920 stage;
@@ -316,23 +395,58 @@
   .up-after-line2{font-size:88px;font-weight:600;letter-spacing:-0.02em;line-height:1.18;color:var(--ink);margin-top:6px}
   .up-tag{width:210px;height:auto;display:block}
 
-  /* ---- code / terminal slide ---- */
-  .cd-wrap{text-align:center;padding:0 80px;width:100%}
-  .cd-line{font-size:80px;font-weight:600;letter-spacing:-0.02em;line-height:1.15;color:var(--ink);margin-bottom:56px}
+  /* ---- code / terminal slide (headline left, live terminal right) ---- */
+  .cd-wrap{position:absolute;inset:0;display:flex;align-items:center}
+  .cd-left{padding-left:var(--gm);max-width:var(--g2);z-index:2}
   .cd-window{
-    width:1180px;margin:0 auto;background:#0d0d0f;border:1px solid var(--line);border-radius:16px;
+    position:absolute;right:75px;top:50%;transform:translateY(-50%);
+    width:960px;height:468px;background:#0d0d0f;border:1px solid var(--line);border-radius:16px;
     overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.55);text-align:left;
+    display:flex;flex-direction:column;
   }
   .cd-window.reveal{filter:brightness(.6);transition:opacity .5s ease,transform .62s cubic-bezier(.16,1,.3,1),filter .55s ease}
-  .slide.active .cd-window.reveal{filter:brightness(1)}
-  .cd-chrome{display:flex;align-items:center;gap:8px;padding:16px 20px;border-bottom:1px solid var(--line);background:#141416}
+  .slide.active .cd-window.reveal{filter:brightness(1);transform:translateY(-50%)}
+  .cd-chrome{display:flex;align-items:center;gap:8px;padding:14px 18px;border-bottom:1px solid var(--line);background:#141416;flex:none}
   .cd-chrome i{width:12px;height:12px;border-radius:50%;background:#33333a;flex:none;opacity:0;transition:opacity .3s ease}
   .slide.active .cd-chrome i{opacity:1}
   .slide.active .cd-chrome i:nth-child(1){background:#ff5f57;transition-delay:.42s}
   .slide.active .cd-chrome i:nth-child(2){background:#febc2e;transition-delay:.5s}
   .slide.active .cd-chrome i:nth-child(3){background:#28c840;transition-delay:.58s}
   .cd-file{margin-left:10px;font-family:var(--cmono);font-size:14px;color:#7a7a82}
-  .cd-body{padding:28px 30px;min-height:220px;font-family:var(--cmono);font-size:22px;line-height:1.75;color:#8E8E8E}
+  .cd-body{padding:24px 28px;flex:1;font-family:var(--cmono);font-size:20px;line-height:1.7;color:#8E8E8E;overflow:hidden}
+  .cd-cmd{color:#c9c9d2}
+  .cd-cmd b{color:#6a6a72;font-weight:400;margin-right:8px}
+  .cd-out{margin-top:14px;color:#8E8E8E;white-space:pre-wrap}
+  .cd-out .g{color:var(--ok)}
+  /* run bar pinned to the terminal's lower-left; the cursor taps RUN */
+  .cd-runbar{position:absolute;left:28px;bottom:26px;display:flex;align-items:center;gap:16px;z-index:3}
+  .cd-run{
+    font-family:var(--cmono);font-size:14px;letter-spacing:.12em;color:#d6d6de;
+    background:#232329;border:1px solid #34343c;border-radius:8px;padding:9px 20px;
+  }
+  .cd-run.press{background:#2E6BFF;border-color:#2E6BFF;color:#fff}
+  .cd-mascot{width:40px;height:auto;display:block;image-rendering:pixelated}
+  .cd-cursor{position:absolute;left:0;top:0;width:34px;z-index:4;filter:drop-shadow(0 3px 5px rgba(0,0,0,.45));opacity:0}
+
+  /* ---- Webflow marketplace install slide ---- */
+  .in-wrap{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 var(--gm)}
+  .in-head{margin-bottom:66px}
+  .in-app{display:flex;flex-direction:column;align-items:center}
+  .in-card{display:flex;align-items:flex-start;gap:18px;text-align:left;width:520px}
+  .in-icon{width:56px;height:56px;border-radius:12px;background:#141416;border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;flex:none}
+  .in-icon svg{width:34px;height:34px}
+  .in-icon svg path{fill:var(--brand)}
+  .in-title{font-size:17px;font-weight:600;color:var(--ink)}
+  .in-dl{font-family:var(--mono);font-size:13px;color:#7a7a82;margin:3px 0 9px}
+  .in-desc{font-size:14px;color:#8a8a92;line-height:1.5;max-width:420px}
+  .in-btnrow{position:relative;align-self:flex-start;margin-left:74px;margin-top:20px}
+  .in-btn{background:#2E6BFF;color:#fff;font-size:15px;font-weight:600;padding:11px 24px;border-radius:9px;
+    display:inline-block;transition:transform .12s ease,filter .12s ease}
+  .in-btn.press{transform:scale(.95);filter:brightness(.88)}
+  .in-btn.done{background:#1f8f4e}
+  .in-cursor{position:absolute;left:0;top:0;width:34px;z-index:4;opacity:0;filter:drop-shadow(0 3px 5px rgba(0,0,0,.45))}
+  .in-foot{margin-top:60px;font-family:var(--mono);font-size:20px;letter-spacing:.01em;color:#7a7a82}
 
   /* ================= HERO BOARD SLIDE ================= */
   .hb{position:absolute;inset:0;overflow:hidden}
@@ -570,14 +684,15 @@
 
 <div id="viewport">
   <div id="stage">
-    <div class="watermark" id="watermark"></div>
     <div id="slides"></div>
+    <div id="gridOverlay"><div class="gi"></div></div>
+    <div class="watermark" id="watermark"></div>
     <div id="progress"><i id="progressBar"></i></div>
   </div>
 </div>
 
 <button id="gear" title="Edit slides (E)">⚙</button>
-<div id="hint">E edit · Space pause · ←/→ nav · F fullscreen</div>
+<div id="hint">E edit · Space pause · ←/→ nav · F fullscreen · G grid</div>
 
 <aside id="editor">
   <div class="ed-head">
@@ -593,7 +708,7 @@
         <label class="f"><span>Fade (ms)</span>
           <input type="number" id="gFade" min="0" step="100"></label>
       </div>
-      <label class="chk"><input type="checkbox" id="gLogo"> Show logo watermark on content slides</label>
+      <label class="chk"><input type="checkbox" id="gLogo"> Show Uploadcare glyph (bottom-right, every slide)</label>
     </div>
     <div id="cards"></div>
   </div>
@@ -612,6 +727,8 @@
         <button data-type="mockup">UI mockup</button>
         <button data-type="code">Code / terminal</button>
         <button data-type="upload">Upload demo</button>
+        <button data-type="chaos">Chaos graph</button>
+        <button data-type="install">Install app</button>
       </div>
     </div>
     <button class="btn" id="ioBtn">Export / Import</button>
@@ -633,9 +750,11 @@
 </div>
 
 <script id="logo-src" type="text/plain">__LOGO_SVG__</script>
+<script id="glyph-src" type="text/plain">__GLYPH_SVG__</script>
 <script id="assets-src" type="application/json">__ASSETS_JSON__</script>
 <script id="globe-src" type="text/plain">__GLOBE_SVG__</script>
 <script id="uploader-src" type="application/json">__UPLOADER_JSON__</script>
+<script id="pixel-src" type="application/json">__PIXEL_JSON__</script>
 
 <script>
 /* =========================================================
@@ -643,77 +762,70 @@
    Types: statement | number | chart | stats | logo
 ========================================================= */
 const LOGO = document.getElementById('logo-src').textContent;
+const GLYPH = document.getElementById('glyph-src').textContent;
 const ASSETS = JSON.parse(document.getElementById('assets-src').textContent);
 const GLOBE = document.getElementById('globe-src').textContent;
 const UPLOADER = JSON.parse(document.getElementById('uploader-src').textContent);
+const PIXEL = JSON.parse(document.getElementById('pixel-src').textContent);
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* ---------------- default deck ---------------- */
 const DEFAULT_DECK = {
   settings: { duration: 8, fade: 900, watermark: true },
   slides: [
-    // 1 — brand open
-    { type:'logo', duration:9,
-      tagline:'', sub:'' },
-    // 2.0 — hook: statement over the abstract mosaic
-    { type:'reveal', duration:7,
-      kicker:'', line:'Every image starts with an upload.', photo:'',
+    // 1 — brand open (full logo; the SVG lockup is swapped in later)
+    { type:'logo', duration:8, tagline:'', sub:'' },
+
+    // 2 — hook: pixels resolve into the full photo
+    { type:'reveal', duration:9,
+      kicker:'', line:'Every image starts with an upload.', reveal:true,
       textFx:'stagger' },
-    // 2.1 — payoff: same line, mosaic reveals into a full photo
-    { type:'reveal', duration:8,
-      kicker:'', line:'Every image starts with an upload.', photo:'tennis',
-      textFx:'stagger' },
-    // 3 — problem: anyone can build a simple uploader
-    { type:'mockup', duration:8,
+
+    // 3 — what everyone already builds: the drag-and-drop uploader
+    { type:'upload', duration:10,
       kicker:'', heading:'Everyone can build a file uploader.',
-      kind:'uploader', textFx:'weight' },
-    // 3.5 — live demo: drag a file in, watch it upload
-    { type:'upload', duration:13,
-      kicker:'', heading:'As simple as drag and drop.',
-      heading2:'Then it becomes a side project that never ends.',
-      progressMs:3000, textFx:'weight' },
-    // 4 — escalation: it grows into an unending side project
-    { type:'mockup', duration:9,
-      kicker:'', heading:'Then it becomes a side project that never ends.',
-      kind:'complexity', textFx:'stagger' },
-    // 5 — resolve: 15 years of infra, shown as a pipeline
+      outcome:false, progressMs:2600, textFx:'weight' },
+
+    // 4 — ...and it sprawls into an endless side project
+    { type:'chaos', duration:12,
+      kicker:'', heading:'Then it becomes\na side project\nthat never ends.',
+      textFx:'stagger' },
+
+    // 5 — the resolve: 15 years turning that chaos into a clean pipeline
     { type:'statement', duration:9,
       kicker:'', heading:'We\u2019ve spent 15 years making sure it doesn\u2019t have to be.',
-      line2mono:false, pipeline:true, textFx:'weight' },
-    // 6.1 — platform framing, same pipeline
+      pipeline:true, textFx:'weight' },
+
+    // 6 — the platform framing: typographic, with a shining pipeline
     { type:'statement', duration:9,
       kicker:'', heading:'The infrastructure behind every line.',
-      line2mono:false, pipeline:true, textFx:'weight' },
-    // 6.2 — brand beat: the mark, breathing
-    { type:'logoAnim', duration:8,
-      variant:'mark-breathe',
-      tagline:'', tagmono:false },
-    // 7 — integration / marketplace
-    { type:'mockup', duration:8,
-      kicker:'', line1:'Already in your', line2:'platform.',
-      kind:'marketplace', textFx:'blur' },
-    // 8 — developer angle: ask your coding agent
+      subtitle:'Upload. Store. Transform. Deliver. |One integration',
+      pipeline:true, shine:true, textFx:'clip' },
+
+    // 7 — brand beat: the mark, breathing
+    { type:'logoAnim', duration:7, variant:'mark-breathe', tagline:'', tagmono:false },
+
+    // 8 — distribution: one-click install from the Webflow marketplace
+    { type:'install', duration:9,
+      heading:'Already in your\nWebflow Marketplace.',
+      foot:'A native, no-code File Uploader app. Approved by Webflow.',
+      textFx:'weight' },
+
+    // 9 — developer angle: ask your coding agent (cursor runs the command)
     { type:'code', duration:10,
-      kicker:'', line:'Ask your coding\nagent about us.',
-      lines:'$ npx uploadcare init\nDetecting project... Next.js\nInstalling @uploadcare/upload-client\nDone. Ready to upload.',
-      typeSpeed:22, textFx:'blur' },
-    // 9a — proof: Abyss metrics
-    { type:'stats', duration:9,
-      kicker:'Ecommerce page builder',
-      items:[
-        { value:'10K\u2013200K', label:'uploads a day' },
-        { value:'99%', label:'uptime' }
-      ]},
-    // 9b — proof: growth chart + customer quote
-    { type:'chart', duration:11,
-      big:'200K', label:'Uploads per day at peak',
-      startLabel:'10K', endLabel:'200K',
-      points:'10, 14, 18, 22, 30, 45, 60, 85, 120, 150, 180, 200',
+      line:'Ask your coding\nagent about us.',
+      cmd:'uploadcare file upload my-image.jpg',
+      lines:'Uploading my-image.jpg\u2026\n\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588  100%\n\u2713 https://ucarecdn.com/\u2026/my-image.jpg\nDone in 0.4s.',
+      textFx:'weight' },
+
+    // 10 — proof: metrics + customer quote
+    { type:'stats', duration:10,
+      items:[ { value:'10K\u2013200K', label:'uploads a day' }, { value:'99%', label:'uptime' } ],
       quote:'This part of the product is simply handled.',
-      quoteBy:'Finbarr Taylor \u2014 CEO & Co-founder', textFx:'weight' },
-    // 10 — close: floating files + CTA
-    { type:'board', duration:10,
-      layout:'outro',
+      quoteBy:'Finbarr Taylor', quoteRole:'CEO & Co-founder', textFx:'weight' },
+
+    // 11 — close: floating files + CTA
+    { type:'board', duration:12, layout:'outro',
       title:'How are you handling\nfiles today?',
       sub:'Come, say hi \ud83d\udc4b',
       globe:false, float:true, typing:false, textFx:'stagger' }
@@ -778,7 +890,7 @@ function applyTextFx(slideEl, fx){
 
 /* Upload -> Store -> Transform -> Deliver chip row, reused by any statement
    slide that wants to show the pipeline (see s.pipeline). */
-function pipelineHTML(){
+function pipelineHTML(shine){
   const steps = ['Upload','Store','Transform','Deliver'];
   const parts = [];
   let n = 0;
@@ -786,7 +898,17 @@ function pipelineHTML(){
     if (i>0){ parts.push(`<div class="pl-line" style="--pi:${n}"><i></i><span></span><i></i></div>`); n++; }
     parts.push(`<div class="pl-pill" style="--pi:${n}">${label}</div>`); n++;
   });
-  return `<div class="pl-row reveal d3 pl-anim">${parts.join('')}</div>`;
+  return `<div class="pl-row reveal d3 pl-anim${shine?' pl-shine':''}">${parts.join('')}</div>`;
+}
+
+/* mono subtitle for the platform slide — text after a "|" glows brand-yellow
+   (e.g. "Upload. Store. Transform. Deliver. |One integration"). */
+function subtitleHTML(s){
+  const raw = String(s||'');
+  const i = raw.indexOf('|');
+  const head = esc(i<0 ? raw : raw.slice(0,i));
+  const hi = i<0 ? '' : `<span class="st-sub-hi">${esc(raw.slice(i+1))}</span>`;
+  return `<div class="st-sub reveal d2">${head}${hi}</div>`;
 }
 
 /* faint procedural "growing complexity" overlay for the mockup slide's
@@ -799,12 +921,68 @@ function mockupOverlaySVG(){
   return `<svg class="mk-overlay" viewBox="0 0 360 240" preserveAspectRatio="none">${lines}${circles}</svg>`;
 }
 
+/* chaos slide graph — feature nodes (% coords) + chaotic edges. Node 12 is the
+   "File uploaded" anchor everything tangles around. */
+const CHAOS_NODES = [
+  {x:12,y:7,t:'VIDEO UP TO 4K'},        // 0
+  {x:34,y:6,t:'ANY OTHERS'},            // 1
+  {x:47,y:4,t:'CONTENT INSIGHTS'},      // 2
+  {x:61,y:8,t:'FILE TYPES'},            // 3
+  {x:93,y:6,t:'BLUR FACES'},            // 4
+  {x:24,y:13,t:'ZOOM BY OBJECTS'},      // 5
+  {x:29,y:21,t:'IMAGE FILES'},          // 6
+  {x:9,y:22,t:'RESIZE & SMART RESIZE'}, // 7
+  {x:19,y:30,t:'BACKGROUND REMOVAL'},   // 8
+  {x:9,y:41,t:'COLOR PROFILE'},         // 9
+  {x:30,y:40,t:'CONTENT PROCESSING'},   // 10
+  {x:52,y:36,t:'DELIVERY',em:1},        // 11
+  {x:74,y:45,t:'FILE UPLOADED',em:1,up:1}, // 12
+  {x:11,y:63,t:'DOCUMENT CONVERSION'},  // 13
+  {x:18,y:73,t:'FILTERS / BLUR / SHARPEN'}, // 14
+  {x:31,y:73,t:'ENHANCEMENT'},          // 15
+  {x:11,y:84,t:'DDOS PROTECTION'},      // 16
+  {x:22,y:88,t:'ATTACK PROTECT'},       // 17
+  {x:31,y:88,t:'CROP & SMART CROP'},    // 18
+  {x:41,y:93,t:'PERF & SECURITY'},      // 19
+  {x:64,y:84,t:'UPLOADS',em:1},         // 20
+  {x:88,y:33,t:'SIGNED URLS'},          // 21
+  {x:90,y:62,t:'WEBHOOKS'},             // 22
+  {x:82,y:20,t:'METADATA'},             // 23
+];
+const CHAOS_EDGES = [
+  [12,11],[12,20],[12,3],[12,23],[12,21],[12,4],[12,10],[12,22],
+  [11,2],[11,10],[11,6],[11,21],[11,13],[11,20],
+  [20,19],[20,18],[20,15],[20,13],[20,10],[20,17],
+  [2,3],[3,4],[1,5],[5,6],[6,7],[7,8],[8,9],[9,10],[10,13],
+  [13,14],[14,15],[16,17],[17,18],[18,19],[0,7],[4,23],[21,22],[3,23],[0,5],
+];
+
+/* tiny yellow pixel mascot for the terminal slide (inline so it stays offline) */
+const MASCOT = (()=>{
+  const Y='#F4C13D', D='#1a1a1a';
+  const g=[
+    '.YYY.',
+    'YYYYY',
+    'YDYDY',
+    'YYYYY',
+    'YYYYY',
+    '.Y.Y.',
+  ];
+  const u=7; let r='';
+  g.forEach((row,y)=>[...row].forEach((c,x)=>{
+    if(c==='.')return;
+    r+=`<rect x="${x*u}" y="${y*u}" width="${u}" height="${u}" fill="${c==='Y'?Y:D}"/>`;
+  }));
+  return `<svg class="cd-mascot" viewBox="0 0 ${5*u} ${6*u}" xmlns="http://www.w3.org/2000/svg">${r}</svg>`;
+})();
+
 const R = {
   statement(s){
     return `<div class="st-wrap">
       ${s.kicker?`<div class="kicker reveal">${esc(s.kicker)}</div>`:''}
       <div class="hd ${s.line2mono?'mono':''} reveal d1">${multiline(headText(s))}</div>
-      ${s.pipeline?pipelineHTML():''}
+      ${s.subtitle?subtitleHTML(s.subtitle):''}
+      ${s.pipeline?pipelineHTML(s.shine):''}
     </div>`;
   },
   number(s){
@@ -834,9 +1012,14 @@ const R = {
         <div class="tr-val">${esc(it.value)}</div>
         <div class="tr-lab">${esc(it.label)}</div>
       </div>`).join('');
+    const by = s.quoteBy ? `<div class="tr-quote-by reveal d4"><b>${esc(s.quoteBy)}</b>${s.quoteRole?` \u2014 ${esc(s.quoteRole)}`:''}</div>` : '';
     return `<div style="width:100%">
       ${s.kicker?`<div class="kicker reveal tr-kicker">${esc(s.kicker)}</div>`:''}
       <div class="tr-wrap" style="justify-content:center">${items}</div>
+      ${s.quote?`<div class="tr-quote">
+        <div class="tr-quote-line reveal d3">\u201c${esc(s.quote)}\u201d</div>
+        ${by}
+      </div>`:''}
     </div>`;
   },
   logo(s){
@@ -850,14 +1033,15 @@ const R = {
     </div>`;
   },
   reveal(s){
+    const rev = revealsPhoto(s);
     return `<div class="rv-wrap">
       <div class="rv-left">
         ${s.kicker?`<div class="kicker reveal">${esc(s.kicker)}</div>`:''}
         <div class="rv-line reveal d1">${multiline(s.line||'')}</div>
       </div>
       <div class="rv-visual">
-        <canvas class="lg-canvas"></canvas>
-        ${s.photo?`<div class="rv-photo"><img src="${ASSETS[s.photo]||''}" alt=""></div>`:''}
+        ${rev?`<div class="rv-photo"><img src="${PIXEL.img}" alt=""></div>`:''}
+        <canvas class="rv-canvas"></canvas>
       </div>
     </div>`;
   },
@@ -889,12 +1073,23 @@ const R = {
     </div>`;
   },
   code(s){
+    const cmd = s.cmd || 'uploadcare file upload my-image.jpg';
     return `<div class="cd-wrap">
-      ${s.kicker?`<div class="kicker reveal">${esc(s.kicker)}</div>`:''}
-      <div class="cd-line reveal d1">${multiline(s.line||'')}</div>
+      <div class="cd-left">
+        ${s.kicker?`<div class="kicker reveal">${esc(s.kicker)}</div>`:''}
+        <div class="hd reveal d1">${multiline(s.line||'')}</div>
+      </div>
       <div class="cd-window reveal d2">
-        <div class="cd-chrome"><i></i><i></i><i></i><span class="cd-file">terminal</span></div>
-        <div class="cd-body"></div>
+        <div class="cd-chrome"><i></i><i></i><i></i><span class="cd-file">bash</span></div>
+        <div class="cd-body">
+          <div class="cd-cmd"><b>$</b>${esc(cmd)}</div>
+          <div class="cd-out"></div>
+        </div>
+        <div class="cd-runbar">
+          <div class="cd-run">RUN</div>
+          ${MASCOT}
+        </div>
+        <img class="cd-cursor" src="${UPLOADER.cursor}" alt="">
       </div>
     </div>`;
   },
@@ -922,6 +1117,51 @@ const R = {
           <div class="hd">${multiline(headText2(s) || 'Then it becomes a side project that never ends.')}</div>
         </div>
         <img class="up-tag" src="${UPLOADER.tag}" alt="File uploaded">
+      </div>
+    </div>`;
+  },
+  install(s){
+    return `<div class="in-wrap">
+      <div class="hd in-head reveal d1">${multiline(s.heading||'')}</div>
+      <div class="in-app reveal d2">
+        <div class="in-card">
+          <div class="in-icon">${GLYPH}</div>
+          <div class="in-info">
+            <div class="in-title">Uploadcare File Uploader</div>
+            <div class="in-dl">\u2193 1k+</div>
+            <div class="in-desc">Accelerate time to market with a no-code plugin for scalable and secure end-user file uploads.</div>
+          </div>
+        </div>
+        <div class="in-btnrow">
+          <div class="in-btn">Install App</div>
+          <img class="in-cursor" src="${UPLOADER.cursor}" alt="">
+        </div>
+      </div>
+      ${s.foot?`<div class="in-foot reveal d4">${esc(s.foot)}</div>`:''}
+    </div>`;
+  },
+  chaos(s){
+    // node coords are % of the 1920x1080 stage; em = emphasized, up = "File uploaded"
+    const px = n=>[n.x/100*1920, n.y/100*1080];
+    const circles = CHAOS_NODES.map(n=>{const[x,y]=px(n);return `<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="2.4"/>`}).join('');
+    const paths = CHAOS_EDGES.map(([a,b])=>{
+      const [x1,y1]=px(CHAOS_NODES[a]), [x2,y2]=px(CHAOS_NODES[b]);
+      const mx=(x1+x2)/2, my=(y1+y2)/2;
+      const bow=(a*13+b*7)%2? 60 : -60;                    // deterministic curve bow
+      return `<path d="M${x1.toFixed(0)} ${y1.toFixed(0)} Q ${(mx+bow).toFixed(0)} ${(my-bow).toFixed(0)} ${x2.toFixed(0)} ${y2.toFixed(0)}"/>`;
+    }).join('');
+    const nodes = CHAOS_NODES.map((n,i)=>{
+      const d = n.up ? 0 : 700 + ((i*173)%1500);           // "File uploaded" lands first
+      const cls = 'ch2-node'+(n.em?' em':'')+(n.up?' up':'');
+      return `<div class="${cls}" style="left:${n.x}%;top:${n.y}%;--d:${d}ms">${esc(n.t)}</div>`;
+    }).join('');
+    return `<div class="ch2-wrap">
+      <svg class="ch2-lines" viewBox="0 0 1920 1080" preserveAspectRatio="none">${paths}${circles}</svg>
+      ${nodes}
+      <div class="ch2-scrim"></div>
+      <div class="ch2-left">
+        ${s.kicker?`<div class="kicker reveal">${esc(s.kicker)}</div>`:''}
+        <div class="hd reveal d1">${multiline(headText(s))}</div>
       </div>
     </div>`;
   },
@@ -995,7 +1235,11 @@ const R = {
 
 const slidesEl = document.getElementById('slides');
 const watermarkEl = document.getElementById('watermark');
-watermarkEl.innerHTML = LOGO;
+watermarkEl.innerHTML = GLYPH;
+
+/* populate the invisible Swiss-grid overlay (16 modules) — toggle with "g" */
+const gridOverlay = document.getElementById('gridOverlay');
+gridOverlay.querySelector('.gi').innerHTML = '<i></i>'.repeat(16);
 
 function renderDeck(){
   slidesEl.innerHTML = '';
@@ -1389,17 +1633,68 @@ function typeLines(el, lines, speed){
   typeLine();
 }
 
+/* code slide: the cursor glides onto RUN, taps it, and the command's output
+   streams into the terminal. Cursor = WAAPI (self-cancels); output = timers. */
 function setupCode(slideEl, sd){
   clearCodeTimers();
-  const body = slideEl.querySelector('.cd-body');
-  if (!body) return;
+  const win = slideEl.querySelector('.cd-window');
+  const out = slideEl.querySelector('.cd-out');
+  const run = slideEl.querySelector('.cd-run');
+  const cursor = slideEl.querySelector('.cd-cursor');
+  if (!out || !run) return;
   const lines = (sd.lines || '').split('\n');
-  if (sd.typing===false || REDUCED){
-    fillLinesInstant(body, lines);
-  } else {
-    const speed = Math.max(4, sd.typeSpeed||22);
-    typeLines(body, lines, speed);
-  }
+
+  out.innerHTML = ''; run.classList.remove('press');
+  win && win.querySelectorAll('*').forEach(el=>el.getAnimations&&el.getAnimations().forEach(a=>a.cancel()));
+
+  const paint = ()=>{ out.innerHTML = lines.map(t=>`<div>${t?esc(t):'&nbsp;'}</div>`).join('')
+      .replace('\u2713','<span class="g">\u2713</span>'); };
+
+  if (REDUCED){ if(cursor) cursor.style.opacity=0; paint(); return; }
+  if (!cursor){ paint(); return; }
+
+  // RUN button sits ~ lower-left of the window; cursor starts mid-window
+  const START='translate(430px,150px)', OVER='translate(70px,392px)';
+  cursor.style.opacity=0; cursor.style.transform=START;
+  cursor.animate([{opacity:0},{opacity:1}],{duration:300,delay:700,fill:'both'});
+  cursor.animate([{transform:START},{transform:OVER}],
+    {duration:1100,delay:800,easing:'cubic-bezier(.4,0,.2,1)',fill:'both'});
+  cursor.animate([{transform:OVER},{transform:'translate(70px,397px)'},{transform:OVER}],
+    {duration:260,delay:1950,easing:'ease-in-out'});
+  const clickAt = 2050;
+  codeTimers.push(setTimeout(()=>run.classList.add('press'), clickAt));
+  codeTimers.push(setTimeout(()=>run.classList.remove('press'), clickAt+220));
+  // after the tap, stream the output
+  codeTimers.push(setTimeout(()=>typeLines(out, lines, Math.max(4, sd.typeSpeed||18)), clickAt+320));
+}
+
+/* install slide: the cursor moves onto "Install App", taps it, and the button
+   flips to an installing → installed state. */
+const installTimers = [];
+function clearInstallTimers(){ installTimers.forEach(clearTimeout); installTimers.length=0; }
+function setupInstall(slideEl, sd){
+  clearInstallTimers();
+  const btn = slideEl.querySelector('.in-btn');
+  const cursor = slideEl.querySelector('.in-cursor');
+  if (!btn) return;
+  btn.textContent = 'Install App'; btn.classList.remove('press','done');
+
+  if (REDUCED){ if(cursor) cursor.style.opacity=0; btn.textContent='Installed'; btn.classList.add('done'); return; }
+  if (!cursor) return;
+  cursor.getAnimations().forEach(a=>a.cancel());
+
+  const START='translate(240px,150px)', OVER='translate(78px,26px)';
+  cursor.style.opacity=0; cursor.style.transform=START;
+  cursor.animate([{opacity:0},{opacity:1}],{duration:300,delay:800,fill:'both'});
+  cursor.animate([{transform:START},{transform:OVER}],
+    {duration:1100,delay:900,easing:'cubic-bezier(.4,0,.2,1)',fill:'both'});
+  cursor.animate([{transform:OVER},{transform:'translate(78px,31px)'},{transform:OVER}],
+    {duration:260,delay:2050,easing:'ease-in-out'});
+  const clickAt=2150;
+  installTimers.push(setTimeout(()=>btn.classList.add('press'), clickAt));
+  installTimers.push(setTimeout(()=>btn.classList.remove('press'), clickAt+220));
+  installTimers.push(setTimeout(()=>{ btn.textContent='Installing\u2026'; }, clickAt+240));
+  installTimers.push(setTimeout(()=>{ btn.textContent='Installed \u2713'; btn.classList.add('done'); }, clickAt+1500));
 }
 
 /* ---------------- upload demo: cursor drags a photo into the dropzone,
@@ -1435,12 +1730,14 @@ function setupUpload(slideEl, sd){
   hand.style.transform = START;
   phase1.style.opacity = 1; phase2.style.opacity = 0; nodes.style.opacity = 0;
 
+  const withOutcome = sd.outcome !== false;         // slide 3 ends clean at "uploaded"
+
   if (REDUCED){
-    // jump straight to the end state: file uploaded → project sprawl
+    // jump straight to the end state
     stat.style.opacity = 0; uploading.style.opacity = 1;
     prog.style.opacity = 1; fill.style.width = '100%';
     hand.style.display = 'none';
-    phase1.style.opacity = 0; phase2.style.opacity = 1; nodes.style.opacity = 1;
+    if (withOutcome){ phase1.style.opacity = 0; phase2.style.opacity = 1; nodes.style.opacity = 1; }
     return;
   }
   hand.style.display = '';
@@ -1473,8 +1770,8 @@ function setupUpload(slideEl, sd){
   fill.animate([{width:'0%'},{width:'100%'}],
     {duration:progMs, delay:B+1750, easing:'cubic-bezier(.25,.1,.25,1)', fill:'both'});
 
-  // ---- the payoff: once the bar completes, the tidy demo gives way to the
-  // reality of maintaining it ------------------------------------------------
+  // ---- the payoff (only when this slide owns the outcome) -------------------
+  if (!withOutcome) return;                         // slide 3 rests on "uploaded"
   const PE = B + 1750 + progMs;                    // moment the fill hits 100%
   // 8 — headline + uploader fade out; "side project" line + tag fade in
   phase1.animate([{opacity:1},{opacity:0}],
@@ -1524,6 +1821,93 @@ function stopMosaic(canvas){
   if (stop){ stop(); mosaics.delete(canvas); }
 }
 
+/* whether a reveal slide should dissolve its dots into the real photo.
+   `reveal` is the modern flag; fall back to the legacy `photo` field so old
+   decks keep working. */
+function revealsPhoto(s){ return s.reveal!==undefined ? !!s.reveal : !!s.photo; }
+
+/* pixel-halftone reveal (reveal slides) — the modern take on the mosaic.
+   Paints PIXEL.dots on a single canvas: the dots materialise (staggered fade +
+   scale), twinkle, and — when the slide reveals a photo — dissolve out while the
+   real image (sitting underneath) crossfades in, so the pixels resolve into it. */
+function startPixelReveal(canvas, photoEl){
+  stopMosaic(canvas);
+  const ctx = canvas.getContext('2d');
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const W = canvas.offsetWidth, H = canvas.offsetHeight;
+  if (!W || !H) return;
+  canvas.width = W*dpr; canvas.height = H*dpr;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+
+  const scale = Math.max(W/PIXEL.w, H/PIXEL.h);          // object-fit: cover
+  const ox = (W - PIXEL.w*scale)/2, oy = (H - PIXEL.h*scale)/2;
+  const dots = PIXEL.dots.map(d=>({
+    x: ox + d[0]*scale,
+    y: oy + d[1]*scale,
+    s: Math.max(1.2, d[2]*scale),
+    g: d[3],
+    md: Math.random()*620,                                // materialise stagger
+    dd: Math.random()*560,                                // dissolve stagger
+    tw: 0.5 + Math.random()*0.8,                          // twinkle speed
+    ph: Math.random()*Math.PI*2,
+  }));
+
+  const reveal = !!photoEl;
+  const MAT = 520;                                         // per-dot fade-in span
+  const HOLD = 950;                                        // linger before reveal
+  const DISS = 620;                                        // per-dot fade-out span
+  const revealAt = MAT + 620 + HOLD;                       // when dissolve starts
+  const clamp = (v,a,b)=>v<a?a:v>b?b:v;
+  const paint = d=>{ const s=d._s; ctx.fillRect(d.x-s/2, d.y-s/2, s, s); };
+
+  if (REDUCED){
+    if (reveal){ photoEl.classList.add('shown'); return; }
+    ctx.clearRect(0,0,W,H);
+    for(const d of dots){ ctx.fillStyle=`rgb(${d.g},${d.g},${d.g})`; d._s=d.s; paint(d); }
+    return;
+  }
+
+  const start = performance.now();
+  let raf, photoTriggered=false;
+  function frame(now){
+    const t = now - start;
+    ctx.clearRect(0,0,W,H);
+    let anyVisible = false;
+    for(const d of dots){
+      const appear = clamp((t - d.md)/MAT, 0, 1);
+      if (appear<=0) { anyVisible = true; continue; }
+      let alpha = appear;
+      const twinkle = 0.78 + 0.22*Math.sin(t/1000*d.tw + d.ph);
+      alpha *= twinkle;
+      if (reveal && t > revealAt){
+        alpha *= 1 - clamp((t - revealAt - d.dd)/DISS, 0, 1);
+      }
+      d._s = d.s * (0.35 + 0.65*appear);
+      if (alpha>0.01){
+        anyVisible = true;
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = `rgb(${d.g},${d.g},${d.g})`;
+        paint(d);
+      }
+    }
+    ctx.globalAlpha = 1;
+
+    if (reveal && !photoTriggered && t > revealAt){
+      photoTriggered = true;
+      photoEl.classList.add('shown');
+    }
+    // stop once the dissolve has fully cleared; keep looping (twinkle) otherwise
+    if (reveal && photoTriggered && !anyVisible){
+      ctx.clearRect(0,0,W,H);
+      mosaics.delete(canvas);
+      return;
+    }
+    raf = requestAnimationFrame(frame);
+  }
+  raf = requestAnimationFrame(frame);
+  mosaics.set(canvas, ()=>cancelAnimationFrame(raf));
+}
+
 /* ---------------- playback ---------------- */
 let idx = 0, playing = true, timer = null, tickTimer = null, slideStart = 0, elapsedBeforePause = 0;
 const progressBar = document.getElementById('progressBar');
@@ -1543,11 +1927,12 @@ function enter(i){
   });
   clearBoardTimers();
   clearCodeTimers();
+  clearInstallTimers();
   const cur = nodes[idx];
   const sd = deck.slides[idx];
 
-  // watermark on everything except the logo/hero-style slides
-  watermarkEl.classList.toggle('show', !!deck.settings.watermark && sd.type!=='logo' && sd.type!=='logoAnim' && sd.type!=='board' && sd.type!=='reveal');
+  // brand glyph sits on every slide (consistent signature, bottom-right grid corner)
+  watermarkEl.classList.toggle('show', !!deck.settings.watermark);
 
   // fit oversized headlines (measure counters at their final value)
   cur.querySelectorAll('.count').forEach(el=>{
@@ -1560,10 +1945,12 @@ function enter(i){
   cur.querySelectorAll('.count').forEach(el=>setTimeout(()=>animateCount(el), 350));
   cur.querySelectorAll('.ch-svg').forEach(buildChart);
   cur.querySelectorAll('canvas.lg-canvas').forEach(startMosaic);
+  cur.querySelectorAll('canvas.rv-canvas').forEach(c=>startPixelReveal(c, cur.querySelector('.rv-photo')));
   if (sd.type==='logoAnim') animateLogo(cur);
   if (sd.type==='board') setupBoard(cur, sd);
   if (sd.type==='code') setupCode(cur, sd);
   if (sd.type==='upload') setupUpload(cur, sd);
+  if (sd.type==='install') setupInstall(cur, sd);
 
   // timing
   clearTimeout(timer); clearInterval(tickTimer);
@@ -1591,7 +1978,7 @@ const editor = document.getElementById('editor');
 const cardsEl = document.getElementById('cards');
 let expanded = -1;
 
-const TYPE_LABEL = {statement:'Statement', number:'Number', chart:'Chart', stats:'Stats', logo:'Logo', logoAnim:'Logo FX', board:'File board', reveal:'Reveal', mockup:'Mockup', code:'Code / terminal', upload:'Upload demo'};
+const TYPE_LABEL = {statement:'Statement', number:'Number', chart:'Chart', stats:'Stats', logo:'Logo', logoAnim:'Logo FX', board:'File board', reveal:'Reveal', mockup:'Mockup', code:'Code / terminal', upload:'Upload demo', chaos:'Chaos graph', install:'Install app'};
 const VARIANT_LABEL = {
   'assemble':'Pixel assembly — lockup',
   'rise':'Cinematic rise — lockup',
@@ -1613,6 +2000,8 @@ function slideTitle(s){
     case 'mockup': return headText(s).replace(/\n/g,' ');
     case 'code': return (s.line||'').replace(/\n/g,' ');
     case 'upload': return headText(s).replace(/\n/g,' ');
+    case 'chaos': return headText(s).replace(/\n/g,' ');
+    case 'install': return (s.heading||'').replace(/\n/g,' ');
   }
   return '';
 }
@@ -1638,8 +2027,10 @@ function fieldsFor(s, i){
     case 'statement': return dur+`
       <label class="f"><span>Kicker (optional small label)</span><input type="text" data-f="kicker" value="${esc(s.kicker||'')}"></label>
       <label class="f"><span>Heading</span><textarea data-f="heading">${esc(headText(s))}</textarea></label>
+      <label class="f"><span>Mono subtitle (text after "|" glows yellow)</span><input type="text" data-f="subtitle" value="${esc(s.subtitle||'')}"></label>
       <label class="chk"><input type="checkbox" data-f="line2mono" ${s.line2mono?'checked':''}> Render heading in mono (terminal style)</label>
-      <label class="chk"><input type="checkbox" data-f="pipeline" ${s.pipeline?'checked':''}> Show Upload → Store → Transform → Deliver pipeline chips</label>`;
+      <label class="chk"><input type="checkbox" data-f="pipeline" ${s.pipeline?'checked':''}> Show Upload → Store → Transform → Deliver pipeline chips</label>
+      <label class="chk"><input type="checkbox" data-f="shine" ${s.shine?'checked':''}> Shine the pipeline chips (brand-yellow sweep)</label>`;
     case 'number': return dur+`
       <label class="f"><span>Kicker (optional)</span><input type="text" data-f="kicker" value="${esc(s.kicker||'')}"></label>
       <div class="row3">
@@ -1671,7 +2062,12 @@ function fieldsFor(s, i){
         </div>`).join('');
       return dur+`
         <label class="f"><span>Kicker (optional)</span><input type="text" data-f="kicker" value="${esc(s.kicker||'')}"></label>
-        ${items}`;
+        ${items}
+        <label class="f"><span>Quote (optional)</span><textarea data-f="quote">${esc(s.quote||'')}</textarea></label>
+        <div class="row2">
+          <label class="f"><span>Quote by</span><input type="text" data-f="quoteBy" value="${esc(s.quoteBy||'')}"></label>
+          <label class="f"><span>Role</span><input type="text" data-f="quoteRole" value="${esc(s.quoteRole||'')}"></label>
+        </div>`;
     }
     case 'logo': return dur+`
       <label class="f"><span>Tagline (line breaks allowed)</span><textarea data-f="tagline">${esc(s.tagline||'')}</textarea></label>
@@ -1706,15 +2102,8 @@ function fieldsFor(s, i){
     case 'reveal': return dur+`
       <label class="f"><span>Kicker (optional)</span><input type="text" data-f="kicker" value="${esc(s.kicker||'')}"></label>
       <label class="f"><span>Headline</span><textarea data-f="line">${esc(s.line||'')}</textarea></label>
-      <label class="f"><span>Photo (right side reveal — leave as None for the abstract mosaic only)</span>
-        <select data-f="photo">
-          <option value="" ${!s.photo?'selected':''}>None (mosaic only)</option>
-          <option value="tennis" ${s.photo==='tennis'?'selected':''}>Tennis</option>
-          <option value="blonde" ${s.photo==='blonde'?'selected':''}>Portrait</option>
-          <option value="car" ${s.photo==='car'?'selected':''}>Car</option>
-          <option value="docx" ${s.photo==='docx'?'selected':''}>Docx</option>
-        </select>
-      </label>`;
+      <label class="chk"><input type="checkbox" data-f="reveal" ${revealsPhoto(s)?'checked':''}> Dissolve the pixel halftone into the full photo</label>
+      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">The right panel paints the dot-halftone of the shot; leave the box unchecked for the pixel field on its own (attention hook), or check it to have the pixels resolve into the real image.</p>`;
     case 'mockup': {
       const kinds = [['uploader','Simple upload modal'],['complexity','Upload modal + growing complexity'],['marketplace','Marketplace connect card']];
       const opts = kinds.map(([v,l])=>`<option value="${v}" ${s.kind===v?'selected':''}>${l}</option>`).join('');
@@ -1726,12 +2115,22 @@ function fieldsFor(s, i){
     case 'code': return dur+`
       <label class="f"><span>Kicker (optional)</span><input type="text" data-f="kicker" value="${esc(s.kicker||'')}"></label>
       <label class="f"><span>Headline</span><textarea data-f="line">${esc(s.line||'')}</textarea></label>
-      <label class="f"><span>Terminal lines (one per line)</span><textarea data-f="lines" style="min-height:120px">${esc(s.lines||'')}</textarea></label>
-      <label class="f"><span>Typing speed (ms per character — lower is faster)</span><input type="number" min="4" max="80" step="1" data-f="typeSpeed" value="${s.typeSpeed||22}"></label>`;
+      <label class="f"><span>Command (typed after the $, cursor taps RUN)</span><input type="text" data-f="cmd" value="${esc(s.cmd||'')}"></label>
+      <label class="f"><span>Output lines (one per line, appear after RUN)</span><textarea data-f="lines" style="min-height:120px">${esc(s.lines||'')}</textarea></label>
+      <label class="f"><span>Typing speed (ms per character — lower is faster)</span><input type="number" min="4" max="80" step="1" data-f="typeSpeed" value="${s.typeSpeed||18}"></label>`;
+    case 'chaos': return dur+`
+      <label class="f"><span>Kicker (optional)</span><input type="text" data-f="kicker" value="${esc(s.kicker||'')}"></label>
+      <label class="f"><span>Heading (line breaks allowed)</span><textarea data-f="heading">${esc(headText(s))}</textarea></label>
+      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">A "File uploaded" node lands first, then the tangled maintenance graph blooms in behind the headline.</p>`;
+    case 'install': return dur+`
+      <label class="f"><span>Heading (line breaks allowed)</span><textarea data-f="heading">${esc(s.heading||'')}</textarea></label>
+      <label class="f"><span>Footer line (mono)</span><input type="text" data-f="foot" value="${esc(s.foot||'')}"></label>
+      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">The cursor moves onto “Install App” and taps it — the button flips to Installing → Installed.</p>`;
     case 'upload': return dur+`
       <label class="f"><span>Kicker (optional)</span><input type="text" data-f="kicker" value="${esc(s.kicker||'')}"></label>
       <label class="f"><span>Heading</span><textarea data-f="heading">${esc(headText(s))}</textarea></label>
       <label class="f"><span>After-upload heading</span><textarea data-f="heading2">${esc(headText2(s))}</textarea></label>
+      <label class="chk"><input type="checkbox" data-f="outcome" ${s.outcome!==false?'checked':''}> Play the "side project" outcome (headline swap + nodes)</label>
       <label class="f"><span>Progress duration (ms — how slowly the bar fills)</span><input type="number" min="800" max="12000" step="100" data-f="progressMs" value="${s.progressMs||3000}"></label>
       <button class="btn sm" data-act="replay" style="margin-top:14px">↻ Replay animation</button>
       <p style="font-size:12px;color:#7a7a82;margin-top:14px;line-height:1.5">Cursor drags the photo into the dropzone (static → hover → uploading), then the progress bar fills. When it completes, the headline cross-fades to the after-upload heading with a File-uploaded tag, and 2s later the maintenance-nodes network blooms in behind them. Assets come from assets/photos.</p>`;
@@ -1822,10 +2221,12 @@ const NEW = {
   logo:{type:'logo',duration:9,tagline:'Complete upload\nand delivery platform',sub:''},
   logoAnim:{type:'logoAnim',duration:10,variant:'assemble',tagline:'uploadcare.com',tagmono:true},
   board:{type:'board',duration:11,layout:'hero',title:'Complete upload\nand delivery platform',foot:'© 2011–2026 UPLOADCARE INC.',globe:true,float:true,typing:true,typeSpeed:16},
-  reveal:{type:'reveal',duration:8,kicker:'',line:'Every image starts with an upload.',photo:''},
+  reveal:{type:'reveal',duration:8,kicker:'',line:'Every image starts with an upload.',reveal:true,textFx:'stagger'},
   mockup:{type:'mockup',duration:8,kicker:'',heading:'Everyone can build a file uploader.',kind:'uploader'},
-  code:{type:'code',duration:10,kicker:'',line:'Ask your coding\nagent about us.',lines:'$ npx uploadcare init\nDetecting project... Next.js\nInstalling @uploadcare/upload-client\nDone. Ready to upload.',typeSpeed:22},
-  upload:{type:'upload',duration:13,kicker:'',heading:'As simple as drag and drop.',heading2:'Then it becomes a side project that never ends.',progressMs:3000,textFx:'weight'}
+  code:{type:'code',duration:10,kicker:'',line:'Ask your coding\nagent about us.',cmd:'uploadcare file upload my-image.jpg',lines:'Uploading my-image.jpg\u2026\n\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588  100%\n\u2713 https://ucarecdn.com/\u2026/my-image.jpg\nDone in 0.4s.',typeSpeed:18,textFx:'weight'},
+  upload:{type:'upload',duration:12,kicker:'',heading:'As simple as drag and drop.',heading2:'Then it becomes a side project that never ends.',outcome:true,progressMs:3000,textFx:'weight'},
+  chaos:{type:'chaos',duration:12,kicker:'',heading:'Then it becomes\na side project\nthat never ends.',textFx:'stagger'},
+  install:{type:'install',duration:9,heading:'Already in your\nWebflow Marketplace.',foot:'A native, no-code File Uploader app. Approved by Webflow.',textFx:'weight'}
 };
 const addBtn=document.getElementById('addBtn'), addList=document.getElementById('addlist');
 addBtn.onclick=()=>addList.classList.toggle('open');
@@ -1879,6 +2280,7 @@ addEventListener('keydown', e=>{
   if (e.key===' '){ e.preventDefault(); togglePlay(); }
   if (e.key==='f'||e.key==='F'){ toggleFS(); }
   if (e.key==='e'||e.key==='E'){ editor.classList.contains('open')?closeEditor():openEditor(); }
+  if (e.key==='g'||e.key==='G'){ gridOverlay.classList.toggle('show'); }
   if (e.key==='Escape'){ closeEditor(); io.classList.remove('open'); }
 });
 

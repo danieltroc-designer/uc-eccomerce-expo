@@ -137,9 +137,62 @@ def encode_uploader() -> str:
     return json.dumps(out)
 
 
+def encode_pixel_reveal() -> str:
+    """Parse the dot-halftone SVG into compact data + inline the full photo.
+
+    Pixelated-image.svg is a variable-dot halftone of Full-image.png: ~2255
+    little squares whose *size* and grey value encode the picture. Rather than
+    drop 2255 SVG nodes into the DOM, we extract each dot as [cx, cy, size, grey]
+    and let the reveal slide paint them on a single <canvas> (startPixelReveal)
+    — the dots materialise, twinkle, then dissolve to unveil the real photo.
+    """
+    from PIL import Image
+
+    svg = (PHOTOS / "Pixelated-image.svg").read_text()
+    m = re.search(r'viewBox="0 0 ([\d.]+) ([\d.]+)"', svg)
+    vw, vh = (float(m.group(1)), float(m.group(2))) if m else (628.0, 842.0)
+
+    # each dot is a rect drawn as: M x2 y1 H x1 V y2 H x2 V y1 Z  fill="#rrggbb"
+    dot_re = re.compile(
+        r'd="M([-\d.]+) ([-\d.]+)H([-\d.]+)V([-\d.]+)[^"]*"\s*fill="#([0-9A-Fa-f]{3,6})"'
+    )
+    dots = []
+    for mm in dot_re.finditer(svg):
+        x2, y1, x1, y2, hexv = mm.groups()
+        x2, y1, x1, y2 = float(x2), float(y1), float(x1), float(y2)
+        if len(hexv) == 3:
+            hexv = "".join(c * 2 for c in hexv)
+        grey = int(hexv[0:2], 16)  # halftone is greyscale, R==G==B
+        cx = round((x1 + x2) / 2, 1)
+        cy = round((y1 + y2) / 2, 1)
+        size = round(abs(x2 - x1), 1)
+        dots.append([cx, cy, size, grey])
+
+    # the full photo, matted + compressed like the board photos
+    im = Image.open(PHOTOS / "Full-image.png").convert("RGBA")
+    W = 660
+    H = round(im.height * W / im.width)
+    bg = Image.new("RGB", im.size, BG)
+    bg.paste(im, mask=im.split()[-1])
+    bg = bg.resize((W, H), Image.LANCZOS)
+    buf = io.BytesIO()
+    bg.save(buf, "JPEG", quality=JPEG_QUALITY, optimize=True)
+    img = "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()
+
+    return json.dumps({"w": vw, "h": vh, "img": img, "dots": dots},
+                      separators=(",", ":"))
+
+
 def minify_svg(path: Path) -> str:
     """Collapse newlines so the SVG lives happily inside a <script> tag."""
     return re.sub(r"\n+", "", path.read_text())
+
+
+def prepare_glyph() -> str:
+    """Uploadcare pixel glyph, sized by CSS (fixed width/height dropped)."""
+    svg = minify_svg(PHOTOS / "uploadcare-logo-glyph.svg")
+    svg = re.sub(r'\swidth="\d+"\sheight="\d+"', ' ', svg, count=1)
+    return svg
 
 
 def prepare_logo() -> str:
@@ -158,9 +211,11 @@ def build() -> None:
         "/*__INTER_VAR__*/":   encode_variable_font(),
         "/*__JB_MONO__*/":     encode_jbmono(),
         "__LOGO_SVG__":        prepare_logo(),
+        "__GLYPH_SVG__":       prepare_glyph(),
         "__GLOBE_SVG__":       minify_svg(BRAND / "globe.svg"),
         "__ASSETS_JSON__":     encode_photos(),
         "__UPLOADER_JSON__":   encode_uploader(),
+        "__PIXEL_JSON__":      encode_pixel_reveal(),
     }
     for token, value in replacements.items():
         if token not in html:

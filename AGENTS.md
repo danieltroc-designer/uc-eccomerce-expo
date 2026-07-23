@@ -23,9 +23,17 @@ python build.py
 directly, your changes are lost on the next build and the source drifts out of
 sync.
 
-The template contains six placeholder tokens that `build.py` fills:
+The template contains placeholder tokens that `build.py` fills:
 `/*__COMMIT_MONO__*/`, `/*__INTER_VAR__*/`, `/*__JB_MONO__*/`, `__LOGO_SVG__`,
-`__GLOBE_SVG__`, `__ASSETS_JSON__`. Don't remove or rename them.
+`__GLOBE_SVG__`, `__GLYPH_SVG__`, `__ASSETS_JSON__`, `__UPLOADER_JSON__`,
+`__PIXEL_JSON__`. `__GLYPH_SVG__` is the pixel glyph shown bottom-right on every
+slide. Layout is authored against an invisible Swiss grid (75px margins, 4x4
+modules — CSS vars `--gm`/`--gcol`/`--grow`/`--g2` on `:root`); press **g** to
+toggle the grid overlay for design checks.
+Don't remove or rename them. `__PIXEL_JSON__` carries the dot-halftone data
+(parsed from `assets/photos/Pixelated-image.svg`) plus the inlined
+`Full-image.png`; the reveal slide's `startPixelReveal` paints the dots on a
+canvas and dissolves them into the photo.
 
 ## Verify your work
 
