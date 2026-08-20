@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
   "rewrites": [
-    { "source": "/", "destination": "/dist/uploadcare-simple.html" },
-    { "source": "/full", "destination": "/dist/uploadcare-show.html" }
+    { "source": "/full", "destination": "/dist/uploadcare-show" },
+    { "source": "/booth", "destination": "/dist/uploadcare-simple" }
   ]
 }
