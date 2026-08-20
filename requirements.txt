@@ -1,1 +1,4 @@
 Pillow>=10.0
+# Optional: only for build_simple.py's CTA QR code. If missing, the simplified
+# deck still builds (it falls back to a placeholder QR tile).
+segno>=1.6

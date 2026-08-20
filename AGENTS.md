@@ -23,6 +23,72 @@ python build.py
 directly, your changes are lost on the next build and the source drifts out of
 sync.
 
+### Second deck: the simplified booth loop
+
+There is a parallel, shorter 7-card cut for the Webflow booth. It has its own
+source + build + output and is fully independent of the main deck:
+
+- Source: `src/simple.template.html` (a superset copy of the main template with
+  extra card types: `dropin`, `features`, `quote2`, `logos`, `scale`,
+  `pipeline`). Card 7 is a `board` slide with `layout:'outro'` and `qr:true`.
+- Build: `python build_simple.py` → `dist/uploadcare-simple.html`.
+- Same rule applies: never hand-edit `dist/uploadcare-simple.html`.
+- `build_simple.py` reuses every encoder from `build.py` and adds three tokens
+  of its own: `__QR_SVG__` (the card-7 QR — destination is `CTA_URL`, generated
+  with the optional `segno` dependency), `__LOGOS_JSON__` (the customer marks
+  in `assets/logos/`), and `__UPLOADERUI_JSON__` (the uploader widget's icons
+  and file thumbnails in `assets/uploader/`).
+
+This deck is laid out directly against the Figma storyboard ("Storyboard –
+Webflow – 2"). Two conventions come from there and are worth keeping:
+
+- **Headlines are anchored, not centred.** Every card pins its headline to
+  `--head-y` (205px) rather than centring the column, so type doesn't shift as
+  the deck advances. Cards position their supporting art at the storyboard's
+  own coordinates — the stage is a native 1920x1080, so Figma numbers are used
+  verbatim.
+- **`.reveal` animates `transform`.** Anything wearing it must be centred with
+  an explicit `left` offset, never `translateX(-50%)`, or the two rules fight
+  and the element slides sideways as it enters.
+
+### Choreography: the `Timeline`
+
+Cards don't schedule their own timers. `enter()` builds one `Timeline` per
+slide, hands it to that card's `setup*` function, and calls `play()`; moving to
+the next slide is a single `tl.kill()` that retires every timer and animation
+the card scheduled. A card's choreography is written as a score in absolute
+seconds, so retiming a beat means changing one number:
+
+```js
+tl.cls(zone, 'hot', 1.95);                            // class on at t
+tl.cls(zone, 'hot', 3.45, false);                     // ...and off again
+tl.to(card, [{opacity:0},{opacity:1}], {dur:.4, at:2.45});
+tl.spring(cursor, START, OVER, {at:.9, onArrive:t=>arrive=t});
+tl.at(2.95, ()=>txt.textContent='2 files added');
+```
+
+`tl.timeout(ms, fn)` is the escape hatch for recursive work that isn't a fixed
+score (the two typewriters); it's still owned by the timeline, so it dies with
+it. `spring()` reports its settle time through `onArrive` synchronously, which
+is how the cursor demos anchor the tap that follows the travel.
+
+Two things to keep in mind when adding a card:
+
+- **Reset state synchronously, schedule the animation.** The deck loops, so a
+  card is re-entered with the previous visit's DOM intact. Anything a cue will
+  later overwrite must be cleared while the score is being *built*, not when
+  the cue fires, or the card shows a stale frame until then.
+- **Reduced motion collapses the score.** Tweens jump to their last keyframe
+  and cues fire in time order at `play()`. Where the settled frame is
+  deliberately *not* the end of the animation (card 1 holds the files above the
+  zone rather than dropping them), branch on `REDUCED` and return before
+  building a score.
+
+Verify with `python tools/verify_simple.py`, which screenshots all eight cards
+in both normal and reduced motion to `tools/_shots/` and fails loudly on
+console errors, and `python tools/verify_timeline.py`, which asserts a slide's
+score is fully retired on exit and replays from the top on re-entry.
+
 The template contains placeholder tokens that `build.py` fills:
 `/*__COMMIT_MONO__*/`, `/*__INTER_VAR__*/`, `/*__JB_MONO__*/`, `__LOGO_SVG__`,
 `__GLOBE_SVG__`, `__GLYPH_SVG__`, `__ASSETS_JSON__`, `__UPLOADER_JSON__`,

@@ -3,3 +3,7 @@ __pycache__/
 .DS_Store
 .vscode/
 .idea/
+
+# verify_simple.py scratch: screenshots and the headless browser profile
+tools/_shots/
+tools/_profile/
