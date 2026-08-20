@@ -1185,40 +1185,41 @@ function Timeline({reduced=false}={}){
 /* ---- Simplified 7-card booth loop -------------------------------------
    A calmer, product-first cut: no brand open, no chaos. The logo only
    signs off on the final card — everywhere else the product speaks. Timings
-   follow the storyboard (5/6/6/5/5/6/4s). */
+   are the storyboard's (5/6/6/5/5/6/8s) plus two seconds a card, so each one
+   holds after its choreography lands instead of cutting on the last beat. */
 const DEFAULT_DECK = {
-  settings: { duration: 5, fade: 650, watermark: true },
+  settings: { duration: 7, fade: 650, watermark: true },
   slides: [
     // 1 — "uploads that just work": files (incl. a big video) drop in and finish
-    { type:'dropin', duration:5,
+    { type:'dropin', duration:7,
       heading:'Uploads that just work.',
       sub:'Any file, any source, safe.', textFx:'stagger' },
 
     // 2 — five capabilities, one per icon, fast rhythm, settle into a row
-    { type:'features', duration:6 },
+    { type:'features', duration:8 },
 
     // 3 — customer quote, quiet and calm
-    { type:'quote2', duration:6,
+    { type:'quote2', duration:8,
       quote:'It just works out of the box without having to think about it.',
       by:'Luca Mausberg', role:'Co-founder', mark:'marko' },
 
     // 4 — trusted-by logo wall, soft simultaneous fade-in
-    { type:'logos', duration:5,
+    { type:'logos', duration:7,
       title:'Trusted by',
       logos:'Zapier, SoundCloud, L\u2019Or\u00e9al, Sequoia, UserTesting, Prezly, Aryeo, marko' },
 
     // 5 — distribution: already in the Webflow marketplace, cursor installs it
-    { type:'install', duration:5,
+    { type:'install', duration:7,
       heading:'No code. It\u2019s already in your\nWebflow Marketplace.',
       foot:'A native File Uploader app, approved by Webflow.', textFx:'weight' },
 
     // 6 — the bigger picture: one headline over the whole pipeline
-    { type:'scale', duration:6,
+    { type:'scale', duration:8,
       heading:'Set it up once, use it on every client site, and go beyond uploads with the full pipeline via API.',
       steps:'Upload, Store, Transform, Optimize, Deliver' },
 
     // 7 — booth invite on the file-board backdrop, QR in the middle
-    { type:'board', duration:8, layout:'outro', globe:true, float:true, typing:true, typeSpeed:16,
+    { type:'board', duration:10, layout:'outro', globe:true, float:true, typing:true, typeSpeed:16,
       title:'Get more out of Webflow.',
       sub:'Come say hi \ud83d\udc4b', qr:true }
   ]
