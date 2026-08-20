@@ -45,8 +45,12 @@ with sync_playwright() as p:
     print("typewriter stops when the deck moves on")
     pg.evaluate(f"enter({BOARD})")
     pg.wait_for_timeout(1400)                      # mid-typing
-    mid = pg.evaluate("[...document.querySelectorAll('.hb-meta')].map(e=>e.textContent.length)")
-    pg.evaluate("enter(0)")                        # leave: tl.kill()
+    # leave and sample in one round trip: measuring first would race the
+    # typewriter, which can land another character before enter(0) arrives
+    mid = pg.evaluate("""(() => {
+        enter(0);
+        return [...document.querySelectorAll('.hb-meta')].map(e=>e.textContent.length);
+    })()""")
     pg.wait_for_timeout(2500)                      # long enough to finish typing
     after = pg.evaluate("[...document.querySelectorAll('.hb-meta')].map(e=>e.textContent.length)")
     check("meta text frozen after leaving", mid == after, f"{sum(mid)} -> {sum(after)} chars")

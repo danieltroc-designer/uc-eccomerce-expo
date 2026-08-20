@@ -29,6 +29,19 @@ SRC = ROOT / "src" / "simple.template.html"
 OUT = ROOT / "dist" / "uploadcare-simple.html"
 LOGOS = ROOT / "assets" / "logos"
 UPLOADER_UI = ROOT / "assets" / "uploader"
+DEMO = ROOT / "assets" / "demo"
+
+# The three-panel pipeline card runs on one photo and the three transforms the
+# on-screen URL builds up, so the frames have to match the ops exactly:
+#   crop/face -> scale_crop/460x460/center -> border_radius/50p
+# They're pre-rendered by the CDN and inlined here because the deck has to run
+# with no network at the booth.
+DEMO_FRAMES = {
+    "original": "portrait.jpg",
+    "step1":    "step1-crop.jpg",
+    "step2":    "step2-square.jpg",
+    "step3":    "step3-round.png",
+}
 
 # Customer logos for the "Trusted by" wall, in the storyboard's order. Each is
 # the isolated white vector exported from the Figma frame — not a wordmark we
@@ -94,6 +107,17 @@ def encode_uploader_ui() -> str:
     return json.dumps(out)
 
 
+def encode_demo() -> str:
+    """JSON map of pipeline-card frame name -> base64 data URI."""
+    out = {}
+    for key, name in DEMO_FRAMES.items():
+        path = DEMO / name
+        mime = "image/png" if path.suffix == ".png" else "image/jpeg"
+        b64 = base64.b64encode(path.read_bytes()).decode()
+        out[key] = f"data:{mime};base64,{b64}"
+    return json.dumps(out)
+
+
 def make_qr(url: str) -> str:
     """Return an inline monochrome SVG QR for `url`.
 
@@ -150,6 +174,7 @@ def build_simple() -> None:
         "__QR_SVG__":          make_qr(CTA_URL),
         "__LOGOS_JSON__":      encode_logos(),
         "__UPLOADERUI_JSON__": encode_uploader_ui(),
+        "__DEMO_JSON__":       encode_demo(),
     }
     for token, value in replacements.items():
         if token not in html:

@@ -22,7 +22,9 @@ SHOTS = {
     2: [2200],               # quote
     3: [2000],               # logo wall
     4: [4000],               # install
-    5: [2600],               # scale / chip row
+    # pipeline: mid-drag, bar filling, first delivery frame, two transforms in,
+    # and the settled end state
+    5: [1000, 2400, 4200, 6600, 8200, 11800],
     6: [3000],               # outro board + QR
 }
 

@@ -107,6 +107,43 @@
   .watermark svg{width:100%;height:auto;display:block}
   .watermark.show{opacity:1}
 
+  /* ---------- ambient substrate ----------
+     A quiet version of the file board's world running behind every card: the
+     globe wireframe, plus the occasional signal blip out in the margins. The
+     sparser cards were content floating on flat black; this gives them a frame
+     to sit in and makes the deck read as one continuous system instead of
+     seven separate posters. Blips are deliberately kept outside the middle of
+     the stage so they never compete with the message.
+
+     Card 7 runs the same board at full strength as its payoff, so the
+     substrate steps aside there. */
+  #substrate{
+    position:absolute;inset:0;z-index:0;pointer-events:none;
+    opacity:1;transition:opacity .9s var(--ease-out);
+  }
+  #stage.sb-off #substrate{opacity:0}
+  .sb-globe{
+    position:absolute;left:50%;top:52%;width:1560px;
+    transform:translate(-50%,-50%);opacity:.62;
+    animation:hbGlobe 68s ease-in-out infinite;
+  }
+  .sb-globe svg{width:100%;height:auto;display:block}
+  .sb-field{position:absolute;inset:0}
+  /* amber while in flight, green once it lands — the board's own vocabulary */
+  .sb-blip{
+    position:absolute;width:6px;height:6px;
+    background:var(--brand);opacity:0;
+    animation:sbBlip var(--life,2800ms) linear forwards;
+  }
+  @keyframes sbBlip{
+    0%{opacity:0;background:var(--brand)}
+    12%{opacity:.8}
+    52%{opacity:.8;background:var(--brand)}
+    64%{background:var(--ok)}
+    86%{opacity:.7}
+    100%{opacity:0;background:var(--ok)}
+  }
+
   /* progress hairline */
   #progress{
     position:absolute;left:0;bottom:0;height:3px;width:100%;
@@ -723,57 +760,103 @@
   .tag.ok{color:var(--ok)}
 
   /* =======================================================================
-     Marquee card: "How Uploadcare works" — recreates the onboarding-prototype
-     three-panel demo (original | sequential steps | result + self-building URL),
-     adapted for the auto-play booth loop. Choreographed by setupPipeline().
+     Pipeline card — the website's three-panel demo (upload | analyse | deliver),
+     ported for the booth loop: it plays once when the card is entered and has
+     no replay control.
+
+     Geometry is the site's, scaled ~1.35x for the 1920x1080 stage and for
+     viewing across a stand: the site's 13px mono would be unreadable at that
+     distance, so the type is set at 20px and the boxes grew to match.
+     Choreographed by setupPipeline(); colours mirror the site's tokens.
      ======================================================================= */
-  .pp-wrap{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:34px;padding:0 var(--gm)}
-  .pp-head{font-size:26px;font-weight:500;line-height:1.4;color:var(--ink-faint);letter-spacing:0}
-  .pp-panel{width:1500px;padding:16px}
-  .pp-grid{display:grid;grid-template-columns:460px 1fr 460px;height:620px;gap:0}
-  .pp-col{position:relative;height:100%}
-  /* left — the original file in a dashed frame */
-  .pp-left{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px}
-  .pp-frame{position:relative;width:300px;height:400px;border:1px dashed var(--dash);border-radius:26px;padding:14px;
-    opacity:0;transform:translateY(12px);transition:opacity .5s ease,transform .6s var(--ease-out)}
-  .slide.active .pp-frame.in{opacity:1;transform:none}
-  .pp-frame img{width:100%;height:100%;object-fit:cover;border-radius:14px;display:block}
-  .pp-del{position:absolute;top:26px;right:26px;width:28px;height:28px;border-radius:8px;background:rgba(10,10,12,.7);
-    display:flex;align-items:center;justify-content:center;color:#c7c7cf}
-  .pp-del svg{width:15px;height:15px}
-  .pp-tag-l{opacity:0;transition:opacity .5s ease}
-  .slide.active .pp-tag-l.in{opacity:1}
-  /* middle — the step list, activates one at a time */
-  .pp-steps{display:flex;flex-direction:column;justify-content:center;gap:30px;padding:0 40px}
-  .pp-step{display:grid;grid-template-columns:22px 1fr;gap:14px;align-items:start;
-    opacity:0;transform:translateY(8px);transition:opacity .45s ease,transform .5s var(--ease-out)}
-  .pp-step.in{opacity:.42;transform:none}
-  .pp-step.active{opacity:1}
-  .pp-step.done{opacity:.42}
-  .pp-ic{width:22px;height:22px;color:var(--ink-dim);margin-top:1px}
-  .pp-step.active .pp-ic{color:var(--ink)}
-  .pp-ic svg{width:100%;height:100%;display:block}
-  .pp-body .pp-l1{font-size:20px;font-weight:500;color:var(--ink);line-height:1.35;letter-spacing:-0.01em}
-  .pp-body .pp-l2{font-size:20px;font-weight:400;color:var(--ink-dim);line-height:1.35;letter-spacing:-0.01em}
-  .pp-status{margin-top:7px;font-family:var(--mono);font-size:13.5px;letter-spacing:.02em;color:var(--ink-faint);
-    height:0;opacity:0;overflow:hidden;transition:opacity .35s ease}
-  .pp-step.active .pp-status{height:auto;opacity:1}
-  /* right — the transformed result + the CDN URL that builds itself */
-  .pp-right{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px}
-  .pp-result{width:300px;height:400px;display:flex;align-items:center;justify-content:center}
-  .pp-out{width:300px;height:400px;object-fit:cover;object-position:50% 32%;border-radius:14px;display:block;
-    opacity:0;transform:scale(.96);
-    transition:opacity .5s ease,width .55s var(--ease-in-out),height .55s var(--ease-in-out),border-radius .55s var(--ease-in-out),object-position .55s var(--ease-in-out),transform .6s var(--ease-out)}
-  .slide.active .pp-out.in{opacity:1;transform:none}
-  .pp-out.face{width:300px;height:300px;object-position:50% 24%}
-  .pp-out.square{width:300px;height:300px}
-  .pp-out.circle{width:300px;height:300px;border-radius:50%}
-  .pp-url{width:360px;min-height:130px;font-family:var(--mono);font-weight:400;font-size:15px;line-height:1.65;
-    color:var(--url-base);letter-spacing:0;word-break:break-all}
-  .pp-url .ln{display:block;opacity:0;transform:translateY(4px);transition:opacity .4s ease,transform .4s var(--ease-out)}
-  .pp-url .ln.in{opacity:1;transform:none}
-  .pp-tag-r{opacity:0;transition:opacity .5s ease}
-  .slide.active .pp-tag-r.in{opacity:1}
+  .pd-wrap{position:absolute;inset:0}
+  .pd-head{position:absolute;top:var(--head-y);left:var(--gm);right:var(--gm);text-align:center}
+  .pd-title{font-size:var(--h-size);font-weight:var(--h-weight);letter-spacing:var(--h-ls);
+    line-height:var(--h-lh);color:var(--ink)}
+  .pd-sub{margin-top:18px;font-size:30px;font-weight:450;color:var(--ink-dim)}
+
+  .pd-shell{
+    position:absolute;left:210px;top:375px;width:1500px;height:665px;
+    border-radius:44px;background:#0c0c0c;border:1px solid rgba(255,255,255,.05);
+    padding:12px;overflow:hidden;
+  }
+  /* the uploaded photo, blurred right down — a wash of the file's own colour
+     that wipes upward in lockstep with the progress bar */
+  .pd-bgwrap{position:absolute;left:50%;top:50%;width:460px;height:595px;
+    transform:translate(-50%,-50%);filter:blur(30px);opacity:.1;pointer-events:none;z-index:0}
+  .pd-bg{width:100%;height:100%;border-radius:32px;overflow:hidden;clip-path:inset(0 0 100% 0)}
+  .pd-bg img{width:100%;height:100%;object-fit:cover}
+
+  .pd-grid{position:relative;z-index:1;display:grid;grid-template-columns:1fr .8fr 1fr;gap:28px;height:100%}
+  .pd-cell{position:relative;border-radius:32px;background:#000;box-shadow:0 0 0 1px rgba(255,255,255,.05);
+    padding:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
+  .pd-cell.mid{background:transparent;box-shadow:none;padding:0;overflow:visible;gap:24px}
+  .pd-inner{flex:1;width:100%;display:flex;align-items:center;justify-content:center;position:relative}
+
+  /* ---- left: the drop ---- */
+  .pd-cursor{position:absolute;left:50%;top:50%;width:133px;height:172px;z-index:2;pointer-events:none;opacity:0}
+  .pd-cursor-thumb{width:100%;height:100%;border-radius:11px;overflow:hidden;
+    box-shadow:0 25px 50px -12px rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.13);background:#181818}
+  .pd-cursor-thumb img{width:100%;height:100%;object-fit:cover}
+  .pd-cursor-ic{position:absolute;bottom:-16px;right:-16px;width:28px;height:28px;
+    filter:drop-shadow(0 4px 6px rgba(0,0,0,.5))}
+  .pd-cursor-ic svg{width:100%;height:100%;display:block}
+
+  .pd-zone{position:relative;width:380px;height:491px;border-radius:40px;
+    border:1px dashed rgba(255,255,255,.13);overflow:hidden;transition:border-color .3s ease}
+  .pd-zone[data-state="active"]{border-color:rgba(255,255,255,.25)}
+  .pd-ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-family:var(--mono);font-size:20px;text-transform:uppercase;letter-spacing:.05em;
+    color:rgba(255,255,255,.25);transition:color .3s ease}
+  .pd-zone[data-state="active"] .pd-ph{color:rgba(255,255,255,.5)}
+  .pd-shot{width:100%;height:100%;object-fit:cover;border-radius:38px;padding:11px;opacity:0}
+  .pd-track{position:absolute;bottom:28px;left:28px;right:28px;height:9px;padding:2px;
+    border-radius:999px;background:rgba(0,0,0,.2);backdrop-filter:blur(5px);overflow:hidden;opacity:0}
+  .pd-fill{height:100%;background:rgba(255,255,255,.9);border-radius:999px;
+    transform-origin:left center;transform:scaleX(0)}
+  .pd-ctl{position:absolute;top:28px;right:28px;display:flex;gap:2px;opacity:0}
+  .pd-btn{width:44px;height:44px;background:rgba(9,9,9,.8);border-radius:12px;
+    display:flex;align-items:center;justify-content:center;color:#fff}
+  .pd-btn svg{width:20px;height:20px;display:block}
+  .pd-status{display:flex;align-items:center;gap:14px;margin-top:20px;font-family:var(--mono);opacity:0}
+  .pd-status i{width:10px;height:10px;background:#4ade80}
+  .pd-status span{font-size:19px;color:#a7a7a7;text-transform:uppercase;letter-spacing:.05em}
+
+  /* ---- middle: the analysis ---- */
+  .pd-pixel{width:135px;height:176px;opacity:0}
+  .pd-pixel canvas{width:100%;height:100%;display:block;image-rendering:pixelated}
+  .pd-prog{display:flex;align-items:center;justify-content:center;width:100%;margin:26px 0}
+  .pd-prog-side{flex:1;display:flex;justify-content:center}
+  .pd-dots{display:inline-flex;align-items:center;gap:5px}
+  .pd-dots i{width:4px;height:4px;background:rgba(255,255,255,.13)}
+  .pd-dots[data-state="working"] i{background:rgba(255,255,255,.25);
+    animation:pdDot 1s ease-in-out infinite backwards}
+  @keyframes pdDot{0%,85%,100%{opacity:.1}30%{opacity:1}}
+  .pd-donut{flex-shrink:0;width:40px;height:40px}
+  .pd-donut .c{fill:rgba(255,255,255,.13)}
+  .pd-donut .c.lit{fill:#ffcf3e}
+  .pd-analysis{text-align:center;font-family:var(--mono);font-size:20px;color:#a7a7a7;
+    text-transform:uppercase;line-height:30px}
+  .pd-analysis p{opacity:0}
+  .pd-analysis b{font-weight:inherit;color:#fff}
+
+  /* ---- right: the delivery ---- */
+  /* the stage is smaller than a straight scale of the site's would be: six rows
+     of 20px mono is a lot taller than six rows of 13px, and the URL is what the
+     right panel is actually saying */
+  .pd-stage{position:relative;width:286px;height:369px;margin-top:16px;opacity:0}
+  .pd-stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0}
+  .pd-url{margin-top:30px;font-family:var(--mono);font-size:20px;line-height:29px}
+  .pd-url .row{margin:0;display:flex;flex-wrap:nowrap;white-space:nowrap}
+  .pd-url .bracket{color:rgba(255,255,255,.25)}
+  .pd-url .indent{padding-left:26px}
+  .pd-url .host{color:#a7a7a7}
+  .pd-url .dim{color:#a7a7a7}
+  .pd-url .id{color:#fff}
+  .pd-url .op{color:#ffd864}
+  .pd-url .arg{color:#a7a7a7}
+  .pd-url .tf{overflow:hidden;height:0;opacity:0}
+  .pd-url .st{opacity:0}
 
   /* card 1 — uploads that just work.
      The real Uploadcare uploader widget, rebuilt 1:1 from the storyboard: the
@@ -866,7 +949,10 @@
   /* card 6 — the bigger picture: one headline over the full pipeline as a
      chip row (storyboard frame 14). Its own background so it reads as a
      step up from the product cards. */
-  .sc-wrap{position:absolute;inset:0;background:radial-gradient(130% 100% at 50% 8%,#141726 0%,#0b0b0f 62%)}
+  /* the outer stop is transparent, not solid, so the ambient substrate reads
+     through the card's "bigger picture" tint instead of being masked by it */
+  .sc-wrap{position:absolute;inset:0;
+    background:radial-gradient(130% 100% at 50% 8%,rgba(20,23,38,.92) 0%,rgba(11,11,15,0) 62%)}
   /* .reveal animates transform, so anything wearing it is centred with explicit
      offsets rather than translateX(-50%) — otherwise the two fight and the
      element slides sideways as it enters. Offsets are the storyboard's x. */
@@ -907,8 +993,7 @@
     /* entrance choreography collapses to an instant jump to the settled state
        (opacity cross-fades that aid comprehension are kept where they exist) */
     .di-widget,.di-row,.di-card,.di-drop,.ft-item,.sc-cell,
-    .q2-quote,.q2-by,.q2-mark,.lw-grid,
-    .pp-frame,.pp-tag-l,.pp-step,.pp-out,.pp-url .ln,.pp-tag-r,.pp-status,
+    .q2-quote,.q2-by,.q2-mark,.lw-grid,.pd-zone,.pd-ph,
     .reveal,.reveal.fx-stagger .w,.reveal.fx-clip .cl,.slide,.rv-photo,.rv-photo img,.rv-photo::after,
     .pl-row.pl-anim .pl-pill,.pl-row.pl-anim .pl-line,.pl-row.pl-anim .pl-line span,
     .mk-card,.mk-overlay,.cd-window.reveal,.cd-chrome i,
@@ -921,9 +1006,10 @@
     /* stop looping / ambient motion and pin elements to their final state */
     .slide.active .hb-node{animation:none!important}
     .hb-node{opacity:1!important;transform:none!important}
-    .hb-node.float .hb-inner,.hb-globe.spin,.hb-dot.pulse,.hb-cursor{animation:none!important}
+    .hb-node.float .hb-inner,.hb-globe.spin,.hb-dot.pulse,.hb-cursor,.sb-globe{animation:none!important}
     .pl-shine .pl-pill::after{animation:none!important;opacity:0!important}
     .slide.active .sc-chip{animation:none!important}
+    .pd-dots[data-state="working"] i{animation:none!important}
   }
 </style>
 </head>
@@ -931,6 +1017,7 @@
 
 <div id="viewport">
   <div id="stage">
+    <div id="substrate"><i class="sb-globe" id="sbGlobe"></i><div class="sb-field" id="sbField"></div></div>
     <div id="slides"></div>
     <div id="gridOverlay"><div class="gi"></div></div>
     <div class="watermark" id="watermark"></div>
@@ -1011,6 +1098,7 @@
 <script id="qr-src" type="text/plain">__QR_SVG__</script>
 <script id="logos-src" type="application/json">__LOGOS_JSON__</script>
 <script id="uploaderui-src" type="application/json">__UPLOADERUI_JSON__</script>
+<script id="demo-src" type="application/json">__DEMO_JSON__</script>
 
 <script>
 /* =========================================================
@@ -1025,6 +1113,7 @@ const UPLOADER = JSON.parse(document.getElementById('uploader-src').textContent)
 const QR = (document.getElementById('qr-src')||{}).textContent || '';
 const LOGOS = JSON.parse(document.getElementById('logos-src').textContent);
 const UI = JSON.parse(document.getElementById('uploaderui-src').textContent);
+const DEMO = JSON.parse(document.getElementById('demo-src').textContent);
 const PIXEL = JSON.parse(document.getElementById('pixel-src').textContent);
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -1092,7 +1181,7 @@ function springTo(el, from, to, opts={}){
    deliberately *not* the end of the animation still branch on REDUCED
    themselves before building a score. */
 function Timeline({reduced=false}={}){
-  const timers=[], anims=[], cues=[];
+  const timers=[], anims=[], cues=[], teardown=[];
   let killed=false, played=false;
 
   // a keyframe minus the WAAPI-only keys, so it can be written straight to .style
@@ -1153,6 +1242,15 @@ function Timeline({reduced=false}={}){
       return api;
     },
 
+    /* adopt an animation the card started itself — usually because a keyframe
+       value can only be measured at the moment it runs (height:auto and
+       friends). Adopting it means kill() still reaches it. */
+    anim(a){ if (a) anims.push(a); return api; },
+
+    /* run fn when the score is retired, for anything with a lifetime of its
+       own: rAF loops, observers, canvases */
+    onKill(fn){ if (fn) teardown.push(fn); return api; },
+
     play(){
       if (killed || played) return api;
       played = true;
@@ -1169,6 +1267,7 @@ function Timeline({reduced=false}={}){
       killed = true;
       timers.forEach(clearTimeout); timers.length=0;
       anims.forEach(a=>{ try{ a.cancel(); }catch(e){} }); anims.length=0;
+      teardown.forEach(fn=>{ try{ fn(); }catch(e){} }); teardown.length=0;
       cues.length=0;
       return api;
     },
@@ -1208,10 +1307,11 @@ const DEFAULT_DECK = {
       heading:'No code. It\u2019s already in your\nWebflow Marketplace.',
       foot:'A native File Uploader app, approved by Webflow.', textFx:'weight' },
 
-    // 6 — the bigger picture: one headline over the whole pipeline
-    { type:'scale', duration:8,
-      heading:'Set it up once, use it on every client site, and go beyond uploads with the full pipeline via API.',
-      steps:'Upload, Store, Transform, Optimize, Deliver' },
+    // 6 — the bigger picture: the site's own upload/analyse/deliver demo. The
+    // score runs ~11.5s, so the card holds a beat longer than that.
+    { type:'pipeline', duration:13,
+      heading:'Set it up once, use it on every client site',
+      subhead:'Go beyond uploads with the full pipeline via API.' },
 
     // 7 — booth invite on the file-board backdrop, QR in the middle
     { type:'board', duration:10, layout:'outro', globe:true, float:true, typing:true, typeSpeed:16,
@@ -1397,32 +1497,39 @@ const logoKey = n => n.toLowerCase().normalize('NFD').replace(/[^a-z0-9]/g,'');
 const LOGO_WIDTH = { zapier:158, soundcloud:256, loreal:168, sequoia:222,
                      usertesting:227, prezly:166, aryeo:175, marko:210 };
 
-/* the four pipeline steps — each activates in turn with its own mono status line */
-const PP_STEPS = [
-  { l1:'Start with an upload.',        l2:'Widget, API or dashboard.',  status:'Uploading\u2026',
-    icon: svgIcon('<path d="M12 16V4M6 10l6-6 6 6"/><path d="M4 20h16"/>') },
-  { l1:'Every upload returns',         l2:'a ready-to-use URL.',        status:'Getting response\u2026',
-    icon: svgIcon('<path d="M9 15l6-6"/><path d="M11 6l1-1a4 4 0 0 1 6 6l-1 1"/><path d="M13 18l-1 1a4 4 0 0 1-6-6l1-1"/>') },
-  { l1:'Change the URL, change the file.', l2:'Real time, no pipeline.', status:'Transforming, optimizing\u2026',
-    icon: svgIcon('<path d="M4 7h11M4 7l3-3M4 7l3 3"/><path d="M20 17H9M20 17l-3-3M20 17l-3 3"/>') },
-  { l1:'Original stored, untouched.',  l2:'Versions cached on the CDN.', status:'Storing, caching\u2026',
-    icon: svgIcon('<ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/><path d="M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/>') },
+/* ---- pipeline card (the website's demo) ----
+   The three transforms the URL grows, in order. Each one has a matching
+   pre-rendered frame in DEMO (step1..step3), so the picture and the URL always
+   agree: crop the face, square it off, round the corners into a circle. */
+const PD_TRANSFORMS = [
+  ['crop','face','190px190p'],
+  ['scale_crop','460x460','center'],
+  ['border_radius','50p'],
 ];
-
-/* render a CDN URL as syntax-highlighted mono spans.
-   segs: array of {t, k} where k is base|id|key|val (colors from :root) */
-function urlHTML(segs){
-  const c={base:'var(--url-base)',id:'var(--url-id)',key:'var(--url-key)',val:'var(--url-val)'};
-  return segs.map(s=>`<span style="color:${c[s.k]||c.base}">${esc(s.t)}</span>`).join('');
-}
-/* the URL builds up one line at a time, in lockstep with the steps */
-const PP_URL_LINES = [
-  [{t:'https://ucarecdn.com/',k:'base'}],
-  [{t:'13cf5c14-acb4-4cfe-9add-2d2b155d650c/',k:'id'}],
-  [{t:'-/',k:'base'},{t:'crop',k:'key'},{t:'/face/190px190p/',k:'val'}],
-  [{t:'-/',k:'base'},{t:'scale_crop',k:'key'},{t:'/460x460/center/',k:'val'}],
-  [{t:'-/',k:'base'},{t:'border_radius',k:'key'},{t:'/50p/',k:'val'}],
+const PD_UUID = '13cf5c14-acb...2d2b155d650c';
+/* *stars* mark the value half of each readout, which is set in white */
+const PD_ANALYSIS = [
+  'image/jpeg \u00b7 290 KB',
+  'malware: *clean*',
+  'nsfw: *safe*',
+  'optimized: *10 KB [-97%]*',
+  'Delivered in 7ms',
 ];
+const PD_DOTS = '<div class="pd-dots" data-state="standby"><i></i><i></i><i></i></div>';
+/* the site's 8x8 pixel-ring spinner: cells inside a 78-unit box, gapped by a
+   mask so each square reads separately, lit one at a time as work completes */
+const PD_DONUT = (()=>{
+  const cells = [];
+  for (let y=0; y<8; y++) for (let x=0; x<8; x++){
+    const dx = x-3.5, dy = y-3.5, d = Math.hypot(dx,dy);
+    if (d>1.7 && d<4.4) cells.push([x*10, y*10]);
+  }
+  const rects = cells.map(([x,y])=>`<rect x="${x}" y="${y}" width="10" height="10" class="c"/>`).join('');
+  const holes = cells.map(([x,y])=>`M${x} ${y}h8v8h-8z`).join('');
+  return `<svg class="pd-donut" viewBox="0 0 78 78" aria-hidden="true">
+    <defs><mask id="pdGaps"><path d="${holes}" fill="#fff"/></mask></defs>
+    <g mask="url(#pdGaps)">${rects}</g></svg>`;
+})();
 
 const R = {
   /* ---- card 1: the real uploader widget, files dragged in and dropped ---- */
@@ -1510,32 +1617,66 @@ const R = {
       <div class="sc-panel">${parts.join('')}</div>
     </div>`;
   },
-  /* ---- marquee: the "how Uploadcare works" three-panel demo ---- */
+  /* ---- marquee: the website's upload | analyse | deliver demo ---- */
   pipeline(s){
-    const img = ASSETS[s.photo] || ASSETS.blonde || ASSETS.portrait;
-    const steps = PP_STEPS.map((st,i)=>`
-      <div class="pp-step" data-i="${i}">
-        <div class="pp-ic">${st.icon}</div>
-        <div class="pp-body">
-          <div class="pp-l1">${esc(st.l1)}</div>
-          <div class="pp-l2">${esc(st.l2)}</div>
-          <div class="pp-status">${esc(st.status)}</div>
-        </div>
-      </div>`).join('');
-    return `<div class="pp-wrap">
-      <div class="pp-head reveal">${esc(s.heading||'You\u2019re in. Here\u2019s how Uploadcare works')}</div>
-      <div class="panel pp-panel">
-        <div class="pp-grid">
-          <div class="pp-col pp-left">
-            <div class="pp-frame"><img src="${img}" alt=""><div class="pp-del">${TRASH_ICON}</div></div>
-            <div class="tag pp-tag-l">${esc(s.sizeIn||'4.3 MB \u00b7 JPEG')}</div>
+    const raw = s.analysis || PD_ANALYSIS;   // the editor hands this back as text
+    const analysis = (Array.isArray(raw) ? raw : String(raw).split('\n'))
+      .filter(t=>t.trim())
+      .map(t=>`<p>${esc(t).replace(/\*(.+?)\*/g,(_,v)=>`<b>${v}</b>`)}</p>`).join('');
+    const transforms = PD_TRANSFORMS.map(op=>`
+      <div class="tf"><p class="row indent"><span class="dim">-/</span><span class="op">${esc(op[0])}</span>${
+        op.slice(1).map(a=>`<span class="dim">/</span><span class="arg">${esc(a)}</span>`).join('')
+      }<span class="dim">/</span></p></div>`).join('');
+
+    return `<div class="pd-wrap">
+      <div class="pd-head">
+        <div class="pd-title reveal">${esc(s.heading||'')}</div>
+        ${s.subhead?`<div class="pd-sub reveal d1">${esc(s.subhead)}</div>`:''}
+      </div>
+      <div class="pd-shell">
+        <div class="pd-bgwrap"><div class="pd-bg"><img src="${DEMO.original}" alt=""></div></div>
+        <div class="pd-grid">
+
+          <div class="pd-cell">
+            <div class="pd-inner">
+              <div class="pd-cursor">
+                <div class="pd-cursor-thumb"><img src="${DEMO.original}" alt=""></div>
+                <div class="pd-cursor-ic">${UI.cursor}</div>
+              </div>
+              <div class="pd-zone" data-state="idle">
+                <span class="pd-ph">Upload image</span>
+                <img class="pd-shot" src="${DEMO.original}" alt="">
+                <div class="pd-track"><div class="pd-fill"></div></div>
+                <div class="pd-ctl"><div class="pd-btn">${TRASH_ICON}</div></div>
+              </div>
+            </div>
+            <div class="pd-status"><i></i><span>Upload successful</span></div>
           </div>
-          <div class="pp-col pp-steps">${steps}</div>
-          <div class="pp-col pp-right">
-            <div class="pp-result"><img class="pp-out" src="${img}" alt=""></div>
-            <div class="pp-url"></div>
-            <div class="tag pp-tag-r brand">${esc(s.sizeOut||'85 KB \u00b7 WEBP')}</div>
+
+          <div class="pd-cell mid">
+            <div class="pd-pixel"><canvas width="100" height="130"></canvas></div>
+            <div class="pd-prog">
+              <div class="pd-prog-side">${PD_DOTS}</div>
+              ${PD_DONUT}
+              <div class="pd-prog-side">${PD_DOTS}</div>
+            </div>
+            <div class="pd-analysis">${analysis}</div>
           </div>
+
+          <div class="pd-cell">
+            <div class="pd-stage">
+              <img src="${DEMO.original}" alt=""><img src="${DEMO.step1}" alt="">
+              <img src="${DEMO.step2}" alt=""><img src="${DEMO.step3}" alt="">
+            </div>
+            <div class="pd-url">
+              <p class="row bracket st">&lt;img src="</p>
+              <p class="row indent st"><span class="host">https://demo.ucarecd.net/</span></p>
+              <p class="row indent st"><span class="id">${esc(PD_UUID)}</span><span class="dim">/</span></p>
+              ${transforms}
+              <p class="row bracket st">" /&gt;</p>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>`;
@@ -1813,8 +1954,66 @@ const R = {
 };
 
 const slidesEl = document.getElementById('slides');
+const stageEl = document.getElementById('stage');
 const watermarkEl = document.getElementById('watermark');
 watermarkEl.innerHTML = GLYPH;
+
+/* ---------------- ambient substrate ----------------
+   Seeds the globe once, then trickles signal blips through the margins for as
+   long as the deck runs. This lives outside the per-slide Timeline on purpose:
+   it has to survive slide changes, and killing it between cards is exactly the
+   flicker it exists to avoid.
+
+   Zones are percentages of the stage and stay clear of the middle, where the
+   headlines and product art sit. */
+const SB_ZONES = [
+  [ 3, 13, 15, 85],   // left column
+  [87, 97, 15, 85],   // right column
+  [15, 85,  4, 11],   // top strip
+  [15, 85, 89, 96],   // bottom strip
+];
+const SB_MAX = 7;     // concurrent blips — enough to feel alive, not busy
+const SB_MIN_DX = 6, SB_MIN_DY = 9;   // % apart, or they read as a dotted line
+
+function startSubstrate(){
+  const globe = document.getElementById('sbGlobe');
+  const field = document.getElementById('sbField');
+  if (globe) globe.innerHTML = GLOBE;
+  if (!field || REDUCED) return;      // reduced motion keeps the still globe only
+  const rnd = (a,b)=>a+Math.random()*(b-a);
+  const live = new Set();
+
+  // a zone is a narrow strip, so uniform placement inside one tends to stack
+  // blips into a column; reject anything landing too near a live neighbour
+  const place = ()=>{
+    for (let i=0;i<8;i++){
+      const [x0,x1,y0,y1] = SB_ZONES[(Math.random()*SB_ZONES.length)|0];
+      const x = rnd(x0,x1), y = rnd(y0,y1);
+      let clear = true;
+      for (const p of live){
+        if (Math.abs(x-p.x) < SB_MIN_DX && Math.abs(y-p.y) < SB_MIN_DY){ clear=false; break; }
+      }
+      if (clear) return {x,y};
+    }
+    return null;
+  };
+
+  (function spawn(){
+    if (live.size < SB_MAX){
+      const p = place();
+      if (p){
+        const blip = document.createElement('i');
+        blip.className = 'sb-blip';
+        blip.style.cssText = `left:${p.x.toFixed(2)}%;top:${p.y.toFixed(2)}%;`
+                           + `--life:${rnd(2200,3400)|0}ms`;
+        live.add(p);
+        blip.addEventListener('animationend', ()=>{ live.delete(p); blip.remove(); });
+        field.appendChild(blip);
+      }
+    }
+    setTimeout(spawn, rnd(700,1600));
+  })();
+}
 
 /* populate the invisible Swiss-grid overlay (16 modules) — toggle with "g" */
 const gridOverlay = document.getElementById('gridOverlay');
@@ -2297,56 +2496,300 @@ function setupDropin(slideEl, sd, tl){
   tl.cls(drop, 'hot', 3.45, false);
 }
 
-/* ---------------- marquee pipeline demo: original → sequential steps →
-   result morph + self-building CDN URL. Adapted from the onboarding prototype
-   for the auto-play loop (plays the sequence once, no buttons). All state is
-   toggled by timers, so leaving/re-entering the slide re-runs it cleanly. */
+/* ---------------- the analysis grid ----------------
+   The website's pixel canvas, ported. An image is downsampled to a grid and
+   redrawn as flat squares; what sells it is how a cell travels between two
+   colours. Interpolation runs in HSL with a saturation overshoot — a 4t(1-t)
+   bell peaking at x1.2 — so a cell blooms mid-transition instead of
+   cross-fading flatly. That bloom is what makes the grid read as "working"
+   rather than "loading".
+
+   Only the states this card uses are here: `reveal` (cells light up in scan
+   order, each flashing bright before settling — the image materialising),
+   `processing` (random cells flare and fall back), and `static` (everything
+   settles to its true colour). The site also has a `scanning` state its
+   desktop timeline never reaches. --------------------------------------- */
+const PDX_LIT = [235,235,235];      // the flash a cell passes through
+const PDX_SAT_PEAK = 1.2;
+const PDX_REVEAL_SECS = 3;          // a full reveal at speed 1; the card runs it at 2
+
+function pdxRgbToHsl(r,g,b){
+  r/=255; g/=255; b/=255;
+  const mx=Math.max(r,g,b), mn=Math.min(r,g,b), l=(mx+mn)/2;
+  if (mx===mn) return [0,0,l];
+  const d=mx-mn, s = l>.5 ? d/(2-mx-mn) : d/(mx+mn);
+  let h;
+  if (mx===r)      h=((g-b)/d + (g<b?6:0))/6;
+  else if (mx===g) h=((b-r)/d + 2)/6;
+  else             h=((r-g)/d + 4)/6;
+  return [h,s,l];
+}
+function pdxHslToRgb(h,s,l){
+  if (!s) { const v=Math.round(l*255); return [v,v,v]; }
+  const q = l<.5 ? l*(1+s) : l+s-l*s, p = 2*l-q;
+  const ch = t => {
+    t = (t+1)%1;
+    if (t < 1/6) return p+(q-p)*6*t;
+    if (t < 1/2) return q;
+    if (t < 2/3) return p+(q-p)*(2/3-t)*6;
+    return p;
+  };
+  return [ch(h+1/3), ch(h), ch(h-1/3)].map(v=>Math.round(v*255));
+}
+/* hue takes the short way round the wheel, and saturation arcs above both
+   endpoints so the midpoint of any move is the most vivid part of it */
+function pdxMix(from, to, t){
+  const a = pdxRgbToHsl(from[0],from[1],from[2]);
+  const b = pdxRgbToHsl(to[0],to[1],to[2]);
+  let dh = b[0]-a[0];
+  if (dh >  .5) dh -= 1;
+  if (dh < -.5) dh += 1;
+  const bell = 4*t*(1-t);
+  const s = (a[1] + (b[1]-a[1])*t) * (1 + (PDX_SAT_PEAK-1)*bell);
+  return pdxHslToRgb(a[0]+dh*t, Math.min(1, s), a[2]+(b[2]-a[2])*t);
+}
+
+function createPixelGrid(canvas, src, {cell=5, gap=1, fade=200}={}){
+  const ctx = canvas.getContext('2d');
+  const cols = Math.floor(canvas.width/cell), rows = Math.floor(canvas.height/cell);
+  const n = cols*rows;
+  const truth = new Array(n).fill(null);   // each cell's real colour
+  const from  = new Array(n).fill(null);   // where the current move started
+  const to    = new Array(n).fill(null);   // where it's heading
+  const t0    = new Float64Array(n);       // when it started
+  let raf = 0, state = 'static', speed = 1, tick = 0, ready = false, dead = false;
+
+  const img = new Image();
+  img.onload = ()=>{
+    if (dead) return;
+    const off = document.createElement('canvas');
+    off.width = cols; off.height = rows;
+    const octx = off.getContext('2d', {willReadFrequently:true});
+    octx.drawImage(img, 0, 0, cols, rows);
+    const d = octx.getImageData(0,0,cols,rows).data;
+    for (let i=0;i<n;i++) truth[i] = [d[i*4], d[i*4+1], d[i*4+2]];
+    ready = true;
+  };
+  img.src = src;
+
+  const dark = i => [12,12,12];
+  const send = (i, target, at)=>{
+    from[i] = to[i] ? sample(i, at) : (from[i] || dark(i));
+    to[i] = target; t0[i] = at;
+  };
+  const sample = (i, now)=>{
+    if (!to[i]) return from[i] || dark(i);
+    const p = Math.min(1, (now - t0[i]) / fade);
+    if (p >= 1) return to[i];
+    return pdxMix(from[i] || dark(i), to[i], p);
+  };
+
+  const paint = now =>{
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    for (let i=0;i<n;i++){
+      const c = sample(i, now);
+      ctx.fillStyle = `rgb(${c[0]},${c[1]},${c[2]})`;
+      ctx.fillRect((i%cols)*cell, ((i/cols)|0)*cell, cell-gap, cell-gap);
+    }
+  };
+
+  const frame = now =>{
+    if (dead) return;
+    if (ready){
+      if (state === 'static'){
+        for (let i=0;i<n;i++) if (to[i] !== truth[i]) send(i, truth[i], now);
+      } else if (state === 'reveal'){
+        // light cells in scan order, a slab at a time; each flashes then settles.
+        // Paced to fill across the upload rather than snapping in — the grid and
+        // the progress bar are reporting the same thing.
+        const per = Math.max(1, Math.ceil(n / (PDX_REVEAL_SECS*60/speed)));
+        const head = Math.min(n, tick*per);
+        for (let i=0;i<head;i++){
+          if (to[i] === null) send(i, PDX_LIT, now);
+          else if (to[i] === PDX_LIT && now - t0[i] > fade) send(i, truth[i], now);
+        }
+        tick++;
+      } else if (state === 'processing'){
+        // a few cells flare each frame and fall back — idle "analysing" texture
+        if (tick % Math.max(1, Math.round(6/speed)) === 0){
+          for (let k=0;k<3;k++){
+            const i = (Math.random()*n)|0;
+            send(i, PDX_LIT, now);
+          }
+        }
+        for (let i=0;i<n;i++){
+          if (to[i] === PDX_LIT && now - t0[i] > fade) send(i, truth[i], now);
+          else if (to[i] === null) send(i, truth[i], now);
+        }
+        tick++;
+      }
+      paint(now);
+    }
+    raf = requestAnimationFrame(frame);
+  };
+  raf = requestAnimationFrame(frame);
+
+  return {
+    setState(next, {animationSpeed=1}={}){ state = next; speed = animationSpeed; tick = 0; },
+    reset(){
+      for (let i=0;i<n;i++){ from[i]=null; to[i]=null; }
+      state='static'; tick=0;
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+    },
+    /* jump straight to the finished picture, for reduced motion */
+    settle(){
+      const now = performance.now();
+      for (let i=0;i<n;i++){ from[i]=truth[i]; to[i]=truth[i]; t0[i]=now-fade; }
+      if (ready) paint(now); else img.addEventListener('load', ()=>{
+        for (let i=0;i<n;i++){ from[i]=truth[i]; to[i]=truth[i]; }
+        paint(performance.now());
+      });
+    },
+    destroy(){ dead = true; cancelAnimationFrame(raf); },
+  };
+}
+
+/* ---------------- pipeline card: upload | analyse | deliver ----------------
+   The website's demo timeline, re-cut onto our Timeline so it plays exactly
+   once per visit and retires with the card. The site loops it behind a Replay
+   button; a booth screen has no one to press it, so the score just ends on the
+   finished frame. Beat times are the site's. ---------------------------- */
+let pdGrid = null;   // the live pixel canvas, torn down when the card leaves
+
 function setupPipeline(slideEl, sd, tl){
-  const frame = slideEl.querySelector('.pp-frame');
-  const tagL  = slideEl.querySelector('.pp-tag-l');
-  const tagR  = slideEl.querySelector('.pp-tag-r');
-  const out   = slideEl.querySelector('.pp-out');
-  const url   = slideEl.querySelector('.pp-url');
-  const steps = [...slideEl.querySelectorAll('.pp-step')];
-  if (!frame || !out || !url) return;
+  const q  = slideEl.querySelector.bind(slideEl);
+  const qa = sel => [...slideEl.querySelectorAll(sel)];
+  const bg      = q('.pd-bg');
+  const cursor  = q('.pd-cursor');
+  const zone    = q('.pd-zone');
+  const ph      = q('.pd-ph');
+  const shot    = q('.pd-shot');
+  const track   = q('.pd-track');
+  const fill    = q('.pd-fill');
+  const ctl     = q('.pd-ctl');
+  const status  = q('.pd-status');
+  const pixel   = q('.pd-pixel');
+  const canvas  = q('.pd-pixel canvas');
+  const dots    = qa('.pd-dots');
+  const donut   = qa('.pd-donut .c');
+  const lines   = qa('.pd-analysis p');
+  const stage   = q('.pd-stage');
+  const shots   = qa('.pd-stage img');
+  const statics = qa('.pd-url .st');
+  const tfs     = qa('.pd-url .tf');
+  if (!zone || !canvas) return;
 
-  // reset
-  frame.classList.remove('in'); tagL.classList.remove('in'); tagR.classList.remove('in');
-  out.className = 'pp-out'; url.innerHTML = '';
-  steps.forEach(st=>st.classList.remove('in','active','done'));
-  // pre-build the URL lines (hidden until revealed)
-  url.innerHTML = PP_URL_LINES.map(l=>`<span class="ln">${urlHTML(l)}</span>`).join('');
-  const lns = [...url.querySelectorAll('.ln')];
+  // the grid runs its own rAF loop, so it has to die with the card
+  if (pdGrid) { pdGrid.destroy(); pdGrid = null; }
+  pdGrid = createPixelGrid(canvas, DEMO.original);
+  tl.onKill(()=>{ if (pdGrid) { pdGrid.destroy(); pdGrid = null; } });
 
-  const OUT_STATE = ['','', 'face', 'square', 'circle']; // result morph per url line
+  // every animated property back to its start, so a re-entry looks like a
+  // first entry rather than a resume
+  const reset = ()=>{
+    bg.style.clipPath = 'inset(0 0 100% 0)';
+    Object.assign(cursor.style, {opacity:'0', transform:'translate(150px,180px) scale(1)'});
+    zone.dataset.state = 'idle';
+    ph.style.opacity = '1';
+    shot.style.opacity = '0';
+    track.style.opacity = '0';
+    fill.style.transform = 'scaleX(0)';
+    Object.assign(ctl.style, {opacity:'0', transform:'translateY(-8px)'});
+    status.style.opacity = '0';
+    pixel.style.opacity = '0';
+    stage.style.opacity = '0';
+    shots.forEach(im=>Object.assign(im.style, {opacity:'0', filter:'blur(20px)', transform:'scale(1.05)'}));
+    statics.forEach(p=>p.style.opacity = '0');
+    tfs.forEach(d=>Object.assign(d.style, {opacity:'0', height:'0px'}));
+    lines.forEach(p=>p.style.opacity = '0');
+    dots.forEach(d=>d.dataset.state = 'standby');
+    donut.forEach(c=>c.classList.remove('lit'));
+  };
+  reset();
 
   if (REDUCED){
-    frame.classList.add('in'); tagL.classList.add('in'); tagR.classList.add('in');
-    steps.forEach(st=>st.classList.add('in','done'));
-    lns.forEach(l=>l.classList.add('in'));
-    out.className = 'pp-out in circle';
+    // no motion: show the end of the story, which is the point of the card
+    bg.style.clipPath = 'inset(0 0 0% 0)';
+    shot.style.opacity = '1'; ph.style.opacity = '0';
+    ctl.style.opacity = '1'; ctl.style.transform = 'none';
+    status.style.opacity = '1';
+    pixel.style.opacity = '1'; pdGrid.settle();
+    stage.style.opacity = '1';
+    Object.assign(shots[3].style, {opacity:'1', filter:'none', transform:'none'});
+    statics.forEach(p=>p.style.opacity = '1');
+    tfs.forEach(d=>Object.assign(d.style, {opacity:'1', height:'auto'}));
+    lines.forEach(p=>p.style.opacity = '1');
+    donut.forEach(c=>c.classList.add('lit'));
     return;
   }
 
-  tl.cls(frame, 'in', .35);
-  tl.cls(tagL,  'in', .65);
-  tl.cls(out,   'in', 1.5);     // result appears (original)
-  tl.cls(lns[0],'in', 1.55);    // base url
-  tl.cls(lns[1],'in', 1.85);    // uuid
+  const DROP = 1.4, ANALYSE = 3.5, STATUS = 9, DONUT = 10.1, SETTLE = 11.1;
 
-  // walk the four steps; each activates, shows its status, then settles to "done"
-  const stepStart = .9, stepGap = 1.45;
-  steps.forEach((st,i)=>{
-    tl.at(stepStart + i*stepGap, ()=>st.classList.add('in','active'));
-    tl.at(stepStart + i*stepGap + stepGap - .25,
-          ()=>{ st.classList.remove('active'); st.classList.add('done'); });
+  // ---- the drag and the drop
+  tl.at(.5, ()=>{ zone.dataset.state = 'active'; });
+  tl.to(cursor, [{transform:'translate(150px,180px)'},{transform:'translate(-45px,-58px)'}],
+        {at:.5, dur:1, ease:EASE.out});
+  tl.to(cursor, [{opacity:0},{opacity:1}], {at:.5, dur:.2});
+  // exit tweens open on the *visible* state, so they must not fill backwards —
+  // otherwise WAAPI paints that first keyframe from t=0 and the thing they're
+  // meant to remove is on screen before it ever arrived
+  tl.to(cursor, [{opacity:1, transform:'translate(-45px,-58px) scale(1)'},
+                 {opacity:0, transform:'translate(-45px,-58px) scale(.85)'}],
+        {at:DROP, dur:.3, fill:'forwards'});
+  tl.at(DROP, ()=>{
+    zone.dataset.state = 'idle';
+    dots[0].dataset.state = 'working';
+    pdGrid.setState('reveal', {animationSpeed:2});
+  });
+  tl.to(ph,    [{opacity:1},{opacity:0}], {at:DROP, dur:.3, fill:'forwards'});
+  tl.to(shot,  [{opacity:0},{opacity:1}], {at:DROP, dur:.8});
+  tl.to(track, [{opacity:0},{opacity:1}], {at:DROP, dur:.1});
+  tl.to(pixel, [{opacity:0},{opacity:1}], {at:DROP, dur:.4});
+  // the bar and the background wash fill together — one upload, two readouts
+  tl.to(fill,  [{transform:'scaleX(0)'},{transform:'scaleX(1)'}], {at:DROP, dur:2, ease:'linear'});
+  tl.to(bg,    [{clipPath:'inset(0 0 100% 0)'},{clipPath:'inset(0 0 0% 0)'}],
+        {at:DROP, dur:2, ease:EASE.out});
+
+  // ---- upload done, analysis takes over
+  tl.to(track, [{opacity:1},{opacity:0}], {at:ANALYSE, dur:.3, fill:'forwards'});
+  tl.to(ctl,   [{opacity:0, transform:'translateY(-8px)'},{opacity:1, transform:'translateY(0)'}],
+        {at:ANALYSE, dur:.4});
+  tl.at(ANALYSE, ()=>{
+    pdGrid.setState('processing', {animationSpeed:1});
+    dots[0].dataset.state = 'standby';
+    dots[1].dataset.state = 'working';
   });
 
-  // URL transform lines + result morph, in lockstep with steps 2→4
-  tl.at(stepStart + 2*stepGap - .15, ()=>{ lns[2].classList.add('in'); out.className='pp-out in face'; });
-  tl.at(stepStart + 3*stepGap - .5,  ()=>{ lns[3].classList.add('in'); out.className='pp-out in square'; });
-  tl.at(stepStart + 3*stepGap + .2,  ()=>{
-    lns[4].classList.add('in'); out.className='pp-out in circle'; tagR.classList.add('in');
+  // ---- delivery: the first frame lands, then the URL grows a line at a time
+  tl.to(stage, [{opacity:0},{opacity:1}], {at:ANALYSE, dur:.6});
+  tl.to(shots[0], [{opacity:0, filter:'blur(20px)', transform:'scale(1.05)'},
+                   {opacity:1, filter:'blur(0px)',  transform:'scale(1)'}], {at:ANALYSE, dur:.6});
+  statics.forEach((p,i)=>tl.to(p, [{opacity:0},{opacity:1}], {at:ANALYSE + .1 + i*.05, dur:.4}));
+
+  // each transform types itself in and the picture becomes what it describes
+  [1.5, 3, 4.5].forEach((off, i)=>{
+    const at = ANALYSE + off;
+    tl.to(shots[i],   [{opacity:1, filter:'blur(0px)',  transform:'scale(1)'},
+                       {opacity:0, filter:'blur(20px)', transform:'scale(.95)'}],
+          {at, dur:.6, fill:'forwards'});
+    tl.to(shots[i+1], [{opacity:0, filter:'blur(20px)', transform:'scale(1.05)'},
+                       {opacity:1, filter:'blur(0px)',  transform:'scale(1)'}], {at, dur:.6});
+    // height:auto is not animatable, so measure the row once and use the px
+    tl.at(at, ()=>{
+      const h = tfs[i].firstElementChild.getBoundingClientRect().height;
+      tl.anim(tfs[i].animate([{opacity:0, height:'0px'},{opacity:1, height:h+'px'}],
+              {duration:400, easing:EASE.out, fill:'both'}));
+    });
+  });
+
+  // ---- the verdict
+  tl.to(status, [{opacity:0},{opacity:1}], {at:STATUS, dur:.4});
+  lines.forEach((p,i)=>tl.to(p, [{opacity:0},{opacity:1}], {at:STATUS + i*.2, dur:.3}));
+  // the ring completes cell by cell, so "done" arrives as a fill, not a flash
+  donut.forEach((c,i)=>tl.cls(c, 'lit', DONUT + i*.012));
+  tl.at(SETTLE, ()=>{
+    pdGrid.setState('static');
+    dots[1].dataset.state = 'standby';
   });
 }
 
@@ -2590,6 +3033,9 @@ function enter(i){
   // brand glyph sits on every slide (consistent signature, bottom-right grid corner)
   watermarkEl.classList.toggle('show', !!deck.settings.watermark);
 
+  // the board card owns the full-strength globe; don't run two behind each other
+  stageEl.classList.toggle('sb-off', sd.type==='board');
+
   // fit oversized headlines (measure counters at their final value)
   cur.querySelectorAll('.count').forEach(el=>{
     el.textContent = (+el.dataset.value).toFixed(+el.dataset.decimals);
@@ -2814,13 +3260,10 @@ function fieldsFor(s, i){
       <label class="f"><span>Pipeline steps (comma separated)</span><input type="text" data-f="steps" value="${esc(s.steps||'Upload, Store, Transform, Optimize, Deliver')}"></label>
       <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">Headline over the full pipeline as a chip row, with a lit pulse travelling through it. This card has its own bigger-picture background tint.</p>`;
     case 'pipeline': return dur+`
-      <label class="f"><span>Heading (dimmed, above the panel)</span><input type="text" data-f="heading" value="${esc(s.heading||'')}"></label>
-      <div class="row2">
-        <label class="f"><span>Photo</span><input type="text" data-f="photo" value="${esc(s.photo||'blonde')}"></label>
-        <label class="f"><span>Input size tag</span><input type="text" data-f="sizeIn" value="${esc(s.sizeIn||'4.3 MB · JPEG')}"></label>
-      </div>
-      <label class="f"><span>Output size tag</span><input type="text" data-f="sizeOut" value="${esc(s.sizeOut||'85 KB · WEBP')}"></label>
-      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">Three-panel demo: original → 4 sequential steps → result morph (crop → face → square → circle) with the CDN URL building itself. Photo keys: tennis, blonde, car, docx. Give it ~11s so the full sequence plays.</p>`;
+      <label class="f"><span>Heading</span><input type="text" data-f="heading" value="${esc(s.heading||'')}"></label>
+      <label class="f"><span>Subhead</span><input type="text" data-f="subhead" value="${esc(s.subhead||'')}"></label>
+      <label class="f"><span>Analysis readout (one per line, *stars* set a value in white)</span><textarea data-f="analysis">${esc((s.analysis||PD_ANALYSIS).join('\n'))}</textarea></label>
+      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">The website's three-panel demo: a file is dragged in and uploaded, the grid analyses it, and the CDN URL builds itself while the picture becomes what each transform describes. It plays once — no replay. The score runs ~11.5s, so give the card 13s or more.</p>`;
     case 'upload': return dur+`
       <label class="f"><span>Kicker (optional)</span><input type="text" data-f="kicker" value="${esc(s.kicker||'')}"></label>
       <label class="f"><span>Heading</span><textarea data-f="heading">${esc(headText(s))}</textarea></label>
@@ -2927,7 +3370,7 @@ const NEW = {
   quote2:{type:'quote2',duration:6,quote:'It just works out of the box without having to think about it.',by:'Luca Mausberg',role:'Co-founder',mark:'marko'},
   logos:{type:'logos',duration:5,title:'Trusted by',logos:'Zapier, SoundCloud, L\u2019Or\u00e9al, Sequoia, UserTesting, Prezly, Aryeo, marko'},
   scale:{type:'scale',duration:6,heading:'Set it up once, use it on every client site, and go beyond uploads with the full pipeline via API.',steps:'Upload, Store, Transform, Optimize, Deliver'},
-  pipeline:{type:'pipeline',duration:11,heading:'You\u2019re in. Here\u2019s how Uploadcare works',photo:'blonde',sizeIn:'4.3 MB \u00b7 JPEG',sizeOut:'85 KB \u00b7 WEBP'}
+  pipeline:{type:'pipeline',duration:13,heading:'Set it up once, use it on every client site',subhead:'Go beyond uploads with the full pipeline via API.'}
 };
 const addBtn=document.getElementById('addBtn'), addList=document.getElementById('addlist');
 addBtn.onclick=()=>addList.classList.toggle('open');
@@ -3001,6 +3444,7 @@ addEventListener('touchstart', wake);
 wake();
 
 /* boot */
+startSubstrate();
 renderDeck();
 enter(0);
 </script>

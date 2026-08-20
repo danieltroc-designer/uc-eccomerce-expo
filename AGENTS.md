@@ -33,11 +33,22 @@ source + build + output and is fully independent of the main deck:
   `pipeline`). Card 7 is a `board` slide with `layout:'outro'` and `qr:true`.
 - Build: `python build_simple.py` → `dist/uploadcare-simple.html`.
 - Same rule applies: never hand-edit `dist/uploadcare-simple.html`.
-- `build_simple.py` reuses every encoder from `build.py` and adds three tokens
+- `build_simple.py` reuses every encoder from `build.py` and adds four tokens
   of its own: `__QR_SVG__` (the card-7 QR — destination is `CTA_URL`, generated
   with the optional `segno` dependency), `__LOGOS_JSON__` (the customer marks
-  in `assets/logos/`), and `__UPLOADERUI_JSON__` (the uploader widget's icons
-  and file thumbnails in `assets/uploader/`).
+  in `assets/logos/`), `__UPLOADERUI_JSON__` (the uploader widget's icons
+  and file thumbnails in `assets/uploader/`), and `__DEMO_JSON__` (the pipeline
+  card's photo and its three transformed frames, in `assets/demo/`).
+
+Card 6 is a port of the three-panel demo on the marketing site
+(upload | analyse | deliver). Two things about it differ from the original and
+should stay that way: it **plays once and has no Replay button** — a booth
+screen has nobody to press it, and the deck re-runs the card each loop anyway —
+and its type is set at 20px rather than the site's 13px, with the boxes
+rescaled around that, because the card is read from across a stand. Its frames
+in `assets/demo/` are the CDN's own renders of the three transforms the
+on-screen URL builds (`crop/face` → `scale_crop` → `border_radius`), so
+changing a transform in `PD_TRANSFORMS` means re-fetching the matching frame.
 
 This deck is laid out directly against the Figma storyboard ("Storyboard –
 Webflow – 2"). Two conventions come from there and are worth keeping:
@@ -70,9 +81,13 @@ tl.at(2.95, ()=>txt.textContent='2 files added');
 `tl.timeout(ms, fn)` is the escape hatch for recursive work that isn't a fixed
 score (the two typewriters); it's still owned by the timeline, so it dies with
 it. `spring()` reports its settle time through `onArrive` synchronously, which
-is how the cursor demos anchor the tap that follows the travel.
+is how the cursor demos anchor the tap that follows the travel. `tl.anim(a)`
+adopts an animation the card had to start itself — usually because a keyframe
+can only be measured at the moment it runs, like the pipeline card's
+`height:auto` rows — and `tl.onKill(fn)` registers teardown for anything with a
+lifetime of its own, such as that card's `requestAnimationFrame` canvas.
 
-Two things to keep in mind when adding a card:
+Three things to keep in mind when adding a card:
 
 - **Reset state synchronously, schedule the animation.** The deck loops, so a
   card is re-entered with the previous visit's DOM intact. Anything a cue will
@@ -83,6 +98,10 @@ Two things to keep in mind when adding a card:
   deliberately *not* the end of the animation (card 1 holds the files above the
   zone rather than dropping them), branch on `REDUCED` and return before
   building a score.
+- **A tween that removes something must not fill backwards.** `tl.to()` defaults
+  to `fill:'both'`, so an exit tween opening on `{opacity:1}` paints that
+  keyframe from t=0 and the element is on screen before it ever arrived. Pass
+  `fill:'forwards'` whenever the first keyframe is the visible state.
 
 Verify with `python tools/verify_simple.py`, which screenshots all eight cards
 in both normal and reduced motion to `tools/_shots/` and fails loudly on
