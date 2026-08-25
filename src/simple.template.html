@@ -3381,7 +3381,7 @@ function setupPipeline(slideEl, sd, tl){
     Object.assign(page1.style, {opacity:'1', transform:'none', filter:'none'});
     statics.forEach(p=>p.style.opacity = '0');
     close.style.opacity = '0';
-    tfs.forEach(d=>Object.assign(d.style, {opacity:'0', height:'0px'}));
+    tfs.forEach(d=>Object.assign(d.style, {opacity:'0', height:'0px', overflow:''}));
     lines.forEach(p=>p.style.opacity = '0');
     dots.forEach(d=>d.dataset.state = 'standby');
     donut.forEach(c=>c.classList.remove('lit'));
@@ -3403,7 +3403,7 @@ function setupPipeline(slideEl, sd, tl){
     statics.forEach(p=>p.style.opacity = '1');
     page1.style.opacity = '0';
     close.style.opacity = '1';
-    tfs.forEach(d=>Object.assign(d.style, {opacity:'1', height:'auto'}));
+    tfs.forEach(d=>Object.assign(d.style, {opacity:'1', height:'auto', overflow:'visible'}));
     lines.forEach(p=>p.style.opacity = '1');
     donut.forEach(c=>c.classList.add('lit'));
     return;
@@ -3469,11 +3469,27 @@ function setupPipeline(slideEl, sd, tl){
           {at, dur:.6, fill:'forwards'});
     tl.to(shots[i+1], [{opacity:0, filter:'blur(20px)', transform:'scale(1.05)'},
                        {opacity:1, filter:'blur(0px)',  transform:'scale(1)'}], {at, dur:.6});
-    // height:auto is not animatable, so measure the row once and use the px
+    // height:auto is not animatable, so the row's height has to go in as a
+    // number — and it has to be a *layout* number, not a measurement of what is
+    // on screen. #stage is CSS-scaled to fit the viewport, so
+    // getBoundingClientRect() inside it reports post-transform pixels; feeding
+    // those back in as a length makes the row short by exactly the scale
+    // factor. At 1:1 the two agree, which is how this survived every check —
+    // but a 1440-wide laptop runs the stage at .75 and it sheared 5px off the
+    // bottom of every transform line. line-height is a layout value and each
+    // row is nowrap, so it is always exactly one line tall.
     tl.at(at, ()=>{
-      const h = tfs[i].firstElementChild.getBoundingClientRect().height;
-      tl.anim(tfs[i].animate([{opacity:0, height:'0px'},{opacity:1, height:h+'px'}],
-              {duration:400, easing:EASE.out, fill:'both'}));
+      const row = tfs[i].firstElementChild;
+      const h = parseFloat(getComputedStyle(row).lineHeight) || row.offsetHeight;
+      const a = tfs[i].animate([{opacity:0, height:'0px'},{opacity:1, height:h+'px'}],
+              {duration:400, easing:EASE.out, fill:'both'});
+      // the clip exists only so the row can grow into view; holding it after
+      // that trims the descenders, which sit a little below the line box
+      a.finished.then(()=>{
+        Object.assign(tfs[i].style, {height:'auto', overflow:'visible', opacity:'1'});
+        a.cancel();
+      }, ()=>{});
+      tl.anim(a);
     });
   });
   // the tag closes once the last op is in, which is what tells you the URL is

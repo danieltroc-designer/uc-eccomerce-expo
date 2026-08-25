@@ -387,6 +387,26 @@ Don't remove or rename them. `__PIXEL_JSON__` carries the dot-halftone data
 `Full-image.png`; the reveal slide's `startPixelReveal` paints the dots on a
 canvas and dissolves them into the photo.
 
+### Never feed `getBoundingClientRect()` back in as a length
+
+`#stage` is CSS-scaled to fit the viewport (`fit()` sets `scale(min(w/1920,
+h/1080))`), so **every** rect measured inside it is in screen pixels, not layout
+pixels. Assigning one back as a width, height or offset makes the result wrong
+by exactly the scale factor. This is a nasty one because at a 1920x1080 viewport
+the scale is 1 and the two agree — so it passes every check here, every
+screenshot, and the booth TV, and only breaks on a smaller display. It shipped
+once: the pipeline card's transform rows animated to
+`row.getBoundingClientRect().height`, which on a 1440-wide laptop set a 19.5px
+line into a 14.6px clip box and sheared the descenders off all three lines.
+
+Use a layout source instead — `offsetHeight`/`offsetWidth`, or better a computed
+value like `parseFloat(getComputedStyle(el).lineHeight)`. If you genuinely need
+to convert a rect, divide by
+`stage.getBoundingClientRect().width / stage.offsetWidth`. Rects are still fine
+for comparing two things measured in the same space (hit-testing, relative
+offsets); it is only the round-trip into a style that breaks. When you touch
+sizing code, verify at 1280x800 as well as 1:1.
+
 ### A CSS/JS comment trap worth knowing
 
 Both of this file's long explanatory comments and the template's have bitten the
