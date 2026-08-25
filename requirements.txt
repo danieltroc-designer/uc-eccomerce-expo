@@ -1,4 +1,6 @@
 Pillow>=10.0
-# Optional: only for build_simple.py's CTA QR code. If missing, the simplified
-# deck still builds (it falls back to a placeholder QR tile).
+# Optional, and no longer used by either build: the booth QR is vectorised from
+# assets/qr/booth-qr.png rather than generated. Kept because it is the easiest
+# way to re-encode a decoded payload and check tools/qr_lib.py read a symbol
+# correctly.
 segno>=1.6

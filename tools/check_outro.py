@@ -23,7 +23,11 @@ SPEC = {
     ".hb-sign":        (867, 186, 185, 33),
     ".hb-outro-line":  (507, 320, 907, 143),
     ".hb-mark":        (916, 497, 86, 86),
-    ".hb-outro-sub":   (0, 640, 1920, 23.3),   # full-width, centred; text lands at 960
+    # full-width, centred; the frame's box is 776 wide at x=572, so what is
+    # checked here is the height (two lines at the frame's 57) and that the
+    # text lands on 960.
+    ".hb-outro-sub":   (0, 640, 1920, 57.4),
+    ".hb-outro-qr":    (857, 711, 204, 204),
     ".hb-node.n1 .hb-card": (272, 219, 100, 143),
     ".hb-node.n2 .hb-card": (311, 778, 105, 147),
     ".hb-node.n3 .hb-card": (1342.44, 203, 134.27, 94.72),
@@ -88,6 +92,19 @@ def main():
         bb = pg.evaluate("()=>{const b=document.querySelector('.slide.active .hb-globe svg').getBBox();"
                          "return [b.x,b.y,b.width,b.height]}")
         print(f"     globe viewBox {vb}  vs artwork bbox {[round(v,1) for v in bb]}")
+
+        # The QR's box is checked above, but the box is mostly quiet zone: the
+        # frame's 204px node holds 164px of ink. Measure the drawn modules, or
+        # the code could be any size inside a box that still passes.
+        ink = pg.evaluate("()=>{const s=document.querySelector('.slide.active .hb-outro-qr svg');"
+                          "const b=s.getBBox(), v=s.viewBox.baseVal,"
+                          "r=s.getBoundingClientRect();"
+                          "return [b.width/v.width*r.width, b.height/v.height*r.height]}")
+        ink = [round(v / sc, 1) for v in ink]
+        off = max(abs(ink[0] - 164.5), abs(ink[1] - 164.5))
+        print(f"     QR ink {ink[0]}x{ink[1]} in a 204 box (want 164.5)  "
+              f"{'ok' if off <= 2 else 'WRONG SIZE'}")
+        bad += off > 2
 
         # the glyph should be a spread of opacities, not one value
         ops = pg.evaluate("()=>[...document.querySelectorAll('.slide.active .hb-mark path')]"

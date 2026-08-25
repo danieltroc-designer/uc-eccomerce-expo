@@ -1358,12 +1358,19 @@
   .sc-conn i{width:8px;height:8px;flex:none;border:1px solid rgba(255,255,255,.22);border-radius:2px}
   .sc-conn s{flex:1;height:1px;background:rgba(255,255,255,.18);text-decoration:none}
 
-  /* card 7 — booth CTA. The QR is off in the storyboard but the renderer still
-     honours `qr:true`; it is pinned rather than stacked so it can't push the
-     headline off the centre line. */
-  .hb-outro-qr{position:absolute;left:862px;top:730px;
-    width:196px;height:196px;background:#fff;border-radius:16px;padding:14px;z-index:2;
-    box-shadow:0 24px 60px rgba(0,0,0,.55)}
+  /* card 7 — the booth QR, at frame 184:5666's geometry. Pinned rather than
+     stacked so it can never push the headline off the centre line.
+
+     White modules straight onto the frame, no white plate behind them: that is
+     the design, and the plate it replaces was a bright 196px rectangle sitting
+     under a deliberately dim backdrop, which fought the headline for the eye.
+     It does make this a reverse-polarity code — scanners expect dark on light.
+     Current phone cameras read inverted codes without complaint, so this is
+     safe for a booth, but it is the reason the code is drawn oversized: the
+     modules are ~8px, well past what a camera needs, which buys back the
+     margin that the inversion spends. */
+  .hb-outro-qr{position:absolute;left:857px;top:711px;
+    width:204px;height:204px;z-index:2}
   .hb-outro-qr svg{width:100%;height:100%;display:block}
   .hb-sign{position:absolute;left:867px;top:186px;width:185px;height:33px;z-index:2}
   .hb-sign svg{height:100%;width:auto;display:block}
@@ -1732,10 +1739,11 @@ const DEFAULT_DECK = {
       heading:'Set it up once, use it on every client site',
       subhead:'Go beyond uploads with the full pipeline via API.' },
 
-    // 7 — booth invite on the file-board backdrop, QR in the middle
+    // 7 — booth invite on the file-board backdrop, QR under the sign-off
     { type:'board', duration:10, layout:'outro', globe:true, float:true, typing:true, typeSpeed:16,
       title:'Get more\nout of Webflow.',
-      sub:'Come say hi \ud83d\udc4b', qr:false }
+      sub:'Come say hi \ud83d\udc4b\nand enter to win LEGO Polaroid Camera Building Set',
+      qr:true }
   ]
 };
 
@@ -1752,14 +1760,21 @@ addEventListener('resize', fit); fit();
 /* ---------------- renderers ---------------- */
 function esc(s){ return String(s??'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 function multiline(s){ return esc(s).replace(/\n/g,'<br>'); }
-/* Split a trailing emoji off a line so it can be animated on its own. The
+/* Split each emoji out of a line so it can be animated on its own. The
    sign-off's hand is a gesture, not decoration on the type: it needs its own
-   transform origin, and rotating the whole text run would swing the words. */
-const TRAILING_EMOJI = /(\p{Extended_Pictographic}[\p{Extended_Pictographic}\uFE0F\u200D]*)\s*$/u;
+   transform origin, and rotating the whole text run would swing the words.
+   Emoji are matched anywhere, not just at the end — the sign-off grew a second
+   line under the wave, which left the hand mid-string. Anything wrapped here
+   shares one animation, so several emoji in a line would gesture in unison. */
+const EMOJI_RUN = /\p{Extended_Pictographic}[\p{Extended_Pictographic}\uFE0F\u200D]*/gu;
 function emojiHTML(text, cls){
-  const m = String(text ?? '').match(TRAILING_EMOJI);
-  if (!m) return esc(text);
-  return esc(String(text).slice(0, m.index)) + `<span class="${cls}"><i>${esc(m[1])}</i></span>`;
+  const s = String(text ?? '');
+  let out = '', last = 0;
+  for (const m of s.matchAll(EMOJI_RUN)){
+    out += multiline(s.slice(last, m.index)) + `<span class="${cls}"><i>${esc(m[0])}</i></span>`;
+    last = m.index + m[0].length;
+  }
+  return out + multiline(s.slice(last));
 }
 /* single-field headline, with a fallback that merges the old dimmed line1 +
    bright line2 into one flowing string so existing decks keep working. */

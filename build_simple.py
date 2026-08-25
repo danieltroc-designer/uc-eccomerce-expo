@@ -4,15 +4,15 @@ Build the *simplified* Uploadcare TV show (the 7-card booth loop).
 
 Standalone from build.py so the main deck is never touched: this reads
 src/simple.template.html, inlines the same assets (reusing build.py's
-encoders) plus a generated QR code, and writes a separate self-contained
-file to dist/uploadcare-simple.html.
+encoders) plus the booth QR, and writes a separate self-contained file to
+dist/uploadcare-simple.html.
 
 Usage:
     python build_simple.py            # writes dist/uploadcare-simple.html
     python build_simple.py --watch    # rebuild on any change under src/ or assets/
 
-The QR points at CTA_URL below — change it once the final booth/landing URL
-is confirmed.
+To change where the booth QR sends people, replace assets/qr/booth-qr.png and
+rebuild — the build decodes it and prints the destination.
 """
 
 import base64
@@ -82,9 +82,10 @@ UPLOADER_ICONS = {
 # the 120x150 drag card — and reused at 32px for the row thumbnails.
 UPLOADER_THUMBS = ("thumb-flower", "thumb-flamingo")
 
-# Where the card-7 QR sends people. Swap for the final Webflow-integration /
-# landing URL when confirmed.
-CTA_URL = "https://uploadcare.com/webflow/"
+# The card-7 QR, as supplied by design: black on white, any raster size. To
+# point the booth somewhere else, replace this file — the destination lives in
+# the artwork, not in this script, and the build prints what it decodes to.
+QR_SRC = ROOT / "assets" / "qr" / "booth-qr.png"
 
 
 def inline_svg(path: Path) -> str:
@@ -157,41 +158,37 @@ def encode_demo() -> str:
     return json.dumps(out)
 
 
-def make_qr(url: str) -> str:
-    """Return an inline monochrome SVG QR for `url`.
+def make_qr() -> str:
+    """Inline the booth QR as white vector modules on nothing.
 
-    Uses segno if available (pure-python, no deps); falls back to a neutral
-    placeholder tile so the build never breaks offline. The SVG is sized by CSS
-    (viewBox only), foreground pure white so it reads on the dark card.
+    The designer hands over a raster (assets/qr/booth-qr.png, black on white).
+    We do not embed that bitmap: the outro draws the code at 204px, and a
+    scaled raster gives soft module edges — exactly what a scanner has to work
+    hardest to threshold — plus it is the wrong polarity for the dark frame.
+    Instead `qr_lib` recovers the module grid and re-emits it as vector
+    rectangles, which are crisp at any size and recolourable.
+
+    Deliberately *not* wrapped in a try/except. A QR is a promise about where
+    it goes: if the artwork cannot be read, failing the build is right, because
+    every silent fallback here — a placeholder tile, a regenerated code from
+    some URL constant — ships something that looks scannable and goes
+    somewhere other than intended. `read_matrix` validates finder and timing
+    patterns, so a garbled source raises rather than emitting noise.
     """
-    try:
-        import segno  # type: ignore
-        import io as _io
+    sys.path.insert(0, str(ROOT / "tools"))
+    from qr_lib import read_matrix, decode, to_svg
 
-        qr = segno.make(url, error="m")
-        buf = _io.BytesIO()
-        # dark modules on a solid white field so it scans on the white CTA card
-        qr.save(buf, kind="svg", border=2, dark="#0b0b0f", light="#ffffff",
-                xmldecl=False, svgns=True, nl=False)
-        svg = buf.getvalue().decode("utf-8")
-        # segno emits width/height in module units but no viewBox — add one so the
-        # QR scales to fill its CSS box, then drop the fixed size.
-        import re as _re
-        wm = _re.search(r'width="([\d.]+)"', svg)
-        hm = _re.search(r'height="([\d.]+)"', svg)
-        if wm and hm:
-            svg = svg.replace("<svg", f'<svg viewBox="0 0 {wm.group(1)} {hm.group(1)}"', 1)
-        svg = _re.sub(r'\swidth="[\d.]+"', "", svg, count=1)
-        svg = _re.sub(r'\sheight="[\d.]+"', "", svg, count=1)
-        return svg
-    except Exception as exc:  # pragma: no cover - placeholder path
-        print(f"  (segno unavailable: {exc} — using placeholder QR)")
-        return (
-            '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">'
-            '<rect width="100" height="100" fill="none" stroke="#ffffff" '
-            'stroke-width="2"/><text x="50" y="54" fill="#ffffff" '
-            'font-size="10" text-anchor="middle" font-family="monospace">QR</text></svg>'
-        )
+    matrix, info = read_matrix(QR_SRC)
+    payload, _, ecc, _ = decode(matrix)
+    print(f"  QR: {info['n']}x{info['n']} modules (version {info['version']}, "
+          f"ecc {ecc}) -> {payload}")
+    # 3 modules of quiet zone inside the box. The frame's QR is a 204px node
+    # holding 164px of ink, and since the box is a fixed size the only way to
+    # land the ink at 164 is to pad the viewBox: 25 + 2*3 modules over 204px
+    # puts a module at 6.58px and the ink at 164.5. The border draws nothing —
+    # the real quiet zone is the dark frame the code sits on, which is the
+    # right colour for it given the modules are inverted.
+    return to_svg(matrix, fill="#ffffff", border=3)
 
 
 def build_simple() -> None:
@@ -210,7 +207,7 @@ def build_simple() -> None:
         "__ASSETS_JSON__":     build.encode_photos(),
         "__UPLOADER_JSON__":   build.encode_uploader(),
         "__PIXEL_JSON__":      build.encode_pixel_reveal(),
-        "__QR_SVG__":          make_qr(CTA_URL),
+        "__QR_SVG__":          make_qr(),
         "__LOGOS_JSON__":      encode_logos(),
         "__UPLOADERUI_JSON__": encode_uploader_ui(),
         "__DEMO_JSON__":       encode_demo(),

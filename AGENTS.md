@@ -34,9 +34,8 @@ source + build + output and is fully independent of the main deck:
 - Build: `python build_simple.py` → `dist/uploadcare-simple.html`.
 - Same rule applies: never hand-edit `dist/uploadcare-simple.html`.
 - `build_simple.py` reuses every encoder from `build.py` and adds six tokens
-  of its own: `__QR_SVG__` (a QR to `CTA_URL`, generated with the optional
-  `segno` dependency — card 7 rendered it until the storyboard replaced it with
-  the sign-off, and `qr:true` still brings it back), `__LOGOS_JSON__` (the marks
+  of its own: `__QR_SVG__` (the booth QR, vectorised out of
+  `assets/qr/booth-qr.png` — see card 7 below), `__LOGOS_JSON__` (the marks
   in `assets/logos/`), `__UPLOADERUI_JSON__` (the uploader widget's icons
   and the two file thumbnails in `assets/uploader/`, exported at 240x300 so one
   file serves both the 120x150 drag card and the 32px row thumb),
@@ -276,9 +275,35 @@ Laid out to storyboard frame 184:5666. Four things about it are deliberate:
   render is a still of exactly this, a field of squares sitting at different
   greys between roughly 20% and 100% of `#454545`. The mark keeps its `#090909`
   pad, which knocks the wireframe's crossing lines out from behind it.
-- **The sign-off's hand actually waves.** `emojiHTML()` splits the trailing
-  emoji out of `Come say hi 👋` into `.hb-wave > i` so the gesture can be
-  animated without swinging the words with it. Two nested elements because a
+- **The sign-off is two lines and carries the booth QR.** `Come say hi 👋` runs
+  on over `and enter to win LEGO Polaroid Camera Building Set`, both at the
+  frame's 1.065 leading. The QR under it is pinned at `857,711`, not stacked,
+  for the same reason the rest of the column is.
+  - **The destination lives in the artwork, not in a constant.** `make_qr()`
+    reads `assets/qr/booth-qr.png` — design's black-on-white export — recovers
+    its module grid via `tools/qr_lib.py` and re-emits it as white vector
+    rectangles. To point the booth somewhere else, replace that PNG; the build
+    prints what it decodes to (currently `https://l.ead.me/bgyXox`). It is
+    deliberately not wrapped in a try/except: every silent fallback here ships
+    something that looks scannable and goes somewhere other than intended, so
+    unreadable artwork fails the build.
+  - **Why vectorise rather than inline the PNG.** The box is 204px and the
+    export is 1024px; scaling a raster gives soft module edges, which is what a
+    scanner works hardest to threshold. It is also the wrong polarity.
+  - **The 204px box is mostly quiet zone.** The frame's node is 204 holding
+    164.5 of ink, so `to_svg` pads the viewBox by 3 modules. Checking the box
+    alone would pass at any ink size, so `check_outro.py` measures the drawn
+    `getBBox()` too.
+  - **It is a reverse-polarity code** — white modules on dark, per the frame.
+    Phone cameras read inverted codes fine, and at 204px the modules are ~4mm
+    on a 55-inch panel, far past what a scanner needs. If a scanner ever does
+    baulk at a booth, the fix is a light plate behind it, not a bigger code.
+- **The sign-off's hand actually waves.** `emojiHTML()` splits every
+  emoji out of the sign-off into `.hb-wave > i` so the gesture can be
+  animated without swinging the words with it. It matches anywhere in the
+  string, not just at the end — the giveaway line put the hand mid-copy — and
+  everything it wraps shares one animation, so two emoji in a sign-off would
+  gesture in unison rather than take turns. Two nested elements because a
   wave is two motions on different clocks — the hand lifts (and scales a hair)
   over the whole burst while it pivots much faster. Three things do the work:
   the pivot is at the wrist, the arc damps, and it comes in bursts.
