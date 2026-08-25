@@ -77,15 +77,32 @@ room it has, which is the check that matters when any of this is touched.
 whole tag is seven rows (bracket, host, UUID, three transforms, closing
 bracket), and after the 297px picture and its margins the column has room for
 about six, so the tail was being cut off by `.pd-cell`'s `overflow:hidden`.
-`.pd-u1` shows the plain address, clears at `ANALYSE + 1.15`, and `.pd-u2`
-builds the transforms in the space it left, closing the tag once the last op is
-in. Both pages are absolutely positioned inside a fixed four-row (78px) box, so
-the swap is a crossfade with no reflow and the picture above never shifts —
-which also means `.pd-url` needs an explicit width, because `.pd-cell` centres
-its children and a box with only absolute content collapses to nothing. Paging
-is the better read regardless of the clipping: the address and the operations
-stop competing for the same glance. Note the height is sized to the *taller*
-page; adding a fourth transform means growing it and re-checking the column.
+`.pd-u1` shows the plain address and `.pd-u2` builds the transforms in the space
+it leaves. Both pages are absolutely positioned inside a fixed four-row (78px)
+`.pd-body`, so the swap is a crossfade with no reflow and the picture above never
+shifts — which also means `.pd-url` needs an explicit width, because `.pd-cell`
+centres its children and a box with only absolute content collapses to nothing.
+Paging is the better read regardless of the clipping: the address and the
+operations stop competing for the same glance. Three things about it are load
+bearing and were each a bug first:
+
+- **The opening `<img src="` lives outside both pages and never leaves.** With
+  the address gone, `-/crop/face/...` on its own does not read as part of a URL,
+  and the closing bracket that would say so does not arrive until the last op is
+  in — some 3.5s later. The open bracket also gives the swap an anchor, so the
+  block changes underneath a fixed line instead of turning over wholesale.
+- **The pages overlap; they do not take turns.** Clearing the address first and
+  then bringing the transforms in left ~300ms where the column held nothing but
+  the photo, and an empty box under a picture reads as a failed render, not as a
+  beat. The address now leaves *across* the first op's arrival, lifting and
+  blurring as it goes so the op growing into the same line never competes with
+  legible text.
+- **`.pd-url`'s top margin pays for the bracket's row.** The cell centres its
+  column, so the extra 19.5px would lift the picture ~10px off the storyboard's
+  y. The margin is the frame's 32px minus that row; total column height, and so
+  the picture, is unchanged. `check_pipeline.py` asserts this — if the URL block
+  ever grows another row (a fourth transform, say) the margin has to pay for it
+  again, and the four-row `.pd-body` has to grow too.
 
 The three compliance marks along the bottom come from the storyboard's own logo
 sheet (node 189:493) and keep its relative sizing: `PD_BADGES` draws each at
@@ -127,7 +144,10 @@ row and it sits centred in the stage.
 Once the icons land the row used to just sit there, which was the one card in
 the deck that read as a static slide rather than a paused one. A pulse now
 loops across it left to right: each panel washes to 10% of **its own icon's**
-accent and back, on the same 180ms stagger idea as the icons. Per-card colour
+accent and back, 300ms apart. That gap was 180ms first and read as a single
+wash sliding across the row rather than five panels taking turns; each pulse
+still runs far longer than the gap (1.5s against 300ms) so neighbours overlap
+and the row never breaks into five separate blinks. Per-card colour
 rather than a house colour is what makes it read as five capabilities lighting
 up in turn instead of one effect painted over the row, so `FEATURES[].ac`
 duplicates the accent baked into each SVG and the two have to be kept in step —
@@ -366,6 +386,16 @@ Don't remove or rename them. `__PIXEL_JSON__` carries the dot-halftone data
 (parsed from `assets/photos/Pixelated-image.svg`) plus the inlined
 `Full-image.png`; the reveal slide's `startPixelReveal` paints the dots on a
 canvas and dissolves them into the photo.
+
+### A CSS/JS comment trap worth knowing
+
+Both of this file's long explanatory comments and the template's have bitten the
+same way twice: appending a paragraph to an existing `/* … */` block **after**
+its closing `*/` leaves the new prose loose in the stylesheet or the script. In
+JS it is an instant `SyntaxError` and the whole deck fails to boot (`deck is not
+defined`); in CSS it silently swallows the next rule's declarations, which is far
+worse because the page still renders and only a geometry check catches it. When
+extending a comment, put the text *before* the terminator.
 
 ## Verify your work
 

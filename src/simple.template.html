@@ -910,14 +910,30 @@
      anyway: you see the plain file's URL, it clears, and the transforms build in
      its place, so the ops aren't competing with the address for attention.
 
-     Both pages are absolutely positioned inside a fixed four-row box (four is
-     the taller page: three ops plus the closing bracket). That makes the swap a
-     crossfade with no reflow, so the picture above it never shifts and the ops
-     grow into the space the URL just left. The explicit width is needed because
-     .pd-cell centres its children — with only absolute content the box would
-     collapse to nothing. */
-  .pd-url{position:relative;width:100%;height:78px;margin-top:32px;
+     The opening `<img src="` sits outside both pages and never leaves. It is
+     what stops page two reading as three orphaned lines of text: with the
+     address gone, `-/crop/face/...` on its own is not obviously part of a URL,
+     and the closing bracket that would say so does not arrive until the last op
+     is in. Keeping the tag open also gives the swap an anchor — the bracket
+     holds while the body changes underneath it, rather than the whole block
+     turning over at once.
+
+     Both pages are absolutely positioned inside a fixed four-row body (four is
+     the taller page: three ops plus the closing bracket), so the swap costs no
+     reflow and the picture above never shifts. The explicit width is needed
+     because .pd-cell centres its children — a box with only absolute content
+     collapses to nothing.
+
+     The 12.5px top margin is the 32px the frame asks for, less the 19.5px row
+     the persistent bracket adds. The cell centres its column, so a taller URL
+     block would otherwise lift the picture ~10px off the y the storyboard puts
+     it at (check_pipeline.py catches exactly this). Trading the margin keeps the
+     column's total height, and hence the picture, where it was; the visible gap
+     barely changes because the photo is `contain`-fitted and already sits well
+     inside the bottom of its 297px box. */
+  .pd-url{position:relative;width:100%;height:97.5px;margin-top:12.5px;
     font-family:var(--mono);font-size:15px;line-height:19.5px}
+  .pd-body{position:relative;height:78px}
   .pd-u1,.pd-u2{position:absolute;left:0;right:0;top:0}
   .pd-url .row{margin:0;display:flex;flex-wrap:nowrap;white-space:nowrap}
   .pd-url .bracket{color:rgba(255,255,255,.25)}
@@ -1084,8 +1100,13 @@
     box-shadow:inset 0 0 0 1px var(--ac);
     opacity:0;
   }
+  /* 300ms between panels, not 180. The faster hand-off read as one wash sliding
+     across the row; at this spacing each panel gets its own moment and the
+     sweep is legible as five events. Each pulse also runs longer than the gap
+     (1.5s against 300ms), so neighbours still overlap and the row never breaks
+     into five separate blinks. */
   .slide.active .ft-card::before{
-    animation:ftPulse 3.4s ease-in-out calc(1.9s + var(--i)*.18s) infinite;
+    animation:ftPulse 3.8s ease-in-out calc(1.9s + var(--i)*.30s) infinite;
   }
   /* the card's own content has to outrank the wash, or the tint lands on top of
      the label and the icon instead of behind them */
@@ -1093,7 +1114,7 @@
   @keyframes ftPulse{
     0%,100%{opacity:0}
     12%    {opacity:.25}
-    36%    {opacity:0}
+    40%    {opacity:0}
   }
   .ft-label{font-size:28px;font-weight:580;letter-spacing:-.42px;line-height:1.065;
     color:#bcbdc0;text-box-trim:trim-both;text-box-edge:cap alphabetic}
@@ -2159,14 +2180,16 @@ const R = {
               <img src="${DEMO.step2}" alt=""><img src="${DEMO.step3}" alt="">
             </div>
             <div class="pd-url">
-              <div class="pd-u1">
-                <p class="row bracket st">&lt;img src="</p>
-                <p class="row indent st"><span class="host">https://demo.ucarecd.net/</span></p>
-                <p class="row indent st"><span class="id">${esc(PD_UUID)}</span><span class="dim">/</span></p>
-              </div>
-              <div class="pd-u2">
-                ${transforms}
-                <p class="row bracket cl">" /&gt;</p>
+              <p class="row bracket st">&lt;img src="</p>
+              <div class="pd-body">
+                <div class="pd-u1">
+                  <p class="row indent st"><span class="host">https://demo.ucarecd.net/</span></p>
+                  <p class="row indent st"><span class="id">${esc(PD_UUID)}</span><span class="dim">/</span></p>
+                </div>
+                <div class="pd-u2">
+                  ${transforms}
+                  <p class="row bracket cl">" /&gt;</p>
+                </div>
               </div>
             </div>
           </div>
@@ -3329,8 +3352,8 @@ function setupPipeline(slideEl, sd, tl){
   const lines   = qa('.pd-analysis p');
   const stage   = q('.pd-stage');
   const shots   = qa('.pd-stage img');
-  const page1   = q('.pd-u1');            // bracket + host + UUID
-  const statics = qa('.pd-u1 .st');
+  const page1   = q('.pd-u1');             // host + UUID (the bracket stays put)
+  const statics = qa('.pd-url .st');
   const close   = q('.pd-url .cl');        // the tag's closing " />
   const tfs     = qa('.pd-url .tf');
   if (!zone || !canvas) return;
@@ -3355,7 +3378,7 @@ function setupPipeline(slideEl, sd, tl){
     pixel.style.opacity = '0';
     stage.style.opacity = '0';
     shots.forEach(im=>Object.assign(im.style, {opacity:'0', filter:'blur(20px)', transform:'scale(1.05)'}));
-    page1.style.opacity = '1';
+    Object.assign(page1.style, {opacity:'1', transform:'none', filter:'none'});
     statics.forEach(p=>p.style.opacity = '0');
     close.style.opacity = '0';
     tfs.forEach(d=>Object.assign(d.style, {opacity:'0', height:'0px'}));
@@ -3374,7 +3397,10 @@ function setupPipeline(slideEl, sd, tl){
     pixel.style.opacity = '1'; pdGrid.settle();
     stage.style.opacity = '1';
     Object.assign(shots[3].style, {opacity:'1', filter:'none', transform:'none'});
-    // the transforms page is the end of the story, so that is the one to hold
+    // the transforms page is the end of the story, so that is the one to hold —
+    // but the opening bracket is a static and still has to be painted, or the
+    // ops sit there as three unattributed lines
+    statics.forEach(p=>p.style.opacity = '1');
     page1.style.opacity = '0';
     close.style.opacity = '1';
     tfs.forEach(d=>Object.assign(d.style, {opacity:'1', height:'auto'}));
@@ -3425,9 +3451,15 @@ function setupPipeline(slideEl, sd, tl){
   tl.to(shots[0], [{opacity:0, filter:'blur(20px)', transform:'scale(1.05)'},
                    {opacity:1, filter:'blur(0px)',  transform:'scale(1)'}], {at:ANALYSE, dur:.6});
   statics.forEach((p,i)=>tl.to(p, [{opacity:0},{opacity:1}], {at:ANALYSE + .1 + i*.05, dur:.4}));
-  // the address has ~1.2s to be read, then clears exactly as the first
-  // transform lands, so the column is only ever showing one idea at a time
-  tl.to(page1, [{opacity:1},{opacity:0}], {at:ANALYSE + 1.15, dur:.35, fill:'forwards'});
+  // The address leaves *across* the first transform's arrival, not before it.
+  // Clearing first left ~300ms where the column held nothing but the picture,
+  // and an empty box under a photo reads as a failed render rather than a beat.
+  // The two overlap by ~250ms; the address lifts and blurs on its way out so the
+  // op growing into the same line underneath it never has to compete with
+  // legible text — blur is what lets a crossfade happen in one place.
+  tl.to(page1, [{opacity:1, transform:'translateY(0)',    filter:'blur(0px)'},
+                {opacity:0, transform:'translateY(-8px)', filter:'blur(3px)'}],
+        {at:ANALYSE + 1.3, dur:.45, ease:EASE.out, fill:'forwards'});
 
   // each transform types itself in and the picture becomes what it describes
   [1.5, 3, 4.5].forEach((off, i)=>{
