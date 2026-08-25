@@ -226,6 +226,35 @@ Laid out to storyboard frame 184:5666. Four things about it are deliberate:
   render is a still of exactly this, a field of squares sitting at different
   greys between roughly 20% and 100% of `#454545`. The mark keeps its `#090909`
   pad, which knocks the wireframe's crossing lines out from behind it.
+- **The sign-off's hand actually waves.** `emojiHTML()` splits the trailing
+  emoji out of `Come say hi 👋` into `.hb-wave > i` so the gesture can be
+  animated without swinging the words with it. Two nested elements because a
+  wave is two motions on different clocks — the hand lifts (and scales a hair)
+  over the whole burst while it pivots much faster. Three things do the work:
+  the pivot is at the wrist, the arc damps, and it comes in bursts.
+  - **The pivot is measured, not guessed.** `transform-origin:65% 88%` is a
+    fraction of the *line box*, which the emoji does not fill. Eyeballing "the
+    bottom of the hand" as ~100% drops the pivot into empty space below the
+    glyph, and rotating about a point outside the artwork reads as the hand
+    sliding rather than turning. 65/88 is where the ink tapers to a point — the
+    forearm. If the emoji font ever changes, re-measure by differencing a frame
+    against one with the `<i>` set to `visibility:hidden`; that isolates the
+    glyph's ink from the warm pixels in the corner cards nearby.
+  - **The arc damps and winds up.** 18° → 14 → 14 → 10 → 8 → 3 → rest, preceded
+    by a 5° counter-tip, because a gesture loads before it fires and runs out of
+    energy rather than stopping on a beat. Half-swings land ~275ms apart (~1.8Hz,
+    the rate of an actual friendly wave). `ease-in-out` between every stop is
+    what makes the ends of the arc settle and the middle move quickly; that is
+    pendulum motion, and `linear` or `ease-out` here reads mechanical.
+  - **It rests between bursts.** ~2.2s of waving inside a 6.4s cycle. A
+    continuous wave reads as a looping GIF. The card runs 10s, so a visitor sees
+    the burst, a pause, and the start of a second one.
+  - **Scoped to `.slide.active`.** Unscoped, a CSS animation starts when the deck
+    renders, so the card inherits whatever phase it lands on — as likely to
+    arrive mid-swing as at rest, and somewhere else again on the next loop. The
+    1.5s delay puts the wave just after the sign-off's own entrance (`d5`,
+    .46s + .58s) so the hand reads as noticing you rather than waving before it
+    is there. Reduced motion pins it still.
 - **The corner watermark is suppressed here.** `enter()` skips it on
   `layout:'outro'` — the mark is already the centre of the composition, and the
   frame has no second copy.

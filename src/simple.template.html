@@ -601,6 +601,58 @@
     text-box-trim:trim-both;text-box-edge:cap alphabetic;
   }
 
+  /* ---- the sign-off's hand actually waves ----
+     Two nested elements, because a wave is two motions on different clocks: the
+     whole hand lifts as the gesture starts and lowers as it ends, while the
+     hand itself pivots much faster. One transform can't carry both.
+
+     What makes it read as a wave rather than a rocking icon:
+     - it pivots at the wrist, not the centre of the glyph. Centre origin makes
+       the hand look like it is spinning in place. 65%/88% is measured, not
+       guessed: the glyph's ink tapers to a point at the bottom (that taper is
+       the forearm) and that point sits there within the inline box. Note it is
+       a fraction of the *line box*, which the emoji does not fill — eyeballing
+       "the bottom of the hand" as 100% puts the pivot in empty space below it.
+     - it winds up. The hand tips a few degrees the wrong way before the first
+       real swing, the way a gesture loads before it fires.
+     - it damps. 18° → 14 → 14 → 10 → 8 → 3 → rest, because a wave runs out of
+       energy rather than stopping on a beat. The arc is wider than it would be
+       on a desktop UI because this plays on a TV people read from 2–4m; at ±12
+       the hand only travels a few millimetres on the panel.
+     - it comes in bursts. ~1.9s of waving then four and a half seconds of
+       stillness — a person waves, then stops. A metronome reads as a GIF.
+     Half-swings land ~275ms apart, which is the ~2Hz a friendly wave runs at.
+     ease-in-out between every stop is what makes each end of the arc settle
+     and the middle move quickly: that is pendulum motion. */
+     Both are scoped to .slide.active so the gesture starts when the card does.
+     Unscoped, the animation runs from the moment the deck renders and the card
+     inherits whatever phase it happens to land on — the hand is as likely to be
+     mid-swing on arrival as at rest, and on the second loop it would be
+     somewhere else again. The 1.5s delay puts the wave just after the sign-off
+     finishes its own entrance (d5, .46s + .58s), so it reads as the hand
+     noticing you rather than waving before it is there. */
+  .hb-wave{display:inline-block}
+  .hb-wave i{display:inline-block;font-style:normal;transform-origin:65% 88%}
+  .slide.active .hb-wave{animation:hbWaveLift 6.4s ease-in-out 1.5s infinite}
+  .slide.active .hb-wave i{animation:hbWaveArm 6.4s ease-in-out 1.5s infinite}
+  @keyframes hbWaveArm{
+    0%    {transform:rotate(0deg)}
+    3%    {transform:rotate(-5deg)}
+    8%    {transform:rotate(18deg)}
+    12.5% {transform:rotate(-14deg)}
+    17%   {transform:rotate(14deg)}
+    21.5% {transform:rotate(-10deg)}
+    26%   {transform:rotate(8deg)}
+    30%   {transform:rotate(-3deg)}
+    34%,100%{transform:rotate(0deg)}
+  }
+  @keyframes hbWaveLift{
+    0%    {transform:translateY(0) scale(1)}
+    8%    {transform:translateY(-2.5px) scale(1.04)}
+    26%   {transform:translateY(-2px) scale(1.03)}
+    36%,100%{transform:translateY(0) scale(1)}
+  }
+
   /* The glyph on the centre line. Its own #090909 pad is the storyboard's: it
      knocks the wireframe's crossing lines out from behind the mark so the
      pixels read as pixels. */
@@ -1276,6 +1328,7 @@
     .hb-node{opacity:1!important;transform:none!important}
     .hb-node.float .hb-inner,.hb-globe.spin,.hb-dot.pulse,.hb-cursor{animation:none!important}
     .hb-mark path{animation:none!important;opacity:.62}
+    .hb-wave,.hb-wave i{animation:none!important}
     .pl-shine .pl-pill::after{animation:none!important;opacity:0!important}
     .slide.active .sc-chip{animation:none!important}
     .pd-dots[data-state="working"] i{animation:none!important}
@@ -1616,6 +1669,15 @@ addEventListener('resize', fit); fit();
 /* ---------------- renderers ---------------- */
 function esc(s){ return String(s??'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 function multiline(s){ return esc(s).replace(/\n/g,'<br>'); }
+/* Split a trailing emoji off a line so it can be animated on its own. The
+   sign-off's hand is a gesture, not decoration on the type: it needs its own
+   transform origin, and rotating the whole text run would swing the words. */
+const TRAILING_EMOJI = /(\p{Extended_Pictographic}[\p{Extended_Pictographic}\uFE0F\u200D]*)\s*$/u;
+function emojiHTML(text, cls){
+  const m = String(text ?? '').match(TRAILING_EMOJI);
+  if (!m) return esc(text);
+  return esc(String(text).slice(0, m.index)) + `<span class="${cls}"><i>${esc(m[1])}</i></span>`;
+}
 /* single-field headline, with a fallback that merges the old dimmed line1 +
    bright line2 into one flowing string so existing decks keep working. */
 function headText(s){ return s.heading!=null ? s.heading : [s.line1,s.line2].filter(v=>v).join(' '); }
@@ -2275,7 +2337,7 @@ const R = {
           <div class="hb-outro-line reveal d3">${multiline(title)}</div>
          </div>
          <div class="hb-mark reveal d4">${GLYPH}</div>
-         ${s.sub?`<div class="hb-outro-sub reveal d5">${esc(s.sub)}</div>`:''}
+         ${s.sub?`<div class="hb-outro-sub reveal d5">${emojiHTML(s.sub,'hb-wave')}</div>`:''}
          ${s.qr?`<div class="hb-outro-qr reveal d5">${QR}</div>`:''}`
       : `<div class="hb-logo">${LOGO}</div>
          <div class="hb-title">${multiline(title)}</div>`;
