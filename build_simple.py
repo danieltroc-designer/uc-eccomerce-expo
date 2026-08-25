@@ -30,6 +30,12 @@ OUT = ROOT / "dist" / "uploadcare-simple.html"
 LOGOS = ROOT / "assets" / "logos"
 UPLOADER_UI = ROOT / "assets" / "uploader"
 DEMO = ROOT / "assets" / "demo"
+CAPS = ROOT / "assets" / "caps"
+
+# Card 2's capability icons, exported from the storyboard with their accent
+# colours baked in — they are not a monochrome set, so they can't be recoloured
+# from CSS. Keys are what FEATURES looks them up by.
+CAP_ICONS = ("large-files", "multi-file", "any-source", "malware", "editor")
 
 # The three-panel pipeline card runs on one photo and the three transforms the
 # on-screen URL builds up, so the frames have to match the ops exactly:
@@ -49,14 +55,22 @@ DEMO_FRAMES = {
 LOGO_ORDER = ("zapier", "soundcloud", "loreal", "sequoia",
               "usertesting", "prezly", "aryeo", "marko")
 
-# The real uploader widget's chrome: the dropzone glyph and one icon per
-# upload source. Keys are what the template looks them up by. The pointer is
-# not here — it reuses the deck's existing cursor (see encode_uploader_ui).
+# The real uploader widget's chrome: the dropzone glyph, one icon per upload
+# source, and the controls on the compact uploading panel (dismiss, per-file
+# checkmark, per-file bin). Keys are what the template looks them up by. Two
+# things are deliberately absent: the pointer, which reuses the deck's existing
+# cursor, and the upload ring, which the template draws so its arc can fill.
 UPLOADER_ICONS = {
     "upload": "icon-upload.svg", "device": "icon-device.svg",
     "camera": "icon-camera.svg", "dropbox": "icon-dropbox.svg",
     "gdrive": "icon-gdrive.svg", "link": "icon-link.svg",
+    "close": "icon-close.svg", "check": "icon-check.svg",
+    "trash": "icon-trash.svg",
 }
+
+# The two files that get dragged in. One photo each, exported at 240x300 — 2x
+# the 120x150 drag card — and reused at 32px for the row thumbnails.
+UPLOADER_THUMBS = ("thumb-flower", "thumb-flamingo")
 
 # Where the card-7 QR sends people. Swap for the final Webflow-integration /
 # landing URL when confirmed.
@@ -101,10 +115,15 @@ def encode_uploader_ui() -> str:
     # the storyboard's cursor exported as an empty mask, so use the pointer the
     # upload-demo slide already uses — same mark, and one cursor across the deck
     out["cursor"] = inline_svg(build.PHOTOS / "Cursor.svg")
-    for key in ("file-mp4", "file-png"):
+    for key in UPLOADER_THUMBS:
         b64 = base64.b64encode((UPLOADER_UI / f"{key}.png").read_bytes()).decode()
         out[key] = f"data:image/png;base64,{b64}"
     return json.dumps(out)
+
+
+def encode_caps() -> str:
+    """JSON map of capability-icon name -> inline SVG, for card 2's tiles."""
+    return json.dumps({n: inline_svg(CAPS / f"{n}.svg") for n in CAP_ICONS})
 
 
 def encode_demo() -> str:
@@ -175,6 +194,7 @@ def build_simple() -> None:
         "__LOGOS_JSON__":      encode_logos(),
         "__UPLOADERUI_JSON__": encode_uploader_ui(),
         "__DEMO_JSON__":       encode_demo(),
+        "__CAPS_JSON__":       encode_caps(),
     }
     for token, value in replacements.items():
         if token not in html:

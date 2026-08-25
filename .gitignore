@@ -7,3 +7,6 @@ __pycache__/
 # verify_simple.py scratch: screenshots and the headless browser profile
 tools/_shots/
 tools/_profile/
+# storyboard frames pulled from Figma to check a rebuild against — reference,
+# not source; re-fetch them from the file rather than committing them
+tools/_fig/

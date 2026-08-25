@@ -17,8 +17,11 @@ PROFILE = ROOT / "tools" / "_profile"
 
 # card index -> ms after enter() worth capturing
 SHOTS = {
-    0: [1400, 2300, 3400],   # dropin: files in flight, over the zone, dropped
-    1: [1800],               # feature row
+    # dropin: stack in flight, landed over the hot zone, dropping, panel taken
+    # over, first ring filling, first file done, both done, window dismissed
+    0: [1700, 2350, 2700, 3400, 3900, 4600, 5900, 7600],
+    # capability panels: mid-stagger, settled, and two loader phases apart
+    1: [700, 1800, 2400, 3000],
     2: [2200],               # quote
     3: [2000],               # logo wall
     4: [4000],               # install

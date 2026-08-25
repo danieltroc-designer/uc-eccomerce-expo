@@ -37,8 +37,12 @@ source + build + output and is fully independent of the main deck:
   of its own: `__QR_SVG__` (the card-7 QR — destination is `CTA_URL`, generated
   with the optional `segno` dependency), `__LOGOS_JSON__` (the customer marks
   in `assets/logos/`), `__UPLOADERUI_JSON__` (the uploader widget's icons
-  and file thumbnails in `assets/uploader/`), and `__DEMO_JSON__` (the pipeline
-  card's photo and its three transformed frames, in `assets/demo/`).
+  and the two file thumbnails in `assets/uploader/`, exported at 240x300 so one
+  file serves both the 120x150 drag card and the 32px row thumb), and
+  `__DEMO_JSON__` (the pipeline card's photo and its three transformed frames,
+  in `assets/demo/`), and `__CAPS_JSON__` (card 2's capability icons in
+  `assets/caps/`, which carry their own accent colours and so can't be
+  recoloured from CSS).
 
 Card 6 is a port of the three-panel demo on the marketing site
 (upload | analyse | deliver). Two things about it differ from the original and
@@ -50,14 +54,46 @@ in `assets/demo/` are the CDN's own renders of the three transforms the
 on-screen URL builds (`crop/face` → `scale_crop` → `border_radius`), so
 changing a transform in `PD_TRANSFORMS` means re-fetching the matching frame.
 
+Card 1 is the real uploader widget playing its whole story: a stack of two
+files is dragged in under a single cursor, dropped, and the widget hands over
+to the compact "Uploading N files" panel, where each file fills its ring and
+settles into a checkmark plus a bin before the window dismisses itself. The
+travel is a spring rather than a tween, because a dragged object carries
+momentum; `tl.spring()` reports its settle time synchronously through
+`onArrive`, and the rest of the score is written against that, so the drop
+always follows the landing however the spring is retuned. The progress ring is
+drawn in the template (`DI_RING`) rather than exported, because the storyboard's
+icon is a snapshot at one arbitrary percentage and this one has to fill.
+
+Card 2 is the storyboard's capability row: five 265x316 panels that rise in a
+70ms stagger, each icon tile landing a beat after its own card. Above them sits
+a status chip running `LOADER` — four squares stepping round a 2x2 ring. All
+four share one set of keyframes and one start position; the negative
+`animation-delay` is what spreads them around the ring, so the whole loop
+retimes from `--ld-dur` alone. Two squares carry the highlight, which is what
+makes the bright pair sweep instead of the ring reading as uniform. Reduced
+motion has to pin each square to its own corner explicitly, or they collapse
+into a single stack.
+
 This deck is laid out directly against the Figma storyboard ("Storyboard –
-Webflow – 2"). Two conventions come from there and are worth keeping:
+Webflow – 2"). Three conventions come from there and are worth keeping:
 
 - **Headlines are anchored, not centred.** Every card pins its headline to
   `--head-y` (205px) rather than centring the column, so type doesn't shift as
   the deck advances. Cards position their supporting art at the storyboard's
   own coordinates — the stage is a native 1920x1080, so Figma numbers are used
   verbatim.
+- **The wireframe globe belongs to card 7 only.** The ambient substrate behind
+  the other cards is now just the occasional signal blip in the margins; the
+  globe read as wallpaper everywhere except the payoff, so it was removed from
+  `#substrate` and lives solely in `.hb-globe`. Card 7 still switches the
+  substrate off (`sb-off`) so the blips don't duplicate the board's own dots.
+- **The rebuilt headline block is `.shd`** — an 88px title over a 32px sub, both
+  Inter 580, trimmed to their cap box with `text-box-trim` so they land on the
+  storyboard's y=168 and y=264 exactly rather than by eye. Card 1 uses it; the
+  rest still sit on `--head-y` and adopt `.shd` as they get rebuilt. Because
+  Figma trims to the cap box, any element measured against it needs the same
+  trim, or it will read ~21px low at 88px.
 - **`.reveal` animates `transform`.** Anything wearing it must be centred with
   an explicit `left` offset, never `translateX(-50%)`, or the two rules fight
   and the element slides sideways as it enters.

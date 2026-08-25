@@ -108,26 +108,20 @@
   .watermark.show{opacity:1}
 
   /* ---------- ambient substrate ----------
-     A quiet version of the file board's world running behind every card: the
-     globe wireframe, plus the occasional signal blip out in the margins. The
-     sparser cards were content floating on flat black; this gives them a frame
-     to sit in and makes the deck read as one continuous system instead of
-     seven separate posters. Blips are deliberately kept outside the middle of
-     the stage so they never compete with the message.
+     The occasional signal blip out in the margins, running behind every card so
+     the deck reads as one continuous system rather than seven separate posters.
+     Blips are deliberately kept outside the middle of the stage so they never
+     compete with the message.
 
-     Card 7 runs the same board at full strength as its payoff, so the
-     substrate steps aside there. */
+     The wireframe globe used to live here too. It now belongs to card 7 alone
+     (`.hb-globe`), which is the payoff — behind the other cards it was reading
+     as wallpaper. Card 7 also owns the blips' vocabulary, so the substrate
+     steps aside entirely there. */
   #substrate{
     position:absolute;inset:0;z-index:0;pointer-events:none;
     opacity:1;transition:opacity .9s var(--ease-out);
   }
   #stage.sb-off #substrate{opacity:0}
-  .sb-globe{
-    position:absolute;left:50%;top:52%;width:1560px;
-    transform:translate(-50%,-50%);opacity:.62;
-    animation:hbGlobe 68s ease-in-out infinite;
-  }
-  .sb-globe svg{width:100%;height:auto;display:block}
   .sb-field{position:absolute;inset:0}
   /* amber while in flight, green once it lands — the board's own vocabulary */
   .sb-blip{
@@ -858,29 +852,47 @@
   .pd-url .tf{overflow:hidden;height:0;opacity:0}
   .pd-url .st{opacity:0}
 
+  /* =======================================================================
+     The storyboard headline block.
+
+     Figma trims both texts to their cap box, which is why the title measures
+     64px tall at 88px type. text-box-trim reproduces that exactly, so the
+     title's cap-top lands on y=168 and the 32px gap is a real 32px between
+     cap-bottom and cap-top — not a line-height fudge that drifts when the
+     font size changes. Cards adopt this as they get rebuilt.
+     ======================================================================= */
+  .shd{position:absolute;top:168px;left:80px;width:1760px;text-align:center;font-weight:580}
+  .shd-t{font-size:88px;letter-spacing:-1.32px;line-height:normal;color:#fff;
+    text-box-trim:trim-both;text-box-edge:cap alphabetic}
+  .shd-s{margin-top:32px;font-size:32px;letter-spacing:-.48px;line-height:1.065;color:#bcbdc0;
+    text-box-trim:trim-both;text-box-edge:cap alphabetic}
+
   /* card 1 — uploads that just work.
      The real Uploadcare uploader widget, rebuilt 1:1 from the storyboard: the
      stage is native 1920x1080, so every number here is the Figma number. Files
-     are dragged in from off-frame and dropped into the zone. */
-  .di-wrap{position:absolute;inset:0;text-align:center;padding:0 var(--gm)}
-  .di-head{position:absolute;top:var(--head-y);left:var(--gm);right:var(--gm)}
-  .di-title{font-size:var(--h-size);font-weight:var(--h-weight);letter-spacing:var(--h-ls);line-height:var(--h-lh);color:var(--ink)}
-  .di-sub{margin-top:18px;font-size:30px;color:var(--ink-dim);font-weight:450}
-  .di-stage{position:absolute;left:650px;top:394px;width:620px;height:600px}
+     are dragged in as a stack, dropped, and then the widget hands over to the
+     compact uploading panel. Choreographed by setupDropin(). */
+  .di-wrap{position:absolute;inset:0}
 
-  .di-widget{position:absolute;left:110px;top:110px;width:400px;display:flex;flex-direction:column;gap:20px;
-    background:#181818;border-radius:18px;padding:20px;text-align:left;
+  .di-widget{position:absolute;left:760px;top:414px;width:400px;display:flex;flex-direction:column;gap:20px;
+    background:#181818;border-radius:18px;padding:20px;
     filter:drop-shadow(0 12px 16px rgba(0,0,0,.25));
     opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .6s var(--ease-out)}
   .slide.active .di-widget{opacity:1;transform:none}
+  /* Figma's 49/25 padding sits inside a stroke that costs no layout, so the
+     padding here is 1px short on each side to pay for the CSS border and land
+     on the same 360x196 box. */
   .di-drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
-    border:1px dashed rgba(255,255,255,.13);border-radius:7px;padding:49px 25px;
+    border:1px dashed rgba(255,255,255,.13);border-radius:7px;padding:48px 24px;
     transition:border-color .35s ease,background .35s ease}
-  .di-drop.hot{border-color:rgba(255,255,255,.36);background:rgba(255,255,255,.025)}
+  /* while the pointer is over it the zone fills solid and the dashed edge
+     drops out — transparent rather than removed, so the border-box keeps the
+     same 196px height and nothing below it shifts */
+  .di-drop.hot{border-color:transparent;background:#242424}
   .di-dropic{width:64px;height:64px;border-radius:9999px;background:rgba(255,255,255,.05);
     display:flex;align-items:center;justify-content:center;flex:none}
   .di-dropic svg{width:16px;height:16px;display:block}
-  .di-droptxt{font-size:15px;color:#fff;line-height:normal}
+  .di-droptxt{font-size:15px;color:#fff;line-height:18px}
   .di-src{display:flex;flex-direction:column}
   .di-row{display:flex;align-items:center;gap:12px;padding:6px 10px;border-radius:8px;
     opacity:0;transform:translateY(6px);transition:opacity .34s ease,transform .4s var(--ease-out);
@@ -892,31 +904,111 @@
   .di-cancel{background:rgba(255,255,255,.05);border-radius:8px;padding:5.5px 0;
     text-align:center;font-size:14px;color:#fff;line-height:normal}
 
-  /* the dragged files: fly in from off-frame, hover, then drop into the zone */
-  .di-card{position:absolute;width:120px;height:150px;
-    opacity:0;transform:translate(var(--fx),var(--fy)) rotate(var(--fr)) scale(.86);
-    transition:opacity .4s ease,transform .85s var(--ease-out);transition-delay:var(--d)}
-  .slide.active .di-card{opacity:1;transform:none}
-  .slide.active .di-card.dropped{opacity:0;transform:translate(-150px,118px) scale(.3);
-    transition:opacity .42s ease,transform .6s var(--ease-in-out);transition-delay:0s}
-  .di-card img{width:100%;height:100%;object-fit:cover;object-position:50% 41%;border-radius:12px;display:block}
+  /* The dragged files travel as one stack under a single cursor, so the group
+     carries the motion and the cards only hold their offsets. The stack rests
+     far enough left that the pointer — pinned to the front card's lower-right
+     corner — sits inside the dropzone rather than beside the widget, which is
+     what makes the zone's hover state read as caused by the pointer. */
+  .di-group{position:absolute;left:1008px;top:398px;width:120px;height:150px;opacity:0}
+  .di-card{position:absolute;inset:0}
+  .di-card.a{transform:translate(24px,-26px)}
+  .di-card img{width:100%;height:100%;object-fit:cover;border-radius:12px;display:block}
   .di-tag{position:absolute;top:6px;background:#161616;border-radius:6px;padding:4px 8px;
     font-family:var(--mono);font-weight:400;font-size:12px;line-height:normal;color:#fff}
   .di-tag.k{left:6px}
   .di-tag.s{right:6px}
-  .di-cur{position:absolute;right:7px;bottom:-16px;width:18px;height:25px;
+  .di-cur{position:absolute;left:95px;top:141px;width:18px;height:25px;
     filter:drop-shadow(1px 0 1px rgba(0,0,0,.3))}
   .di-cur svg{width:100%;height:100%;display:block}
 
-  /* card 2 — five capabilities */
-  .ft-wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:0 var(--gm)}
-  .ft-row{display:flex;gap:52px;align-items:flex-start}
-  .ft-item{width:210px;text-align:center;opacity:0;transform:translateY(12px) scale(.94);
-    transition:opacity .35s ease,transform .5s var(--ease-pop);transition-delay:calc(.15s + var(--i)*.16s)}
-  .slide.active .ft-item{opacity:1;transform:none}
-  .ft-ic{width:88px;height:88px;margin:0 auto 22px;border:1px solid var(--line);border-radius:20px;background:#141416;display:flex;align-items:center;justify-content:center;color:var(--ink)}
-  .ft-ic svg{width:46px;height:46px;display:block}
-  .ft-label{font-size:23px;font-weight:550;color:var(--ink);letter-spacing:-0.01em;line-height:1.2}
+  /* the compact uploading panel that takes over once the files land */
+  .di-panel{position:absolute;left:759px;top:484px;width:400px;
+    background:#1a1a1a;border-radius:12px;overflow:hidden;
+    box-shadow:0 6px 20px rgba(0,0,0,.25);opacity:0}
+  .di-phead{display:flex;align-items:center;justify-content:space-between;padding:10px 10px 10px 20px}
+  .di-ptitle{font-size:14px;font-weight:510;line-height:20px;color:#e1e1e1}
+  .di-pclose{padding:8px;display:flex}
+  .di-pclose svg{width:16px;height:16px;display:block}
+  .di-plist{display:flex;flex-direction:column;gap:4px;padding:0 10px 10px}
+  .di-file{display:flex;align-items:center;justify-content:space-between;
+    background:#242424;border-radius:8px;padding:10px}
+  .di-fleft{display:flex;align-items:center;gap:12px}
+  .di-thumb{position:relative;width:32px;height:32px;flex:none}
+  .di-thumb img{width:100%;height:100%;object-fit:cover;border-radius:8px;display:block}
+  .di-check{position:absolute;left:16px;top:16px;width:14px;height:14px;
+    opacity:0;transform:scale(.55);
+    transition:opacity .18s ease,transform var(--dur-2) var(--ease-pop)}
+  .di-check svg{width:100%;height:100%;display:block}
+  .di-fname{font-size:13px;line-height:20px;color:#989898}
+  .di-act{position:relative;width:21px;height:21px;flex:none;
+    display:flex;align-items:center;justify-content:center}
+  /* the ring and the bin occupy the same slot and swap on completion */
+  .di-ring{position:absolute;width:20px;height:20px;transition:opacity .18s ease}
+  .di-ring .trk{fill:none;stroke:rgba(255,255,255,.14);stroke-width:1}
+  .di-ring .arc{fill:none;stroke:#5199FF;stroke-width:1;stroke-linecap:round;
+    transform:rotate(-90deg);transform-origin:50% 50%;
+    stroke-dasharray:57.6;stroke-dashoffset:57.6}
+  .di-ring .x{stroke:#989898;stroke-width:1}
+  /* the ring is centred in the slot but the bin is flush right, as in the
+     storyboard — they're different widths and both align to the row's edge */
+  .di-bin{position:absolute;right:0;width:16px;height:16px;opacity:0;transition:opacity .18s ease}
+  .di-bin svg{width:100%;height:100%;display:block}
+  .di-file[data-state="done"] .di-check{opacity:1;transform:none}
+  .di-file[data-state="done"] .di-ring{opacity:0}
+  .di-file[data-state="done"] .di-bin{opacity:1}
+
+  /* =======================================================================
+     The four-square loader.
+
+     All four squares share one set of keyframes and one start position; the
+     negative delays are what spread them around the ring, so the whole loop
+     retimes from `--ld-dur` alone. Two squares are bright, so the highlight
+     sweeps round as they travel rather than sitting still. The holds in the
+     keyframes are what make it step corner to corner instead of gliding.
+     ======================================================================= */
+  .ld{position:relative;flex:none;
+    --ld-sq:14px;--ld-step:24px;--ld-dur:2s;
+    width:calc(var(--ld-sq) + var(--ld-step));height:calc(var(--ld-sq) + var(--ld-step))}
+  .ld i{position:absolute;left:0;top:0;width:var(--ld-sq);height:var(--ld-sq);
+    border-radius:2px;background:#626262;
+    animation:ldOrbit var(--ld-dur) var(--ease-in-out) infinite;
+    animation-delay:calc(var(--i) * var(--ld-dur) / -4)}
+  .ld i.hot{background:#c8c8c8}
+  @keyframes ldOrbit{
+    0%,13%  {transform:translate(0,0)}
+    25%,38% {transform:translate(var(--ld-step),0)}
+    50%,63% {transform:translate(var(--ld-step),var(--ld-step))}
+    75%,88% {transform:translate(0,var(--ld-step))}
+    100%    {transform:translate(0,0)}
+  }
+
+  /* card 2 — five capabilities, as the storyboard's panel row */
+  .ft-wrap{position:absolute;inset:0}
+  /* the live chip is the only thing above the row, so it carries the card */
+  .ft-chip{position:absolute;left:0;right:0;top:240px;
+    display:flex;align-items:center;justify-content:center}
+  .ft-chip > span{display:inline-flex;align-items:center;gap:18px;
+    background:#181818;border-radius:999px;padding:14px 28px 14px 22px}
+  .ft-chiptxt{font-size:28px;font-weight:580;letter-spacing:-.42px;color:#bcbdc0;
+    line-height:1.065;text-box-trim:trim-both;text-box-edge:cap alphabetic}
+  .ft-row{position:absolute;left:266px;top:382px;width:1389px;height:316px;
+    display:flex;gap:16px}
+  .ft-card{width:265px;background:#0c0c0c;border:1px solid #181818;border-radius:24px;
+    padding:40px;display:flex;flex-direction:column;justify-content:space-between;
+    opacity:0;transform:translateY(20px);
+    transition:opacity var(--dur-2) ease,transform var(--dur-3) var(--ease-out);
+    transition-delay:calc(.14s + var(--i)*.07s)}
+  .slide.active .ft-card{opacity:1;transform:none}
+  .ft-label{font-size:28px;font-weight:580;letter-spacing:-.42px;line-height:1.065;
+    color:#bcbdc0;text-box-trim:trim-both;text-box-edge:cap alphabetic}
+  /* the tile lands a beat after its card, so the row reads label-then-icon */
+  .ft-tile{width:96px;height:96px;flex:none;background:#181818;border-radius:9.433px;
+    display:flex;align-items:center;justify-content:center;
+    opacity:0;transform:scale(.9);
+    transition:opacity var(--dur-1) ease,transform var(--dur-2) var(--ease-pop);
+    transition-delay:calc(.34s + var(--i)*.07s)}
+  .slide.active .ft-tile{opacity:1;transform:none}
+  .ft-tile svg{width:48px;height:48px;display:block}
 
   /* card 3 — calm quote. Attribution sits under the quote, the customer's real
      wordmark under that (storyboard frame 3). */
@@ -992,7 +1084,7 @@
   @media (prefers-reduced-motion:reduce){
     /* entrance choreography collapses to an instant jump to the settled state
        (opacity cross-fades that aid comprehension are kept where they exist) */
-    .di-widget,.di-row,.di-card,.di-drop,.ft-item,.sc-cell,
+    .di-widget,.di-row,.di-drop,.di-check,.di-ring,.di-bin,.ft-card,.ft-tile,.sc-cell,
     .q2-quote,.q2-by,.q2-mark,.lw-grid,.pd-zone,.pd-ph,
     .reveal,.reveal.fx-stagger .w,.reveal.fx-clip .cl,.slide,.rv-photo,.rv-photo img,.rv-photo::after,
     .pl-row.pl-anim .pl-pill,.pl-row.pl-anim .pl-line,.pl-row.pl-anim .pl-line span,
@@ -1006,10 +1098,15 @@
     /* stop looping / ambient motion and pin elements to their final state */
     .slide.active .hb-node{animation:none!important}
     .hb-node{opacity:1!important;transform:none!important}
-    .hb-node.float .hb-inner,.hb-globe.spin,.hb-dot.pulse,.hb-cursor,.sb-globe{animation:none!important}
+    .hb-node.float .hb-inner,.hb-globe.spin,.hb-dot.pulse,.hb-cursor{animation:none!important}
     .pl-shine .pl-pill::after{animation:none!important;opacity:0!important}
     .slide.active .sc-chip{animation:none!important}
     .pd-dots[data-state="working"] i{animation:none!important}
+    /* the loader stops but still has to read as four squares, not one stack */
+    .ld i{animation:none!important}
+    .ld i:nth-child(2){transform:translate(var(--ld-step),0)}
+    .ld i:nth-child(3){transform:translate(var(--ld-step),var(--ld-step))}
+    .ld i:nth-child(4){transform:translate(0,var(--ld-step))}
   }
 </style>
 </head>
@@ -1017,7 +1114,7 @@
 
 <div id="viewport">
   <div id="stage">
-    <div id="substrate"><i class="sb-globe" id="sbGlobe"></i><div class="sb-field" id="sbField"></div></div>
+    <div id="substrate"><div class="sb-field" id="sbField"></div></div>
     <div id="slides"></div>
     <div id="gridOverlay"><div class="gi"></div></div>
     <div class="watermark" id="watermark"></div>
@@ -1099,6 +1196,7 @@
 <script id="logos-src" type="application/json">__LOGOS_JSON__</script>
 <script id="uploaderui-src" type="application/json">__UPLOADERUI_JSON__</script>
 <script id="demo-src" type="application/json">__DEMO_JSON__</script>
+<script id="caps-src" type="application/json">__CAPS_JSON__</script>
 
 <script>
 /* =========================================================
@@ -1114,6 +1212,7 @@ const QR = (document.getElementById('qr-src')||{}).textContent || '';
 const LOGOS = JSON.parse(document.getElementById('logos-src').textContent);
 const UI = JSON.parse(document.getElementById('uploaderui-src').textContent);
 const DEMO = JSON.parse(document.getElementById('demo-src').textContent);
+const CAPS = JSON.parse(document.getElementById('caps-src').textContent);
 const PIXEL = JSON.parse(document.getElementById('pixel-src').textContent);
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -1284,10 +1383,11 @@ function Timeline({reduced=false}={}){
 const DEFAULT_DECK = {
   settings: { duration: 7, fade: 650, watermark: true },
   slides: [
-    // 1 — "uploads that just work": files (incl. a big video) drop in and finish
-    { type:'dropin', duration:7,
+    // 1 — "uploads that just work": a stack of files is dragged in, dropped,
+    // uploaded one by one, and the window dismisses itself
+    { type:'dropin', duration:8,
       heading:'Uploads that just work.',
-      sub:'Any file, any source, safe.', textFx:'stagger' },
+      sub:'Any file, any source, safe.' },
 
     // 2 — five capabilities, one per icon, fast rhythm, settle into a row
     { type:'features', duration:8 },
@@ -1473,15 +1573,33 @@ const FILE_ICONS = {
   zip:   svgIcon('<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M11 5.5h1M11 8h1M11 10.5h1"/>'),
 };
 const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="#0b0b0f" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M5 12l4 4 10-10"/></svg>';
-/* five product capabilities — one clear icon + a 2-3 word label each */
+/* Five product capabilities. Labels break exactly where the storyboard breaks
+   them — two lines is the design, not an accident of the column width — so the
+   break is written in rather than left to wrapping. Icons are the storyboard's
+   own exports, each with its own accent colour baked in. */
 const FEATURES = [
-  { label:'Large files',        icon: svgIcon('<path d="M13 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M13 3v5h5"/><rect x="7.5" y="12.5" width="9" height="6" rx="1"/><path d="M9.5 15.5h5" stroke-width="1.3"/>') },
-  { label:'Many files at once', icon: svgIcon('<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M4 16V6a2 2 0 0 1 2-2h8"/>') },
-  { label:'Any source',        icon: svgIcon('<circle cx="12" cy="12" r="3.2"/><circle cx="4" cy="4.5" r="1.8"/><circle cx="20" cy="4.5" r="1.8"/><circle cx="4" cy="19.5" r="1.8"/><circle cx="20" cy="19.5" r="1.8"/><path d="M9.6 9.8 5.4 5.8M14.4 9.8l4.2-4M9.6 14.2l-4.2 4M14.4 14.2l4.2 4"/>') },
-  { label:'Malware scanned',   icon: svgIcon('<path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9 12l2.2 2.2L15.5 10" stroke-width="1.8"/>') },
-  { label:'Built-in editor',   icon: svgIcon('<path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M2 6h14a2 2 0 0 1 2 2v14"/>') },
+  { label:'Large files',         icon:'large-files' },
+  { label:'Multi file\nupload',  icon:'multi-file'  },
+  { label:'Any source',          icon:'any-source'  },
+  { label:'Malware\nscanned',    icon:'malware'     },
+  { label:'Built-in\neditor',    icon:'editor'      },
 ];
+
+/* The four-square loader. Two squares carry the highlight; which two is what
+   makes the bright pair sweep round instead of the ring reading as uniform. */
+const LOADER = '<i class="ld"><i class="hot" style="--i:0"></i><i style="--i:1"></i>'
+             + '<i style="--i:2"></i><i class="hot" style="--i:3"></i></i>';
 const TRASH_ICON = svgIcon('<path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1L5 6"/>');
+
+/* The per-file upload ring on card 1. Drawn rather than exported, because the
+   storyboard's icon is a snapshot at one arbitrary percentage and this one has
+   to fill: the arc is a dashed circle whose offset animates from empty to full.
+   Geometry is the export's — a 20px box, a 9.167 hairline radius, and the
+   cancel cross that sits inside the ring while the upload is still running. */
+const DI_RING = `<svg class="di-ring" viewBox="0 0 20 20" aria-hidden="true">`
+  + `<circle class="trk" cx="10" cy="10" r="9.167"/>`
+  + `<circle class="arc" cx="10" cy="10" r="9.167"/>`
+  + `<path class="x" d="M7.5 7.5 12.5 12.5M12.5 7.5 7.5 12.5"/></svg>`;
 
 /* the uploader widget's source list — icon key (into UI) + label, in the
    storyboard's order. The icons are the product's own, exported from Figma. */
@@ -1539,44 +1657,66 @@ const R = {
         <div class="di-rowic">${UI[ic]}</div>
         <div class="di-rowtxt">${esc(label)}</div>
       </div>`).join('');
-    // left/top place the card where the storyboard shows it; --fx/--fy/--fr are
-    // where it flies in from, --d staggers the two arrivals
-    const card = (img,kind,size,pos)=>`
-      <div class="di-card" style="${pos}">
+    const card = (cls,img,kind,size)=>`
+      <div class="di-card ${cls}">
         <img src="${img}" alt="">
         <span class="di-tag k">${esc(kind)}</span>
         <span class="di-tag s">${esc(size)}</span>
-        <i class="di-cur">${UI.cursor}</i>
       </div>`;
-    return `<div class="di-wrap">
-      <div class="di-head">
-        <div class="di-title reveal">${esc(s.heading||'')}</div>
-        ${s.sub?`<div class="di-sub reveal d2">${esc(s.sub)}</div>`:''}
-      </div>
-      <div class="di-stage">
-        <div class="di-widget">
-          <div class="di-drop">
-            <div class="di-dropic">${UI.upload}</div>
-            <div class="di-droptxt">Drop files here</div>
-          </div>
-          <div class="di-src">${rows}</div>
-          <div class="di-cancel">Cancel</div>
+    const file = (img,name)=>`
+      <div class="di-file" data-state="wait">
+        <div class="di-fleft">
+          <div class="di-thumb"><img src="${img}" alt=""><i class="di-check">${UI.check}</i></div>
+          <div class="di-fname">${esc(name)}</div>
         </div>
-        ${card(UI['file-mp4'], s.kindA||'MP4', s.sizeA||'80MB',
-               'left:438px;top:43px;--fx:230px;--fy:-190px;--fr:9deg;--d:.7s')}
-        ${card(UI['file-png'], s.kindB||'PNG', s.sizeB||'120KB',
-               'left:410px;top:70px;--fx:270px;--fy:-130px;--fr:-7deg;--d:1.1s')}
+        <div class="di-act">${DI_RING}<i class="di-bin">${UI.trash}</i></div>
+      </div>`;
+
+    return `<div class="di-wrap">
+      <div class="shd">
+        <div class="shd-t reveal">${esc(s.heading||'')}</div>
+        ${s.sub?`<div class="shd-s reveal d2">${esc(s.sub)}</div>`:''}
+      </div>
+
+      <div class="di-widget">
+        <div class="di-drop">
+          <div class="di-dropic">${UI.upload}</div>
+          <div class="di-droptxt">Drop files here</div>
+        </div>
+        <div class="di-src">${rows}</div>
+        <div class="di-cancel">Cancel</div>
+      </div>
+
+      <div class="di-group">
+        ${card('a', UI['thumb-flamingo'], s.kindA||'MP4',  s.sizeA||'80MB')}
+        ${card('b', UI['thumb-flower'],   s.kindB||'PNG',  s.sizeB||'120KB')}
+        <i class="di-cur">${UI.cursor}</i>
+      </div>
+
+      <div class="di-panel">
+        <div class="di-phead">
+          <div class="di-ptitle">Uploading 2 files</div>
+          <div class="di-pclose">${UI.close}</div>
+        </div>
+        <div class="di-plist">
+          ${file(UI['thumb-flower'],   s.fileB||'flower.png')}
+          ${file(UI['thumb-flamingo'], s.fileA||'flamingo.mp4')}
+        </div>
       </div>
     </div>`;
   },
-  /* ---- card 2: five capabilities appear in rhythm, settle into a row ---- */
+  /* ---- card 2: five capability panels, under a live status chip ---- */
   features(s){
-    const items = FEATURES.map((f,i)=>`
-      <div class="ft-item" style="--i:${i}">
-        <div class="ft-ic">${f.icon}</div>
-        <div class="ft-label">${esc(f.label)}</div>
+    const cards = FEATURES.map((f,i)=>`
+      <div class="ft-card" style="--i:${i}">
+        <div class="ft-label">${multiline(f.label)}</div>
+        <div class="ft-tile" style="--i:${i}">${CAPS[f.icon]||''}</div>
       </div>`).join('');
-    return `<div class="ft-wrap"><div class="ft-row">${items}</div></div>`;
+    const status = s.status===undefined ? 'Uploading\u2026' : s.status;
+    return `<div class="ft-wrap">
+      ${status?`<div class="ft-chip reveal"><span>${LOADER}<span class="ft-chiptxt">${esc(status)}</span></span></div>`:''}
+      <div class="ft-row">${cards}</div>
+    </div>`;
   },
   /* ---- card 3: a quiet, calm customer quote ---- */
   quote2(s){
@@ -1959,10 +2099,10 @@ const watermarkEl = document.getElementById('watermark');
 watermarkEl.innerHTML = GLYPH;
 
 /* ---------------- ambient substrate ----------------
-   Seeds the globe once, then trickles signal blips through the margins for as
-   long as the deck runs. This lives outside the per-slide Timeline on purpose:
-   it has to survive slide changes, and killing it between cards is exactly the
-   flicker it exists to avoid.
+   Trickles signal blips through the margins for as long as the deck runs. This
+   lives outside the per-slide Timeline on purpose: it has to survive slide
+   changes, and killing it between cards is exactly the flicker it exists to
+   avoid.
 
    Zones are percentages of the stage and stay clear of the middle, where the
    headlines and product art sit. */
@@ -1976,10 +2116,8 @@ const SB_MAX = 7;     // concurrent blips — enough to feel alive, not busy
 const SB_MIN_DX = 6, SB_MIN_DY = 9;   // % apart, or they read as a dotted line
 
 function startSubstrate(){
-  const globe = document.getElementById('sbGlobe');
   const field = document.getElementById('sbField');
-  if (globe) globe.innerHTML = GLOBE;
-  if (!field || REDUCED) return;      // reduced motion keeps the still globe only
+  if (!field || REDUCED) return;      // reduced motion runs no ambient layer
   const rnd = (a,b)=>a+Math.random()*(b-a);
   const live = new Set();
 
@@ -2475,25 +2613,106 @@ function setupInstall(slideEl, sd, tl){
   tl.at(clickAt+1.5, ()=>{ btn.textContent='Installed \u2713'; btn.classList.add('done'); });
 }
 
-/* ---------------- card 1: the two dragged files land, the zone lights up,
-   and they drop in. Deliberately has no spinner or progress bar — the point of
-   the card is that an upload is a non-event. */
+/* ---------------- card 1: drag, drop, upload ----------------
+   The storyboard's three frames as one run: a stack of two files is dragged
+   under a single cursor and dropped, the widget hands over to the compact
+   uploading panel, each file fills its ring and settles into a checkmark plus
+   a bin, and then the window dismisses itself.
+
+   The travel is a spring rather than a tween — a dragged object carries
+   momentum, and the pointer should decelerate onto the target instead of
+   arriving on a fixed schedule. Everything else is transform and opacity, bar
+   the ring, where stroke-dashoffset is the only way to draw a partial arc. */
+const DI_RING_LEN = 57.6;                       // 2πr at r=9.167, the arc's dasharray
+
 function setupDropin(slideEl, sd, tl){
-  const drop  = slideEl.querySelector('.di-drop');
-  const txt   = slideEl.querySelector('.di-droptxt');
-  const cards = [...slideEl.querySelectorAll('.di-card')];
-  if (!drop || !txt || !cards.length) return;
+  const drop   = slideEl.querySelector('.di-drop');
+  const txt    = slideEl.querySelector('.di-droptxt');
+  const widget = slideEl.querySelector('.di-widget');
+  const group  = slideEl.querySelector('.di-group');
+  const cards  = [...slideEl.querySelectorAll('.di-card')];
+  const cur    = slideEl.querySelector('.di-cur');
+  const panel  = slideEl.querySelector('.di-panel');
+  const files  = [...slideEl.querySelectorAll('.di-file')];
+  if (!drop || !group || !panel) return;
 
-  drop.classList.remove('hot');
-  txt.textContent = 'Drop files here';
-  cards.forEach(c=>c.classList.remove('dropped'));
-  // reduced motion keeps the storyboard's settled frame: files held over the zone
-  if (REDUCED) return;
+  const arcs = files.map(f=>f.querySelector('.di-ring .arc'));
+  const reset = ()=>{
+    drop.classList.remove('hot');
+    txt.textContent = 'Drop files here';
+    group.style.opacity = '0';
+    group.style.transform = 'none';
+    cards.forEach(c=>{ c.style.opacity=''; c.style.transform=''; });
+    if (cur) cur.style.opacity = '';
+    panel.style.opacity = '0';
+    panel.style.transform = 'none';
+    widget.style.opacity = ''; widget.style.transform = '';
+    files.forEach(f=>f.dataset.state = 'wait');
+    arcs.forEach(a=>a.style.strokeDashoffset = DI_RING_LEN);
+  };
+  reset();
 
-  tl.cls(drop, 'hot', 1.95);
-  cards.forEach((c,i)=>tl.cls(c, 'dropped', 2.45 + i*0.28));
-  tl.at(2.95, ()=>{ txt.textContent = '2 files added'; });
-  tl.cls(drop, 'hot', 3.45, false);
+  if (REDUCED){
+    // the informative frame is the end of the story: both files uploaded
+    widget.style.opacity = '0';
+    panel.style.opacity = '1';
+    files.forEach(f=>f.dataset.state = 'done');
+    arcs.forEach(a=>a.style.strokeDashoffset = 0);
+    return;
+  }
+
+  // ---- the drag: in from off-frame upper right, settling over the zone.
+  // spring() reports its settle time synchronously, so the rest of the score
+  // can be written against when the stack actually lands.
+  const FROM = {x:430, y:-150}, OVER = {x:0, y:0};
+  group.style.transform = `translate(${FROM.x}px,${FROM.y}px)`;
+  tl.to(group, [{opacity:0},{opacity:1}], {dur:.3, at:1.25});
+  let landed = 2.2;
+  tl.spring(group, FROM, OVER, {at:1.3, response:.7, bounce:.06, onArrive:t=>landed=t});
+
+  // the zone lights up just before the stack gets there, the way it would if a
+  // real pointer had crossed the boundary
+  tl.cls(drop, 'hot', Math.max(0, landed - .35));
+
+  // ---- the drop: each card falls to the middle of the zone and shrinks away
+  const DROP = landed + .18;
+  const AIM = [{x:-132, y:85}, {x:-108, y:59}];   // card centre -> zone centre
+  cards.forEach((c,i)=>{
+    const base = i===0 ? 'translate(24px,-26px) ' : '';
+    tl.to(c, [{opacity:1, transform:`${base}translate(0px,0px) scale(1)`},
+              {opacity:0, transform:`${base}translate(${AIM[i].x}px,${AIM[i].y}px) scale(.28)`}],
+          {at:DROP + i*.09, dur:.5, ease:EASE.inOut, fill:'forwards'});
+  });
+  // the pointer lets go the moment the files leave it, rather than hanging
+  // around beside an empty space while they travel
+  if (cur) tl.to(cur, [{opacity:1},{opacity:0}], {at:DROP + .06, dur:.22, fill:'forwards'});
+  tl.at(DROP + .44, ()=>{ txt.textContent = '2 files added'; });
+  tl.cls(drop, 'hot', DROP + .5, false);
+
+  // ---- hand over to the uploading panel, but not before "2 files added" has
+  // been readable for a beat — otherwise the confirmation just flashes
+  const SWAP = DROP + .95;
+  tl.to(widget, [{opacity:1, transform:'scale(1)'},
+                 {opacity:0, transform:'scale(.97)'}],
+        {at:SWAP, dur:.26, fill:'forwards'});
+  tl.to(panel,  [{opacity:0, transform:'scale(.97)'},
+                 {opacity:1, transform:'scale(1)'}], {at:SWAP + .08, dur:.32});
+
+  // ---- one file at a time: the ring fills, then it settles to done
+  const FILL = .8, GAP = .3;
+  let t = SWAP + .5;
+  files.forEach((f,i)=>{
+    tl.to(arcs[i], [{strokeDashoffset:DI_RING_LEN},{strokeDashoffset:0}],
+          {at:t, dur:FILL, ease:EASE.inOut});
+    t += FILL;
+    tl.at(t, ()=>{ f.dataset.state = 'done'; });
+    t += GAP;
+  });
+
+  // ---- and the window dismisses itself
+  tl.to(panel, [{opacity:1, transform:'translateY(0px) scale(1)'},
+                {opacity:0, transform:'translateY(6px) scale(.97)'}],
+        {at:t + .55, dur:.32, fill:'forwards'});
 }
 
 /* ---------------- the analysis grid ----------------
@@ -3033,7 +3252,8 @@ function enter(i){
   // brand glyph sits on every slide (consistent signature, bottom-right grid corner)
   watermarkEl.classList.toggle('show', !!deck.settings.watermark);
 
-  // the board card owns the full-strength globe; don't run two behind each other
+  // the board card runs its own globe and dots; the ambient blips would only
+  // duplicate that vocabulary, so the substrate steps aside there
   stageEl.classList.toggle('sb-off', sd.type==='board');
 
   // fit oversized headlines (measure counters at their final value)
@@ -3108,7 +3328,7 @@ function slideTitle(s){
     case 'chaos': return headText(s).replace(/\n/g,' ');
     case 'install': return (s.heading||'').replace(/\n/g,' ');
     case 'dropin': return (s.heading||'').replace(/\n/g,' ');
-    case 'features': return FEATURES.map(f=>f.label).join(' · ');
+    case 'features': return FEATURES.map(f=>f.label.replace(/\n/g,' ')).join(' · ');
     case 'quote2': return (s.quote||'').replace(/\n/g,' ');
     case 'logos': return (s.logos||'').replace(/\n/g,' ');
     case 'scale': return (s.heading||'').replace(/\n/g,' ');
@@ -3241,9 +3461,18 @@ function fieldsFor(s, i){
     case 'dropin': return dur+`
       <label class="f"><span>Heading</span><textarea data-f="heading">${esc(s.heading||'')}</textarea></label>
       <label class="f"><span>Sub-line</span><input type="text" data-f="sub" value="${esc(s.sub||'')}"></label>
-      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">Four files (one large video, 248 MB) drop into the form one after another and each completes with a green check — no spinner, no waiting.</p>`;
+      <div class="row2">
+        <label class="f"><span>File A name</span><input type="text" data-f="fileA" value="${esc(s.fileA||'flamingo.mp4')}"></label>
+        <label class="f"><span>File B name</span><input type="text" data-f="fileB" value="${esc(s.fileB||'flower.png')}"></label>
+      </div>
+      <div class="row2">
+        <label class="f"><span>A type / size</span><input type="text" data-f="sizeA" value="${esc(s.sizeA||'80MB')}"></label>
+        <label class="f"><span>B type / size</span><input type="text" data-f="sizeB" value="${esc(s.sizeB||'120KB')}"></label>
+      </div>
+      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">A stack of two files is dragged in under one cursor and dropped; the widget hands over to the compact uploading panel, each file fills its ring and settles into a checkmark plus a bin, then the window dismisses itself. The score runs ~7s, so give the card 8s or more.</p>`;
     case 'features': return dur+`
-      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">Five capabilities fade in one by one, then settle into a row: ${FEATURES.map(f=>esc(f.label)).join(', ')}. Icons are defined in the FEATURES array in the template.</p>`;
+      <label class="f"><span>Status chip (blank hides it and its loader)</span><input type="text" data-f="status" value="${esc(s.status===undefined?'Uploading\u2026':s.status)}"></label>
+      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">Five capability panels rise in sequence, each icon tile landing a beat after its card: ${FEATURES.map(f=>esc(f.label.replace(/\n/g,' '))).join(', ')}. Above them a chip runs the four-square loader on an endless orbit. Labels and icons live in the FEATURES array in the template.</p>`;
     case 'quote2': return dur+`
       <label class="f"><span>Quote</span><textarea data-f="quote">${esc(s.quote||'')}</textarea></label>
       <div class="row2">
