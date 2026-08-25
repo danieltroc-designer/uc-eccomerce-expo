@@ -20,11 +20,15 @@ SHOTS = {
     # dropin: stack in flight, landed over the hot zone, dropping, panel taken
     # over, first ring filling, first file done, both done, window dismissed
     0: [1700, 2350, 2700, 3400, 3900, 4600, 5900, 7600],
-    # capability panels: mid-stagger, settled, and two loader phases apart
-    1: [700, 1800, 2400, 3000],
-    2: [2200],               # quote
-    3: [2000],               # logo wall
-    4: [4000],               # install
+    # capability panels: row rising, then three points across the icon wave
+    1: [400, 800, 1100, 2200],
+    # quote spread: lime panel alone, customer panel following, settled
+    2: [300, 550, 2200],
+    # trusted-by wall: title in, then three points across the reading-order sweep
+    3: [400, 700, 1000, 2200],
+    # marketplace install: listing settled, pointer waiting at its start point,
+    # mid-travel, landed, pressed, installing mid-sweep, and installed
+    4: [1300, 1600, 2300, 2650, 3200, 4300],
     # pipeline: mid-drag, bar filling, first delivery frame, two transforms in,
     # and the settled end state
     5: [1000, 2400, 4200, 6600, 8200, 11800],

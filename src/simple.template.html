@@ -123,19 +123,18 @@
   }
   #stage.sb-off #substrate{opacity:0}
   .sb-field{position:absolute;inset:0}
-  /* amber while in flight, green once it lands — the board's own vocabulary */
+  /* 5px squares in the storyboard's own three colours (see SB_COLORS). They
+     used to run amber-to-green, borrowed from the file board's in-flight /
+     landed vocabulary — but the board is card 7 now, so out here that shift
+     was signalling a state nothing on screen has. A particle just arrives and
+     goes. */
   .sb-blip{
-    position:absolute;width:6px;height:6px;
-    background:var(--brand);opacity:0;
+    position:absolute;width:5px;height:5px;
+    background:var(--c,#fff);opacity:0;
     animation:sbBlip var(--life,2800ms) linear forwards;
   }
   @keyframes sbBlip{
-    0%{opacity:0;background:var(--brand)}
-    12%{opacity:.8}
-    52%{opacity:.8;background:var(--brand)}
-    64%{background:var(--ok)}
-    86%{opacity:.7}
-    100%{opacity:0;background:var(--ok)}
+    0%{opacity:0} 14%{opacity:.8} 82%{opacity:.7} 100%{opacity:0}
   }
 
   /* progress hairline */
@@ -490,29 +489,7 @@
   .cd-mascot{width:40px;height:auto;display:block;image-rendering:pixelated}
   .cd-cursor{position:absolute;left:0;top:0;width:34px;z-index:4;filter:drop-shadow(0 3px 5px rgba(0,0,0,.45));opacity:0;will-change:transform}
 
-  /* ---- Webflow marketplace install slide ---- */
-  .in-wrap{position:absolute;inset:0;text-align:center;padding:0 var(--gm)}
-  .in-head{position:absolute;top:var(--head-y);left:var(--gm);right:var(--gm)}
-  /* left is explicit (592px panel, centred) because .in-app wears .reveal */
-  .in-app{position:absolute;left:664px;top:580px;
-    display:flex;flex-direction:column;align-items:flex-start;background:var(--panel-fg);
-    border-radius:var(--panel-radius);box-shadow:var(--shadow-floating);padding:32px 36px 34px}
-  .in-card{display:flex;align-items:flex-start;gap:18px;text-align:left;width:520px}
-  .in-icon{width:56px;height:56px;border-radius:12px;background:#141416;border:1px solid var(--line);
-    display:flex;align-items:center;justify-content:center;flex:none}
-  .in-icon svg{width:34px;height:34px}
-  .in-icon svg path{fill:var(--brand)}
-  .in-title{font-size:17px;font-weight:600;color:var(--ink)}
-  .in-dl{font-family:var(--mono);font-size:13px;color:#7a7a82;margin:3px 0 9px}
-  .in-desc{font-size:14px;color:#8a8a92;line-height:1.5;max-width:420px}
-  .in-btnrow{position:relative;align-self:flex-start;margin-left:74px;margin-top:20px}
-  .in-btn{background:#2E6BFF;color:#fff;font-size:15px;font-weight:600;padding:11px 24px;border-radius:9px;
-    display:inline-block;transition:transform .12s ease,filter .12s ease}
-  .in-btn.press{transform:scale(.95);filter:brightness(.88)}
-  .in-btn.done{background:#1f8f4e}
-  .in-cursor{position:absolute;left:0;top:0;width:34px;z-index:4;opacity:0;filter:drop-shadow(0 3px 5px rgba(0,0,0,.45));will-change:transform}
-  .in-foot{position:absolute;top:410px;left:var(--gm);right:var(--gm);
-    font-family:var(--mono);font-size:20px;letter-spacing:.01em;color:#7a7a82}
+  /* ---- Webflow marketplace install slide — see the .wf-* block below ---- */
 
   /* ================= HERO BOARD SLIDE ================= */
   .hb{position:absolute;inset:0;overflow:hidden}
@@ -527,18 +504,22 @@
     position:absolute;left:0;right:0;bottom:56px;text-align:center;
     font-family:var(--cmono);font-size:22px;letter-spacing:.14em;color:#595959;
   }
+  /* The wireframe is the storyboard's own: 1797.56x995.42 centred on the stage,
+     which leaves a 61px margin at the sides and 42px top and bottom. Both axes
+     are set explicitly — the source SVG's header used to declare a height that
+     cut a third of the globe off, and `height:auto` inherited the lie. The
+     breathe stays under 1.5% so the outer ring never reaches an edge. */
   .hb-globe{
-    position:absolute;left:50%;top:52%;width:1560px;
+    position:absolute;left:50%;top:50%;width:1797.56px;height:995.42px;
     transform:translate(-50%,-50%);pointer-events:none;
     opacity:0;transition:opacity .8s ease;
   }
   .slide.active .hb-globe{opacity:1}
-  .hb-globe svg{width:100%;height:auto;display:block}
+  .hb-globe svg{width:100%;height:100%;display:block}
   .hb-globe.spin{animation:hbGlobe 68s ease-in-out infinite}
   @keyframes hbGlobe{
-    0%{transform:translate(-50%,-50%) scale(1)}
-    50%{transform:translate(-50%,-51%) scale(1.025)}
-    100%{transform:translate(-50%,-50%) scale(1)}
+    0%,100%{transform:translate(-50%,-50%) scale(1)}
+    50%{transform:translate(-50%,-50%) scale(1.012)}
   }
 
   /* scattered signal dots */
@@ -587,8 +568,11 @@
     letter-spacing:.01em;color:#8E8E8E;
   }
   .hb-line{min-height:1.7em;white-space:pre}
-  .hb-meta b{color:#8E8E8E;font-weight:500}
+  /* BOARD_META tags a run with a class name, so these are class selectors:
+     .b = a value, .g = a passed check, .t = a timing, .dim = an aside */
+  .hb-meta .b{color:#8E8E8E;font-weight:500}
   .hb-meta .g{color:var(--ok);font-weight:500}
+  .hb-meta .t{color:var(--ok);font-weight:500}
   .hb-meta .dim{color:#595959}
   .hb-cursor{
     display:inline-block;width:9px;height:19px;background:var(--ok);
@@ -599,20 +583,41 @@
   /* the little status LED beside the framed JPEG */
   .hb-led{position:absolute;width:11px;height:11px;background:var(--ok);border-radius:2px}
 
-  /* board slide, outro layout: centered CTA instead of top-right title. The
-     telemetry stays visible here (the storyboard shows it) — the cards sit in
-     the corners, so it never collides with the headline. */
-  /* 907px is the storyboard's measure — it wraps the headline to two lines and
-     keeps it clear of the corner cards' telemetry */
-  .hb-outro{
-    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-    text-align:center;z-index:2;max-width:907px;
-  }
+  /* Board slide, outro layout — the deck's last card, laid out to storyboard
+     frame 184:5666. Everything on the centre line is pinned to its own y from
+     the frame rather than stacked, because the glyph sits between the headline
+     and the sign-off and a stack would have the three of them pushing on each
+     other. Left offsets, not translateX(-50%): .reveal owns transform. */
+  .hb-outro{position:absolute;left:507px;top:320px;width:907px;text-align:center;z-index:2}
   .hb-outro-line{
-    font-family:var(--sans);font-weight:700;font-size:88px;line-height:1.14;
-    letter-spacing:-0.03em;color:var(--ink);
+    font-family:var(--sans);font-weight:700;font-size:80px;line-height:1.065;
+    letter-spacing:-1.2px;color:var(--ink);
+    text-box-trim:trim-both;text-box-edge:cap alphabetic;
   }
-  .hb-outro-sub{font-size:40px;font-weight:500;color:var(--ink-dim);margin-top:28px}
+  .hb-outro-sub{
+    position:absolute;left:0;right:0;top:640px;text-align:center;z-index:2;
+    font-family:var(--sans);font-size:32px;font-weight:580;line-height:1.065;
+    letter-spacing:-.48px;color:#bcbdc0;
+    text-box-trim:trim-both;text-box-edge:cap alphabetic;
+  }
+
+  /* The glyph on the centre line. Its own #090909 pad is the storyboard's: it
+     knocks the wireframe's crossing lines out from behind the mark so the
+     pixels read as pixels. */
+  .hb-mark{
+    position:absolute;left:916px;top:497px;width:86px;height:86px;
+    display:flex;align-items:center;justify-content:center;
+    background:#090909;z-index:2;
+  }
+  .hb-mark svg{width:62px;height:62px;display:block;overflow:visible}
+  /* the sparkle: every pixel of the mark drifts on its own slow cycle. Range
+     and period are randomised per square in setupBoard() — the storyboard's
+     own render is a snapshot of exactly this, a field of squares sitting at
+     different greys, so animating it is just letting that field move. */
+  .hb-mark.twinkle path{
+    animation:hbTwinkle var(--d,6s) ease-in-out var(--t,0s) infinite;
+  }
+  @keyframes hbTwinkle{0%,100%{opacity:var(--o1,.3)}50%{opacity:var(--o2,.95)}}
 
   /* ---- shared heading type (from Figma spec) — one place to tweak every
      slide's headline. Placed after the individual heading rules so it wins
@@ -623,8 +628,10 @@
             type doesn't shift as the deck advances */
          --head-y:205px; }
   /* .hd is the single, naturally-wrapping headline used by statement / mockup /
-     upload. code, reveal and the board titles share the same type spec. */
-  .hd,.cd-line,.rv-line,.hb-title,.hb-outro-line{
+     upload. code, reveal and the board title share the same type spec.
+     .hb-outro-line is deliberately not in this list: the last card's headline
+     is the storyboard's own 80px bold, set on its own two lines. */
+  .hd,.cd-line,.rv-line,.hb-title{
     font-family:var(--sans);
     font-weight:var(--h-weight);
     font-size:var(--h-size);
@@ -764,86 +771,84 @@
      Choreographed by setupPipeline(); colours mirror the site's tokens.
      ======================================================================= */
   .pd-wrap{position:absolute;inset:0}
-  .pd-head{position:absolute;top:var(--head-y);left:var(--gm);right:var(--gm);text-align:center}
-  .pd-title{font-size:var(--h-size);font-weight:var(--h-weight);letter-spacing:var(--h-ls);
-    line-height:var(--h-lh);color:var(--ink)}
-  .pd-sub{margin-top:18px;font-size:30px;font-weight:450;color:var(--ink-dim)}
 
   .pd-shell{
-    position:absolute;left:210px;top:375px;width:1500px;height:665px;
-    border-radius:44px;background:#0c0c0c;border:1px solid rgba(255,255,255,.05);
-    padding:12px;overflow:hidden;
+    position:absolute;left:334px;top:384px;width:1252px;height:554px;
+    border-radius:39px;background:#0c0c0c;border:1px solid rgba(255,255,255,.05);
+    padding:11px;overflow:hidden;
   }
   /* the uploaded photo, blurred right down — a wash of the file's own colour
      that wipes upward in lockstep with the progress bar */
-  .pd-bgwrap{position:absolute;left:50%;top:50%;width:460px;height:595px;
-    transform:translate(-50%,-50%);filter:blur(30px);opacity:.1;pointer-events:none;z-index:0}
+  .pd-bgwrap{position:absolute;left:50%;top:50%;width:340px;height:440px;
+    transform:translate(-50%,-50%);filter:blur(15px);opacity:.1;pointer-events:none;z-index:0}
   .pd-bg{width:100%;height:100%;border-radius:32px;overflow:hidden;clip-path:inset(0 0 100% 0)}
   .pd-bg img{width:100%;height:100%;object-fit:cover}
 
-  .pd-grid{position:relative;z-index:1;display:grid;grid-template-columns:1fr .8fr 1fr;gap:28px;height:100%}
-  .pd-cell{position:relative;border-radius:32px;background:#000;box-shadow:0 0 0 1px rgba(255,255,255,.05);
-    padding:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
-  .pd-cell.mid{background:transparent;box-shadow:none;padding:0;overflow:visible;gap:24px}
+  .pd-grid{position:relative;z-index:1;display:grid;grid-template-columns:1fr .8fr 1fr;gap:24px;height:100%}
+  .pd-cell{position:relative;border-radius:27px;background:#000;box-shadow:0 0 0 1px rgba(255,255,255,.05);
+    padding:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
+  .pd-cell.mid{background:transparent;box-shadow:none;padding:0;overflow:visible;gap:20px}
   .pd-inner{flex:1;width:100%;display:flex;align-items:center;justify-content:center;position:relative}
 
   /* ---- left: the drop ---- */
-  .pd-cursor{position:absolute;left:50%;top:50%;width:133px;height:172px;z-index:2;pointer-events:none;opacity:0}
-  .pd-cursor-thumb{width:100%;height:100%;border-radius:11px;overflow:hidden;
+  .pd-cursor{position:absolute;left:50%;top:50%;width:76.5px;height:99.5px;z-index:2;pointer-events:none;opacity:0}
+  .pd-cursor-thumb{width:100%;height:100%;border-radius:8px;overflow:hidden;
     box-shadow:0 25px 50px -12px rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.13);background:#181818}
   .pd-cursor-thumb img{width:100%;height:100%;object-fit:cover}
-  .pd-cursor-ic{position:absolute;bottom:-16px;right:-16px;width:28px;height:28px;
-    filter:drop-shadow(0 4px 6px rgba(0,0,0,.5))}
+  .pd-cursor-ic{position:absolute;bottom:-8.9px;right:-6.4px;width:12.9px;height:17.9px;
+    filter:drop-shadow(0 4px 3px rgba(0,0,0,.5))}
   .pd-cursor-ic svg{width:100%;height:100%;display:block}
 
-  .pd-zone{position:relative;width:380px;height:491px;border-radius:40px;
+  .pd-zone{position:relative;width:258px;height:333px;border-radius:27px;
     border:1px dashed rgba(255,255,255,.13);overflow:hidden;transition:border-color .3s ease}
   .pd-zone[data-state="active"]{border-color:rgba(255,255,255,.25)}
   .pd-ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-    font-family:var(--mono);font-size:20px;text-transform:uppercase;letter-spacing:.05em;
+    font-family:var(--mono);font-size:15px;text-transform:uppercase;letter-spacing:.05em;
     color:rgba(255,255,255,.25);transition:color .3s ease}
   .pd-zone[data-state="active"] .pd-ph{color:rgba(255,255,255,.5)}
-  .pd-shot{width:100%;height:100%;object-fit:cover;border-radius:38px;padding:11px;opacity:0}
-  .pd-track{position:absolute;bottom:28px;left:28px;right:28px;height:9px;padding:2px;
+  .pd-shot{width:100%;height:100%;object-fit:cover;border-radius:26px;padding:5px 8px;opacity:0}
+  .pd-track{position:absolute;bottom:21px;left:21px;right:21px;height:6px;padding:2px;
     border-radius:999px;background:rgba(0,0,0,.2);backdrop-filter:blur(5px);overflow:hidden;opacity:0}
   .pd-fill{height:100%;background:rgba(255,255,255,.9);border-radius:999px;
     transform-origin:left center;transform:scaleX(0)}
-  .pd-ctl{position:absolute;top:28px;right:28px;display:flex;gap:2px;opacity:0}
-  .pd-btn{width:44px;height:44px;background:rgba(9,9,9,.8);border-radius:12px;
+  .pd-ctl{position:absolute;top:20px;right:21px;display:flex;gap:2px;opacity:0}
+  .pd-btn{width:32px;height:32px;background:rgba(9,9,9,.8);border-radius:8px;
     display:flex;align-items:center;justify-content:center;color:#fff}
-  .pd-btn svg{width:20px;height:20px;display:block}
-  .pd-status{display:flex;align-items:center;gap:14px;margin-top:20px;font-family:var(--mono);opacity:0}
-  .pd-status i{width:10px;height:10px;background:#4ade80}
-  .pd-status span{font-size:19px;color:#a7a7a7;text-transform:uppercase;letter-spacing:.05em}
+  .pd-btn svg{width:14px;height:14px;display:block}
+  .pd-status{display:flex;align-items:center;gap:12px;margin-top:16px;font-family:var(--mono);opacity:0}
+  .pd-status i{width:8px;height:8px;background:#4ade80}
+  .pd-status span{font-size:14px;color:#a7a7a7;text-transform:uppercase;letter-spacing:.05em}
 
   /* ---- middle: the analysis ---- */
-  .pd-pixel{width:135px;height:176px;opacity:0}
+  .pd-pixel{width:100px;height:130px;opacity:0}
   .pd-pixel canvas{width:100%;height:100%;display:block;image-rendering:pixelated}
-  .pd-prog{display:flex;align-items:center;justify-content:center;width:100%;margin:26px 0}
+  .pd-prog{display:flex;align-items:center;justify-content:center;width:100%;margin:20px 0}
   .pd-prog-side{flex:1;display:flex;justify-content:center}
-  .pd-dots{display:inline-flex;align-items:center;gap:5px}
-  .pd-dots i{width:4px;height:4px;background:rgba(255,255,255,.13)}
+  .pd-dots{display:inline-flex;align-items:center;gap:4px}
+  .pd-dots i{width:3px;height:3px;background:rgba(255,255,255,.13)}
   .pd-dots[data-state="working"] i{background:rgba(255,255,255,.25);
     animation:pdDot 1s ease-in-out infinite backwards}
   @keyframes pdDot{0%,85%,100%{opacity:.1}30%{opacity:1}}
-  .pd-donut{flex-shrink:0;width:40px;height:40px}
+  .pd-donut{flex-shrink:0;width:30px;height:30px}
   .pd-donut .c{fill:rgba(255,255,255,.13)}
   .pd-donut .c.lit{fill:#ffcf3e}
-  .pd-analysis{text-align:center;font-family:var(--mono);font-size:20px;color:#a7a7a7;
-    text-transform:uppercase;line-height:30px}
+  .pd-analysis{text-align:center;font-family:var(--mono);font-size:15px;color:#a7a7a7;
+    text-transform:uppercase;line-height:20px;padding-bottom:30px}
   .pd-analysis p{opacity:0}
   .pd-analysis b{font-weight:inherit;color:#fff}
 
   /* ---- right: the delivery ---- */
-  /* the stage is smaller than a straight scale of the site's would be: six rows
-     of 20px mono is a lot taller than six rows of 13px, and the URL is what the
-     right panel is actually saying */
-  .pd-stage{position:relative;width:286px;height:369px;margin-top:16px;opacity:0}
+  /* 15px is the ceiling here, not a preference: the UUID row is 37 monospace
+     characters and at anything larger it runs past the 358px the column has to
+     give. The storyboard sets it at 13px. */
+  /* flex:none matters — the URL block grows a row per transform, and without it
+     the picture is what gives way */
+  .pd-stage{position:relative;flex:none;width:230px;height:297px;margin-top:16px;opacity:0}
   .pd-stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0}
-  .pd-url{margin-top:30px;font-family:var(--mono);font-size:20px;line-height:29px}
+  .pd-url{margin-top:32px;font-family:var(--mono);font-size:15px;line-height:19.5px}
   .pd-url .row{margin:0;display:flex;flex-wrap:nowrap;white-space:nowrap}
   .pd-url .bracket{color:rgba(255,255,255,.25)}
-  .pd-url .indent{padding-left:26px}
+  .pd-url .indent{padding-left:20px}
   .pd-url .host{color:#a7a7a7}
   .pd-url .dim{color:#a7a7a7}
   .pd-url .id{color:#fff}
@@ -851,6 +856,15 @@
   .pd-url .arg{color:#a7a7a7}
   .pd-url .tf{overflow:hidden;height:0;opacity:0}
   .pd-url .st{opacity:0}
+
+  /* ---- the compliance marks along the bottom ---- */
+  /* pinned at the storyboard's own x/y rather than laid out as a row: the three
+     marks have very different bounding boxes and it centres them optically */
+  .pd-badge{position:absolute;opacity:0;transform:translateY(10px);
+    transition:opacity var(--dur-2) ease,transform var(--dur-3) var(--ease-out);
+    transition-delay:calc(.62s + var(--i,0)*.09s)}
+  .pd-badge svg{width:100%;height:100%;display:block}
+  .slide.active .pd-badge{opacity:.5;transform:none}
 
   /* =======================================================================
      The storyboard headline block.
@@ -861,7 +875,11 @@
      cap-bottom and cap-top — not a line-height fudge that drifts when the
      font size changes. Cards adopt this as they get rebuilt.
      ======================================================================= */
-  .shd{position:absolute;top:168px;left:80px;width:1760px;text-align:center;font-weight:580}
+  /* --shd-y is the cap-top of the title. Cards set their own: the storyboard
+     moves it down as the headline gains lines, so the whole block stays
+     balanced rather than the anchor staying put and the text growing off it. */
+  .shd{position:absolute;top:var(--shd-y,168px);left:80px;width:1760px;
+    text-align:center;font-weight:580}
   .shd-t{font-size:88px;letter-spacing:-1.32px;line-height:normal;color:#fff;
     text-box-trim:trim-both;text-box-edge:cap alphabetic}
   .shd-s{margin-top:32px;font-size:32px;letter-spacing:-.48px;line-height:1.065;color:#bcbdc0;
@@ -957,86 +975,224 @@
   .di-file[data-state="done"] .di-ring{opacity:0}
   .di-file[data-state="done"] .di-bin{opacity:1}
 
-  /* =======================================================================
-     The four-square loader.
-
-     All four squares share one set of keyframes and one start position; the
-     negative delays are what spread them around the ring, so the whole loop
-     retimes from `--ld-dur` alone. Two squares are bright, so the highlight
-     sweeps round as they travel rather than sitting still. The holds in the
-     keyframes are what make it step corner to corner instead of gliding.
-     ======================================================================= */
-  .ld{position:relative;flex:none;
-    --ld-sq:14px;--ld-step:24px;--ld-dur:2s;
-    width:calc(var(--ld-sq) + var(--ld-step));height:calc(var(--ld-sq) + var(--ld-step))}
-  .ld i{position:absolute;left:0;top:0;width:var(--ld-sq);height:var(--ld-sq);
-    border-radius:2px;background:#626262;
-    animation:ldOrbit var(--ld-dur) var(--ease-in-out) infinite;
-    animation-delay:calc(var(--i) * var(--ld-dur) / -4)}
-  .ld i.hot{background:#c8c8c8}
-  @keyframes ldOrbit{
-    0%,13%  {transform:translate(0,0)}
-    25%,38% {transform:translate(var(--ld-step),0)}
-    50%,63% {transform:translate(var(--ld-step),var(--ld-step))}
-    75%,88% {transform:translate(0,var(--ld-step))}
-    100%    {transform:translate(0,0)}
-  }
-
   /* card 2 — five capabilities, as the storyboard's panel row */
   .ft-wrap{position:absolute;inset:0}
-  /* the live chip is the only thing above the row, so it carries the card */
-  .ft-chip{position:absolute;left:0;right:0;top:240px;
-    display:flex;align-items:center;justify-content:center}
-  .ft-chip > span{display:inline-flex;align-items:center;gap:18px;
-    background:#181818;border-radius:999px;padding:14px 28px 14px 22px}
-  .ft-chiptxt{font-size:28px;font-weight:580;letter-spacing:-.42px;color:#bcbdc0;
-    line-height:1.065;text-box-trim:trim-both;text-box-edge:cap alphabetic}
   .ft-row{position:absolute;left:266px;top:382px;width:1389px;height:316px;
     display:flex;gap:16px}
   .ft-card{width:265px;background:#0c0c0c;border:1px solid #181818;border-radius:24px;
     padding:40px;display:flex;flex-direction:column;justify-content:space-between;
     opacity:0;transform:translateY(20px);
     transition:opacity var(--dur-2) ease,transform var(--dur-3) var(--ease-out);
-    transition-delay:calc(.14s + var(--i)*.07s)}
+    transition-delay:calc(.12s + var(--i)*.06s)}
   .slide.active .ft-card{opacity:1;transform:none}
   .ft-label{font-size:28px;font-weight:580;letter-spacing:-.42px;line-height:1.065;
     color:#bcbdc0;text-box-trim:trim-both;text-box-edge:cap alphabetic}
-  /* the tile lands a beat after its card, so the row reads label-then-icon */
+  /* The wells arrive empty with the row; the icons then land in them left to
+     right. The gap between them is wide on purpose — across a booth a 70ms
+     stagger reads as all five at once, and that is what left the card looking
+     like it needed a spinner to prove something was happening. Each pop lasts
+     longer than the gap, so the row fills as one travelling wave rather than
+     five separate ticks. */
   .ft-tile{width:96px;height:96px;flex:none;background:#181818;border-radius:9.433px;
-    display:flex;align-items:center;justify-content:center;
-    opacity:0;transform:scale(.9);
+    display:flex;align-items:center;justify-content:center}
+  .ft-tile svg{width:48px;height:48px;display:block;
+    opacity:0;transform:scale(.62);
     transition:opacity var(--dur-1) ease,transform var(--dur-2) var(--ease-pop);
-    transition-delay:calc(.34s + var(--i)*.07s)}
-  .slide.active .ft-tile{opacity:1;transform:none}
-  .ft-tile svg{width:48px;height:48px;display:block}
+    transition-delay:calc(.62s + var(--i)*.19s)}
+  .slide.active .ft-tile svg{opacity:1;transform:none}
 
-  /* card 3 — calm quote. Attribution sits under the quote, the customer's real
-     wordmark under that (storyboard frame 3). */
-  .q2-wrap{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 200px}
-  .q2-quote{max-width:1316px;font-size:60px;font-weight:600;letter-spacing:-0.02em;line-height:1.24;color:var(--ink);
-    opacity:0;transition:opacity 1.1s ease;transition-delay:.2s}
-  .slide.active .q2-quote{opacity:1}
-  .q2-by{margin-top:170px;font-size:26px;color:var(--ink-dim);font-weight:450;
-    opacity:0;transition:opacity 1.1s ease;transition-delay:.65s}
-  .slide.active .q2-by{opacity:1}
-  .q2-mark{margin-top:24px;width:222px;opacity:0;transition:opacity 1.1s ease;transition-delay:.85s}
-  .slide.active .q2-mark{opacity:1}
-  .q2-mark svg{width:100%;height:auto;display:block}
+  /* =======================================================================
+     card 3 — the customer quote, as the storyboard's two-panel spread.
 
-  /* card 4 — trusted-by logo wall. Real monochrome marks at the storyboard's
-     optical widths (they are not uniform height), on its 4x2 grid. */
+     Geometry is Figma's and absolute: the lime pull-quote at 229,307
+     (938x465) and the customer panel at 1183,307 (507x465), 16px apart on
+     the same 24px radius. Both are `justify-between`, which is what puts the
+     attribution and the blurb on a shared bottom edge across the spread —
+     the alignment reads even though the two columns hold different content.
+     ======================================================================= */
+  .qt-wrap{position:absolute;inset:0}
+  /* Fade fast, move slow. The panels sit inside the slide's own 520ms
+     crossfade, so a long fade here would compound into a second one — and on
+     the lime block that is visible as a colour, not just a dimming: part-opaque
+     #d8ff6e over near-black is olive, which is nowhere in the palette. A short
+     ramp gets the fill to its true colour early and leaves the longer rise to
+     carry the motion. */
+  .qt-panel{position:absolute;top:307px;height:465px;padding:64px;border-radius:24px;
+    display:flex;flex-direction:column;justify-content:space-between;
+    opacity:0;transform:translateY(24px);
+    transition:opacity var(--dur-1) ease,transform var(--dur-3) var(--ease-out)}
+  .slide.active .qt-panel{opacity:1;transform:none}
+  /* the quote leads and the customer panel follows ~220ms later, so the pair
+     reads as a claim and then its source rather than one wide banner */
+  .qt-say{left:229px;width:938px;background:#d8ff6e;color:#000;transition-delay:.08s}
+  .qt-who{left:1183px;width:507px;background:#0c0c0c;border:1px solid #181818;
+    transition-delay:.30s}
+
+  /* Contents ride on top of their own panel's move, so the two transforms
+     compound: the spread arrives with some depth rather than as two flat
+     rectangles sliding up together. Each child sets its own delay below. */
+  .qt-in{opacity:0;transform:translateY(12px);
+    transition:opacity var(--dur-2) ease,transform var(--dur-3) var(--ease-out)}
+  .slide.active .qt-in{opacity:1;transform:none}
+  /* The margin is tracking compensation, not a nudge. CSS adds letter-spacing
+     after the last glyph on a line; Figma only puts it between glyphs. At this
+     tracking that makes every candidate line 0.96px narrower here than in the
+     design, which is enough to pull one more word up onto line 2 and change the
+     rag. Giving the measuring box back that 0.96px makes lines break where the
+     design breaks them. Glyphs don't move — the text is left-aligned. */
+  .qt-quote{font-size:64px;font-weight:600;line-height:1.065;letter-spacing:-.96px;
+    margin-right:.96px;
+    text-box-trim:trim-both;text-box-edge:cap alphabetic;transition-delay:.26s}
+  .qt-by{font-size:24px;font-weight:400;line-height:1.4;transition-delay:.42s}
+  .qt-head{display:flex;flex-direction:column;align-items:flex-start;gap:24px}
+  .qt-logo{width:183px;transition-delay:.50s}
+  .qt-logo svg{width:100%;height:auto;display:block}
+  .qt-tag{background:#181818;border-radius:20px;padding:4px 12px;
+    font-family:var(--cmono);font-size:13px;line-height:1.2;letter-spacing:.13px;
+    text-transform:uppercase;color:#a7a7a7;transition-delay:.58s}
+  .qt-desc{font-size:20px;font-weight:400;line-height:1.4;color:#fff;
+    transition-delay:.66s}
+
+  /* =======================================================================
+     card 4 — the trusted-by wall.
+
+     The marks are not on a grid. The storyboard places all eight optically —
+     column centres drift by up to 13px between the two rows and the vertical
+     centres by up to 16px — because these logos have wildly different visual
+     weight at a common width. So each one is centred on its own slot from the
+     design (LW_SLOTS) at its own exported size (LOGO_BOX); a `repeat(4,1fr)`
+     grid gets close but is visibly wrong at booth scale.
+
+     Every mark is placed with left/top rather than a centring translate,
+     because the entrance animates `transform` and the two would fight.
+     ======================================================================= */
   .lw-wrap{position:absolute;inset:0}
-  .lw-title{position:absolute;top:168px;left:0;right:0;text-align:center;
-    font-size:24px;font-weight:550;color:var(--ink-dim);letter-spacing:-0.01em}
-  /* all eight arrive together on one soft fade — no stagger, no movement */
-  .lw-grid{position:absolute;left:50%;top:558px;transform:translate(-50%,-50%);width:1630px;
-    display:grid;grid-template-columns:repeat(4,1fr);row-gap:181px;
-    opacity:0;transition:opacity 1.1s ease;transition-delay:.3s}
-  .slide.active .lw-grid{opacity:1}
-  .lw-cell{height:68px;display:flex;align-items:center;justify-content:center}
-  .lw-logo{display:block;color:#fff}
-  .lw-logo svg{width:100%;height:auto;display:block}
-  .lw-word{font-size:34px;font-weight:600;letter-spacing:-0.01em;color:#EDEDED;white-space:nowrap}
+  .lw-title{position:absolute;top:175px;left:302px;width:1316px;text-align:center;
+    font-size:32px;font-weight:580;line-height:1.065;letter-spacing:-.48px;
+    color:#bcbdc0;text-box-trim:trim-both;text-box-edge:cap alphabetic;
+    opacity:0;transform:translateY(12px);
+    transition:opacity var(--dur-1) ease,transform var(--dur-3) var(--ease-out)}
+  .slide.active .lw-title{opacity:1;transform:none}
+  /* Reading order, 75ms apart. The old wall brought all eight up on one 1.1s
+     fade, which at this size reads as the slide itself getting brighter rather
+     than as logos arriving. A stagger gives the wall a direction to assemble
+     in, and the rise is what makes each mark read as landing. */
+  .lw-logo{position:absolute;color:#fff;
+    opacity:0;transform:translateY(16px);
+    transition:opacity var(--dur-1) ease,transform var(--dur-3) var(--ease-out);
+    transition-delay:calc(.30s + var(--i)*.075s)}
+  .slide.active .lw-logo{opacity:1;transform:none}
+  .lw-logo svg{width:100%;height:100%;display:block}
+  /* fallback when a name has no mark in assets/logos — set it in type instead */
+  .lw-word{position:absolute;font-size:34px;font-weight:600;letter-spacing:-0.01em;
+    color:#EDEDED;white-space:nowrap;line-height:1;
+    opacity:0;transform:translateY(16px);
+    transition:opacity var(--dur-1) ease,transform var(--dur-3) var(--ease-out);
+    transition-delay:calc(.30s + var(--i)*.075s)}
+  .slide.active .lw-word{opacity:1;transform:none}
+
+  /* =======================================================================
+     card 5 — the Webflow marketplace listing, and a cursor installing it.
+
+     The listing is the storyboard's, rebuilt rather than dropped in as the
+     exported bitmap, because the button has to change state. Geometry is
+     Figma's: a 508x244 panel at 706,591 holding an 89px app tile beside a
+     313px column, and every text block is trimmed to its cap box so the 11 /
+     13 / 32px gaps in the design are real gaps between glyphs.
+     ======================================================================= */
+  .wf-wrap{position:absolute;inset:0}
+  .wf-panel{position:absolute;left:706px;top:591px;width:508px;height:244px;
+    display:flex;gap:24px;align-items:flex-start;padding:40px;
+    background:#0c0c0c;border:1px solid #181818;border-radius:24px;
+    opacity:0;transform:translateY(24px);
+    transition:opacity var(--dur-1) ease,transform var(--dur-3) var(--ease-out);
+    transition-delay:.36s}
+  .slide.active .wf-panel{opacity:1;transform:none}
+
+  /* the panel's contents land 60ms apart behind it — the tile first, so the
+     eye has something to fix on while the text arrives */
+  .wf-in{opacity:0;transform:translateY(10px);
+    transition:opacity var(--dur-1) ease,transform var(--dur-2) var(--ease-out);
+    transition-delay:calc(.50s + var(--i,0)*.06s)}
+  .slide.active .wf-in{opacity:1;transform:none}
+
+  .wf-tile{width:89px;height:89px;flex:none;border-radius:8px;
+    background:#181818;border:1px solid #181818;
+    display:flex;align-items:center;justify-content:center}
+  .wf-tile svg{width:51px;height:51px;display:block}
+  /* the storyboard's app icon is the deck's own glyph in brand yellow */
+  .wf-tile svg path{fill:var(--brand)}
+
+  .wf-col{width:313px;display:flex;flex-direction:column;gap:32px}
+  .wf-name{font-size:16px;font-weight:500;line-height:1.065;letter-spacing:-.24px;
+    color:#fff;text-box-trim:trim-both;text-box-edge:cap alphabetic}
+  .wf-meta{display:flex;align-items:center;gap:4px;width:max-content;margin-top:11px}
+  .wf-meta svg{width:16px;height:16px;display:block}
+  .wf-dl{font-size:14px;font-weight:500;line-height:1.065;letter-spacing:-.21px;
+    color:#888;text-box-trim:trim-both;text-box-edge:cap alphabetic}
+  .wf-desc{margin-top:13px;font-size:14px;font-weight:500;line-height:1.5;
+    letter-spacing:-.21px;color:#888;
+    text-box-trim:trim-both;text-box-edge:cap alphabetic}
+
+  /* Entrance and press live on different elements on purpose: the wrapper owns
+     the translate that brings the button in, the button owns the scale it
+     takes on press. One element can't do both without the two fighting over
+     `transform`. */
+  .wf-btnwrap{position:relative;width:111px;height:47px}
+  .wf-btn{position:absolute;inset:0;border-radius:4px;overflow:hidden;
+    background:#336DED;
+    transition:transform 140ms var(--ease-out),background-color 260ms ease}
+  .wf-btn.press{transform:scale(.97)}
+  .wf-btn.pop{transform:scale(1.03)}
+  .wf-btn[data-state="2"]{background:var(--ok)}
+  /* the install progress: a lighter wash sweeping the fill left to right.
+     linear, because it stands for elapsed work rather than a UI gesture */
+  .wf-sweep{position:absolute;inset:0;background:rgba(255,255,255,.22);
+    clip-path:inset(0 100% 0 0)}
+  .wf-btn[data-state="1"] .wf-sweep{clip-path:inset(0 0 0 0);
+    transition:clip-path 1.15s linear}
+
+  /* Three labels stacked in one box. Only the active one is up; the others sit
+     8px away in the direction they came from or are headed.
+
+     The two halves of the swap are deliberately not symmetric. The old label
+     leaves in 130ms and the new one doesn't start until 120ms in, so the two
+     words are never both legible — crossfade them evenly and you read
+     "Installing" printed over "Install App". The blur covers what overlap is
+     left, bridging them into one change of state rather than two objects. */
+  .wf-lbl{position:absolute;inset:0;display:flex;align-items:center;
+    justify-content:center;gap:5px;
+    /* 15px/600 is what the exported button measures out to — Webflow's own UI
+       font isn't Inter, so this is matched on the label's width, not its name */
+    font-size:15px;font-weight:600;color:#fff;white-space:nowrap;
+    opacity:0;transform:translateY(8px);filter:blur(4px);
+    transition:opacity 130ms ease,transform 130ms var(--ease-out),filter 130ms ease}
+  .wf-btn[data-state="0"] .wf-lbl[data-s="0"],
+  .wf-btn[data-state="1"] .wf-lbl[data-s="1"],
+  .wf-btn[data-state="2"] .wf-lbl[data-s="2"]{
+    opacity:1;transform:none;filter:none;
+    transition:opacity 200ms ease 120ms,transform 240ms var(--ease-out) 120ms,
+               filter 200ms ease 120ms}
+  /* an outgoing label leaves upward, the way the incoming one arrived */
+  .wf-btn[data-state="1"] .wf-lbl[data-s="0"],
+  .wf-btn[data-state="2"] .wf-lbl[data-s="0"],
+  .wf-btn[data-state="2"] .wf-lbl[data-s="1"]{transform:translateY(-8px)}
+  .wf-btn[data-state="2"] .wf-lbl{color:#08210f}
+  .wf-check{width:14px;height:14px;display:block;flex:none}
+  .wf-check path{fill:none;stroke:currentColor;stroke-width:2.4;
+    stroke-linecap:round;stroke-linejoin:round;
+    stroke-dasharray:22;stroke-dashoffset:22}
+  /* the tick draws itself once the fill has turned and the word has landed —
+     a mark being made, not a glyph that was always there */
+  .wf-btn[data-state="2"] .wf-check path{stroke-dashoffset:0;
+    transition:stroke-dashoffset 300ms var(--ease-out) 230ms}
+
+  /* the pointer goes in as a data URI rather than inline SVG: card 1 already
+     inlines this mark, and two copies in one document collide on the ids its
+     mask references — the second one then renders as nothing */
+  .wf-cursor{position:absolute;left:0;top:0;width:18px;height:25px;z-index:4;
+    display:block;opacity:0;filter:drop-shadow(1px 0 1px rgba(0,0,0,.35));
+    will-change:transform}
 
   /* card 6 — the bigger picture: one headline over the full pipeline as a
      chip row (storyboard frame 14). Its own background so it reads as a
@@ -1071,27 +1227,47 @@
   .sc-conn i{width:8px;height:8px;flex:none;border:1px solid rgba(255,255,255,.22);border-radius:2px}
   .sc-conn s{flex:1;height:1px;background:rgba(255,255,255,.18);text-decoration:none}
 
-  /* card 7 — booth CTA, laid over the board backdrop (storyboard frame 22).
-     The QR is pinned rather than stacked so it can't push the headline off the
-     storyboard's centre line. */
-  .hb-outro-qr{position:absolute;left:862px;top:706px;
+  /* card 7 — booth CTA. The QR is off in the storyboard but the renderer still
+     honours `qr:true`; it is pinned rather than stacked so it can't push the
+     headline off the centre line. */
+  .hb-outro-qr{position:absolute;left:862px;top:730px;
     width:196px;height:196px;background:#fff;border-radius:16px;padding:14px;z-index:2;
     box-shadow:0 24px 60px rgba(0,0,0,.55)}
   .hb-outro-qr svg{width:100%;height:100%;display:block}
-  .hb-sign{position:absolute;left:867px;top:230px;height:33px;z-index:2}
+  .hb-sign{position:absolute;left:867px;top:186px;width:185px;height:33px;z-index:2}
   .hb-sign svg{height:100%;width:auto;display:block}
+
+  /* The corner files are backdrop, not content: the storyboard runs their
+     telemetry at 9px, well under anything readable across a stand, and that is
+     the point — they are texture that says "files moving" and the centre line
+     is what gets read. */
+  .hb-outro-mode .hb-meta{font-size:9px;line-height:1.51;letter-spacing:.45px;
+    text-transform:uppercase;color:#595959}
+  .hb-outro-mode .hb-meta .b{color:#8e8e8e;font-weight:400}
+  .hb-outro-mode .hb-meta .g{color:#52e866;font-weight:400}
+  .hb-outro-mode .hb-meta .t{color:#008b4b;font-weight:400}
+  .hb-outro-mode .hb-line{min-height:1.51em}
+  .hb-outro-mode .hb-card{border-radius:22px;box-shadow:0 14px 34px rgba(0,0,0,.5)}
+  .hb-outro-mode .hb-card.framed{border:1.336px dashed rgba(255,255,255,.12);
+    background:#000;padding:6px;border-radius:22.71px;box-shadow:none}
+  .hb-outro-mode .hb-card.framed img{border-radius:14px}
+  .hb-outro-mode .hb-cursor{width:5px;height:10px;vertical-align:-1px}
+  .hb-outro-mode .hb-led{width:6.72px;height:6.72px;background:#3eff51;border-radius:0}
+  .hb-outro-mode .hb-dot{border-radius:0}
 
   @media (prefers-reduced-motion:reduce){
     /* entrance choreography collapses to an instant jump to the settled state
        (opacity cross-fades that aid comprehension are kept where they exist) */
-    .di-widget,.di-row,.di-drop,.di-check,.di-ring,.di-bin,.ft-card,.ft-tile,.sc-cell,
-    .q2-quote,.q2-by,.q2-mark,.lw-grid,.pd-zone,.pd-ph,
+    .di-widget,.di-row,.di-drop,.di-check,.di-ring,.di-bin,.ft-card,.ft-tile svg,.sc-cell,
+    .qt-panel,.qt-in,.lw-title,.lw-logo,.lw-word,.pd-zone,.pd-ph,.pd-badge,
     .reveal,.reveal.fx-stagger .w,.reveal.fx-clip .cl,.slide,.rv-photo,.rv-photo img,.rv-photo::after,
     .pl-row.pl-anim .pl-pill,.pl-row.pl-anim .pl-line,.pl-row.pl-anim .pl-line span,
     .mk-card,.mk-overlay,.cd-window.reveal,.cd-chrome i,
     .up-base,.up-progress,.up-progress .trk i,.up-hand,.up-drag,.up-cursor,
     .up-phase1,.up-phase2,.up-nodes,
-    .ch2-node,.ch2-lines,.st-sub,.in-btn,.in-cursor,.cd-run,.cd-cursor,
+    .ch2-node,.ch2-lines,.st-sub,.cd-run,.cd-cursor,
+    .wf-panel,.wf-in,.wf-btn,.wf-lbl,.wf-sweep,
+    .wf-btn[data-state="1"] .wf-sweep,.wf-btn[data-state="2"] .wf-check path,
     .pl-shine .pl-pill{
       transition:none!important;
     }
@@ -1099,14 +1275,10 @@
     .slide.active .hb-node{animation:none!important}
     .hb-node{opacity:1!important;transform:none!important}
     .hb-node.float .hb-inner,.hb-globe.spin,.hb-dot.pulse,.hb-cursor{animation:none!important}
+    .hb-mark path{animation:none!important;opacity:.62}
     .pl-shine .pl-pill::after{animation:none!important;opacity:0!important}
     .slide.active .sc-chip{animation:none!important}
     .pd-dots[data-state="working"] i{animation:none!important}
-    /* the loader stops but still has to read as four squares, not one stack */
-    .ld i{animation:none!important}
-    .ld i:nth-child(2){transform:translate(var(--ld-step),0)}
-    .ld i:nth-child(3){transform:translate(var(--ld-step),var(--ld-step))}
-    .ld i:nth-child(4){transform:translate(0,var(--ld-step))}
   }
 </style>
 </head>
@@ -1162,7 +1334,7 @@
         <button data-type="install">Install app</button>
         <button data-type="dropin">Drop-in form</button>
         <button data-type="features">Feature row</button>
-        <button data-type="quote2">Quote (calm)</button>
+        <button data-type="quote2">Customer quote</button>
         <button data-type="logos">Logo wall</button>
         <button data-type="scale">Scale / pipeline</button>
         <button data-type="pipeline">How-it-works demo</button>
@@ -1197,6 +1369,8 @@
 <script id="uploaderui-src" type="application/json">__UPLOADERUI_JSON__</script>
 <script id="demo-src" type="application/json">__DEMO_JSON__</script>
 <script id="caps-src" type="application/json">__CAPS_JSON__</script>
+<script id="market-src" type="application/json">__MARKET_JSON__</script>
+<script id="compliance-src" type="application/json">__COMPLIANCE_JSON__</script>
 
 <script>
 /* =========================================================
@@ -1213,6 +1387,8 @@ const LOGOS = JSON.parse(document.getElementById('logos-src').textContent);
 const UI = JSON.parse(document.getElementById('uploaderui-src').textContent);
 const DEMO = JSON.parse(document.getElementById('demo-src').textContent);
 const CAPS = JSON.parse(document.getElementById('caps-src').textContent);
+const MARKET = JSON.parse(document.getElementById('market-src').textContent);
+const COMPLIANCE = JSON.parse(document.getElementById('compliance-src').textContent);
 const PIXEL = JSON.parse(document.getElementById('pixel-src').textContent);
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -1392,10 +1568,14 @@ const DEFAULT_DECK = {
     // 2 — five capabilities, one per icon, fast rhythm, settle into a row
     { type:'features', duration:8 },
 
-    // 3 — customer quote, quiet and calm
+    // 3 — customer quote: the lime pull-quote, then who said it
     { type:'quote2', duration:8,
       quote:'It just works out of the box without having to think about it.',
-      by:'Luca Mausberg', role:'Co-founder', mark:'marko' },
+      by:'Luca Mausberg', role:'Co-founder', company:'Marko', mark:'marko',
+      tag:'Secondhand marketplace',
+      about:'Marko is Switzerland\u2019s community-driven secondhand marketplace, '
+          + 'built for Gen Z and millennial consumers who care about '
+          + 'sustainability, affordability, and style.' },
 
     // 4 — trusted-by logo wall, soft simultaneous fade-in
     { type:'logos', duration:7,
@@ -1403,9 +1583,12 @@ const DEFAULT_DECK = {
       logos:'Zapier, SoundCloud, L\u2019Or\u00e9al, Sequoia, UserTesting, Prezly, Aryeo, marko' },
 
     // 5 — distribution: already in the Webflow marketplace, cursor installs it
-    { type:'install', duration:7,
-      heading:'No code. It\u2019s already in your\nWebflow Marketplace.',
-      foot:'A native File Uploader app, approved by Webflow.', textFx:'weight' },
+    { type:'install', duration:9,
+      heading:'No code. It\u2019s already\nin your Webflow Marketplace.',
+      sub:'A native File Uploader app, approved by Webflow.',
+      app:'Uploadcare File Uploader', downloads:'1k+',
+      blurb:'Accelerate time to market with a no-code plugin for scalable '
+          + 'and secure end-user file uploads.' },
 
     // 6 — the bigger picture: the site's own upload/analyse/deliver demo. The
     // score runs ~11.5s, so the card holds a beat longer than that.
@@ -1415,8 +1598,8 @@ const DEFAULT_DECK = {
 
     // 7 — booth invite on the file-board backdrop, QR in the middle
     { type:'board', duration:10, layout:'outro', globe:true, float:true, typing:true, typeSpeed:16,
-      title:'Get more out of Webflow.',
-      sub:'Come say hi \ud83d\udc4b', qr:true }
+      title:'Get more\nout of Webflow.',
+      sub:'Come say hi \ud83d\udc4b', qr:false }
   ]
 };
 
@@ -1585,10 +1768,12 @@ const FEATURES = [
   { label:'Built-in\neditor',    icon:'editor'      },
 ];
 
-/* The four-square loader. Two squares carry the highlight; which two is what
-   makes the bright pair sweep round instead of the ring reading as uniform. */
-const LOADER = '<i class="ld"><i class="hot" style="--i:0"></i><i style="--i:1"></i>'
-             + '<i style="--i:2"></i><i class="hot" style="--i:3"></i></i>';
+/* The tick on the installed button. Drawn here rather than exported because it
+   has to be a single open path: the install animation strokes it on, and a
+   filled glyph has no length to animate. 22 is its path length, which is what
+   .wf-check's dasharray is set to. */
+const WF_CHECK = '<svg class="wf-check" viewBox="0 0 16 16" aria-hidden="true">'
+               + '<path d="M3.2 8.6 6.4 11.8 12.8 4.6"/></svg>';
 const TRASH_ICON = svgIcon('<path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1L5 6"/>');
 
 /* The per-file upload ring on card 1. Drawn rather than exported, because the
@@ -1612,8 +1797,20 @@ const UPLOAD_SOURCES = [
    fold accents and punctuation away to reach the asset key. Widths are the
    storyboard's — the marks are balanced optically, not to a common height. */
 const logoKey = n => n.toLowerCase().normalize('NFD').replace(/[^a-z0-9]/g,'');
-const LOGO_WIDTH = { zapier:158, soundcloud:256, loreal:168, sequoia:222,
-                     usertesting:227, prezly:166, aryeo:175, marko:210 };
+
+/* Each mark's exported box, w x h. These are the asset viewBoxes, so a logo
+   drawn at this size is 1:1 with the storyboard — no common height, because
+   these marks are balanced by eye, not by bounding box. */
+const LOGO_BOX = { zapier:[158,41], soundcloud:[256,32], loreal:[168,32],
+                   sequoia:[222,29.2082], usertesting:[227,68], prezly:[166,43],
+                   aryeo:[175,50], marko:[210,34] };
+
+/* Where the storyboard centres each of the eight slots, in reading order.
+   Deliberately not derived from a grid: the designer nudged these, and the
+   drift (column 1 sits 12px apart between rows) is what keeps the wall
+   optically even. Slot i takes logo i, so editing the list still works. */
+const LW_SLOTS = [[358,436.5],[769,432],[1179,437],[1577,432.4],
+                  [345.5,693],[769,680.5],[1175.5,677],[1578,683]];
 
 /* ---- pipeline card (the website's demo) ----
    The three transforms the URL grows, in order. Each one has a matching
@@ -1624,7 +1821,18 @@ const PD_TRANSFORMS = [
   ['scale_crop','460x460','center'],
   ['border_radius','50p'],
 ];
-const PD_UUID = '13cf5c14-acb...2d2b155d650c';
+/* the full UUID, as the storyboard writes it. It only just clears the column —
+   37 monospace characters plus the indent against 358px — which is what caps
+   .pd-url at 15px; the abbreviated form was a symptom of the old, bigger type */
+const PD_UUID = '13cf5c14-acb4-4cfe-9add-2d2b155d650c';
+/* The trust marks along the bottom: [asset, w, h], drawn at .839 of the size
+   they are in the storyboard's own logo sheet, which is where their relative
+   scale comes from — HIPAA is a wider, shorter lockup and is drawn smaller so
+   the three read as one weight. Laid out as a centred row on PD_BADGE_Y with
+   PD_BADGE_GAP between centres, rather than at fixed x: the marks are near
+   enough the same width that even spacing is what the eye wants. */
+const PD_BADGES = [['soc2',52.0,52.0],['gdpr',52.9,52.9],['hipaa',53.7,46.1]];
+const PD_BADGE_Y = 1015, PD_BADGE_GAP = 99;
 /* *stars* mark the value half of each readout, which is set in white */
 const PD_ANALYSIS = [
   'image/jpeg \u00b7 290 KB',
@@ -1705,42 +1913,51 @@ const R = {
       </div>
     </div>`;
   },
-  /* ---- card 2: five capability panels, under a live status chip ---- */
+  /* ---- card 2: five capability panels, icons landing one at a time ---- */
   features(s){
     const cards = FEATURES.map((f,i)=>`
       <div class="ft-card" style="--i:${i}">
         <div class="ft-label">${multiline(f.label)}</div>
         <div class="ft-tile" style="--i:${i}">${CAPS[f.icon]||''}</div>
       </div>`).join('');
-    const status = s.status===undefined ? 'Uploading\u2026' : s.status;
-    return `<div class="ft-wrap">
-      ${status?`<div class="ft-chip reveal"><span>${LOADER}<span class="ft-chiptxt">${esc(status)}</span></span></div>`:''}
-      <div class="ft-row">${cards}</div>
-    </div>`;
+    return `<div class="ft-wrap"><div class="ft-row">${cards}</div></div>`;
   },
-  /* ---- card 3: a quiet, calm customer quote ---- */
+  /* ---- card 3: the pull-quote beside who said it ---- */
   quote2(s){
     const mark = LOGOS[logoKey(s.mark||'')];
-    return `<div class="q2-wrap">
-      <div class="q2-quote">\u201c${esc(s.quote||'')}\u201d</div>
-      <div class="q2-by">${esc(s.by||'')}${s.role?`, ${esc(s.role)}`:''}</div>
-      ${mark?`<div class="q2-mark">${mark}</div>`:''}
+    const line = [s.by, s.role, s.company].filter(Boolean).join(', ');
+    return `<div class="qt-wrap">
+      <div class="qt-panel qt-say">
+        <p class="qt-in qt-quote">\u201c${esc(s.quote||'')}\u201d</p>
+        <p class="qt-in qt-by">${esc(line)}</p>
+      </div>
+      <div class="qt-panel qt-who">
+        <div class="qt-head">
+          ${mark?`<div class="qt-in qt-logo">${mark}</div>`:''}
+          ${s.tag?`<div class="qt-in qt-tag">${esc(s.tag)}</div>`:''}
+        </div>
+        <p class="qt-in qt-desc">${esc(s.about||'')}</p>
+      </div>
     </div>`;
   },
-  /* ---- card 4: trusted-by logo wall, one soft simultaneous fade ---- */
+  /* ---- card 4: trusted-by wall, marks landing in reading order ---- */
   logos(s){
     const list = (s.logos||'').split(',').map(x=>x.trim()).filter(Boolean);
-    const cells = list.map(n=>{
+    const marks = list.slice(0, LW_SLOTS.length).map((n,i)=>{
       const key = logoKey(n), svg = LOGOS[key];
-      // fall back to the name set in type if a mark is ever missing
-      const inner = svg
-        ? `<span class="lw-logo" style="width:${LOGO_WIDTH[key]||180}px">${svg}</span>`
-        : `<span class="lw-word">${esc(n)}</span>`;
-      return `<div class="lw-cell">${inner}</div>`;
+      const [cx,cy] = LW_SLOTS[i];
+      if (!svg){
+        // no mark for this name — set it in type, centred on the same slot
+        return `<span class="lw-word" style="--i:${i};left:${cx}px;top:${cy}px;`
+             + `translate:-50% -50%">${esc(n)}</span>`;
+      }
+      const [w,h] = LOGO_BOX[key] || [180,32];
+      return `<span class="lw-logo" style="--i:${i};left:${cx - w/2}px;`
+           + `top:${cy - h/2}px;width:${w}px;height:${h}px">${svg}</span>`;
     }).join('');
     return `<div class="lw-wrap">
       ${s.title?`<div class="lw-title">${esc(s.title)}</div>`:''}
-      <div class="lw-grid">${cells}</div>
+      ${marks}
     </div>`;
   },
   /* ---- card 6: one headline, the whole pipeline as a chip row ---- */
@@ -1768,11 +1985,17 @@ const R = {
         op.slice(1).map(a=>`<span class="dim">/</span><span class="arg">${esc(a)}</span>`).join('')
       }<span class="dim">/</span></p></div>`).join('');
 
+    const cx0 = 960 - (PD_BADGES.length-1)*PD_BADGE_GAP/2;   // row centred on stage
+    const badges = PD_BADGES.map(([name,w,h],i)=>
+      `<div class="pd-badge" style="--i:${i};left:${cx0 + i*PD_BADGE_GAP - w/2}px;`
+      + `top:${PD_BADGE_Y - h/2}px;width:${w}px;height:${h}px">${COMPLIANCE[name]}</div>`).join('');
+
     return `<div class="pd-wrap">
-      <div class="pd-head">
-        <div class="pd-title reveal">${esc(s.heading||'')}</div>
-        ${s.subhead?`<div class="pd-sub reveal d1">${esc(s.subhead)}</div>`:''}
+      <div class="shd">
+        <div class="shd-t reveal">${esc(s.heading||'')}</div>
+        ${s.subhead?`<div class="shd-s reveal d2">${esc(s.subhead)}</div>`:''}
       </div>
+      ${badges}
       <div class="pd-shell">
         <div class="pd-bgwrap"><div class="pd-bg"><img src="${DEMO.original}" alt=""></div></div>
         <div class="pd-grid">
@@ -1964,24 +2187,34 @@ const R = {
       </div>
     </div>`;
   },
+  /* ---- card 5: the marketplace listing, installed by a cursor ---- */
   install(s){
-    return `<div class="in-wrap">
-      <div class="hd in-head reveal d1">${multiline(s.heading||'')}</div>
-      <div class="in-app reveal d2">
-        <div class="in-card">
-          <div class="in-icon">${GLYPH}</div>
-          <div class="in-info">
-            <div class="in-title">Uploadcare File Uploader</div>
-            <div class="in-dl">\u2193 1k+</div>
-            <div class="in-desc">Accelerate time to market with a no-code plugin for scalable and secure end-user file uploads.</div>
+    const lbl = (i,txt,check)=>`<span class="wf-lbl" data-s="${i}">`
+      + (check?WF_CHECK:'') + esc(txt) + `</span>`;
+    return `<div class="wf-wrap">
+      <div class="shd" style="--shd-y:212px">
+        <div class="shd-t reveal">${multiline(s.heading||'')}</div>
+        ${s.sub?`<div class="shd-s reveal d2">${esc(s.sub)}</div>`:''}
+      </div>
+      <div class="wf-panel">
+        <div class="wf-in wf-tile" style="--i:0">${GLYPH}</div>
+        <div class="wf-col">
+          <div>
+            <div class="wf-in wf-name" style="--i:1">${esc(s.app||'')}</div>
+            <div class="wf-in wf-meta" style="--i:2">
+              ${MARKET.downloads||''}<span class="wf-dl">${esc(s.downloads||'')}</span>
+            </div>
+            <div class="wf-in wf-desc" style="--i:3">${esc(s.blurb||'')}</div>
+          </div>
+          <div class="wf-in wf-btnwrap" style="--i:4">
+            <div class="wf-btn" data-state="0">
+              <i class="wf-sweep"></i>
+              ${lbl(0,'Install App')}${lbl(1,'Installing\u2026')}${lbl(2,'Installed',true)}
+            </div>
           </div>
         </div>
-        <div class="in-btnrow">
-          <div class="in-btn">Install App</div>
-          <img class="in-cursor" src="${UPLOADER.cursor}" alt="">
-        </div>
       </div>
-      ${s.foot?`<div class="in-foot reveal d4">${esc(s.foot)}</div>`:''}
+      <img class="wf-cursor" src="${UPLOADER.cursor}" alt="">
     </div>`;
   },
   chaos(s){
@@ -2022,13 +2255,14 @@ const R = {
     const globeOn = s.globe !== false;
     const outro = s.layout === 'outro';
     /* Per-node geometry: [position, cardW, cardH, metaLeft, metaTop]. The outro
-       set comes from the storyboard — cards pushed to the corners with their
-       telemetry beside them, leaving the middle clear for the headline + QR. */
+       set is storyboard frame 184:5666 to the pixel — four small files pushed
+       into the corners with their telemetry beside them, leaving the whole
+       centre line to the lockup, headline, glyph and sign-off. */
     const G = outro ? {
-      n1:['left:11.5%;top:13.5%', 154, 222, 163, 176],
-      n2:['left:14%;top:72.6%',   148, 187, 160,   0],
-      n3:['right:23%;top:18.7%',  184, 128, 206,  19],
-      n4:['right:17.4%;top:68.8%', 70, 101,  84,  14],
+      n1:['left:272px;top:219px',    100, 143, 117.66, 100.66],
+      n2:['left:311px;top:778px',    105, 147, 123.88,       0],
+      n3:['left:1342.44px;top:203px', 134.27, 94.72, 158.01, 16.38],
+      n4:['left:1520px;top:752px',    67,  83,  81,     2.05],
     } : {
       n1:['left:24%;top:26%',  300, 426, 316, 300],
       n2:['left:38%;top:63%',  210, 294, 226,   4],
@@ -2039,19 +2273,27 @@ const R = {
       ? `<div class="hb-sign reveal d2">${LOGO}</div>
          <div class="hb-outro">
           <div class="hb-outro-line reveal d3">${multiline(title)}</div>
-          ${s.sub?`<div class="hb-outro-sub reveal d4">${esc(s.sub)}</div>`:''}
          </div>
+         <div class="hb-mark reveal d4">${GLYPH}</div>
+         ${s.sub?`<div class="hb-outro-sub reveal d5">${esc(s.sub)}</div>`:''}
          ${s.qr?`<div class="hb-outro-qr reveal d5">${QR}</div>`:''}`
       : `<div class="hb-logo">${LOGO}</div>
          <div class="hb-title">${multiline(title)}</div>`;
+    /* [class, x, y, size] — the storyboard scatters five, two sizes */
+    const dots = outro
+      ? [['y',589,86,4],['g',842,340,7],['y',1019.27,610.05,4],
+         ['g',1167.4,823.73,7],['y',1422,686,4]]
+        .map(([c,x,y,d])=>`<div class="hb-dot ${c}" style="left:${x}px;top:${y}px;width:${d}px;height:${d}px"></div>`)
+        .join('')
+      : `<div class="hb-dot g" style="left:16%;top:44%"></div>
+         <div class="hb-dot y" style="left:60%;top:63%"></div>
+         <div class="hb-dot y" style="left:81%;top:66%"></div>
+         <div class="hb-dot g" style="left:69%;top:81%"></div>
+         <div class="hb-dot d" style="left:88%;top:88%"></div>`;
     return `<div class="hb ${outro?'hb-outro-mode':''}">
       ${globeOn ? `<div class="hb-globe">${GLOBE}</div>` : ''}
 
-      <div class="hb-dot g" style="left:16%;top:44%"></div>
-      <div class="hb-dot y" style="left:60%;top:63%"></div>
-      <div class="hb-dot y" style="left:81%;top:66%"></div>
-      <div class="hb-dot g" style="left:69%;top:81%"></div>
-      <div class="hb-dot d" style="left:88%;top:88%"></div>
+      ${dots}
 
       ${header}
 
@@ -2075,7 +2317,7 @@ const R = {
       <div class="hb-node n3" style="${G.n3[0]}" data-meta="car">
         <div class="hb-inner">
           <div class="hb-card framed" style="width:${G.n3[1]}px;height:${G.n3[2]}px"><img src="${ASSETS.car}" alt=""></div>
-          <div class="hb-led" style="left:${G.n3[3]+8}px;top:${G.n3[4]-12}px"></div>
+          <div class="hb-led" style="left:${G.n3[3]}px;top:${outro?0:G.n3[4]-12}px"></div>
           <div class="hb-meta" style="left:${G.n3[3]}px;top:${G.n3[4]}px"></div>
         </div>
       </div>
@@ -2114,6 +2356,9 @@ const SB_ZONES = [
 ];
 const SB_MAX = 7;     // concurrent blips — enough to feel alive, not busy
 const SB_MIN_DX = 6, SB_MIN_DY = 9;   // % apart, or they read as a dotted line
+/* The storyboard draws these particles into its frames, and this is the palette
+   it uses: white, periwinkle, and the same lime as the quote panel. */
+const SB_COLORS = ['#ffffff', '#b6b7ff', '#d8ff6e'];
 
 function startSubstrate(){
   const field = document.getElementById('sbField');
@@ -2143,7 +2388,8 @@ function startSubstrate(){
         const blip = document.createElement('i');
         blip.className = 'sb-blip';
         blip.style.cssText = `left:${p.x.toFixed(2)}%;top:${p.y.toFixed(2)}%;`
-                           + `--life:${rnd(2200,3400)|0}ms`;
+                           + `--life:${rnd(2200,3400)|0}ms;`
+                           + `--c:${SB_COLORS[Math.random()*SB_COLORS.length|0]}`;
         live.add(p);
         blip.addEventListener('animationend', ()=>{ live.delete(p); blip.remove(); });
         field.appendChild(blip);
@@ -2397,12 +2643,12 @@ const BOARD_META = {
   tennis: { lines:[
     [['IMAGE REQUESTED','']],
     [['SIZE: ',''],['1024X768','b']],
-    [['DELIVERED IN: ',''],['67 MS','g']],
+    [['DELIVERED IN: ',''],['67 MS','t']],
   ], keepCursor:false, startAt:600 },
   blonde: { lines:[
     [['IMAGE REQUESTED','']],
     [['SIZE: ',''],['1024X768','b']],
-    [['DELIVERED IN: ',''],['67 MS','g']],
+    [['DELIVERED IN: ',''],['67 MS','t']],
   ], keepCursor:false, startAt:900 },
   car: { lines:[
     [['FILE RECEIVED.','']],
@@ -2479,6 +2725,22 @@ function typeMeta(metaEl, spec, speed, tl){
 function setupBoard(slideEl, sd, tl){
   const globe = slideEl.querySelector('.hb-globe');
   if (globe && sd.globe!==false && !REDUCED) globe.classList.add('spin');
+
+  /* Sparkle the centre glyph: every pixel gets its own slow cycle, its own
+     phase and its own floor and ceiling, so the mark shimmers without any of
+     it reading as a pulse. Negative delays start each square mid-cycle, which
+     is what stops all 47 of them lifting together on the first beat. */
+  const mark = slideEl.querySelector('.hb-mark');
+  if (mark && !REDUCED){
+    const rnd = (a,b)=>a + Math.random()*(b-a);
+    mark.querySelectorAll('path').forEach(px=>{
+      px.style.setProperty('--d',  rnd(4.5, 9.5).toFixed(2)+'s');
+      px.style.setProperty('--t',  (-rnd(0, 9.5)).toFixed(2)+'s');
+      px.style.setProperty('--o1', rnd(.18, .45).toFixed(2));
+      px.style.setProperty('--o2', rnd(.75, 1).toFixed(2));
+    });
+    mark.classList.add('twinkle');
+  }
 
   const floatOn = sd.float!==false && !REDUCED;
   const dots = slideEl.querySelectorAll('.hb-dot');
@@ -2584,33 +2846,75 @@ function setupCode(slideEl, sd, tl){
   tl.at(clickAt+.32, ()=>typeLines(out, lines, Math.max(4, sd.typeSpeed||18), tl));
 }
 
-/* install slide: the cursor moves onto "Install App", taps it, and the button
-   flips to an installing → installed state. */
-function setupInstall(slideEl, sd, tl){
-  const btn = slideEl.querySelector('.in-btn');
-  const cursor = slideEl.querySelector('.in-cursor');
-  if (!btn) return;
-  btn.textContent = 'Install App'; btn.classList.remove('press','done');
+/* ---------------- card 5: install it from the marketplace ----------------
+   The cursor crosses to the button, presses it, and the button works through
+   Install -> Installing -> Installed.
 
-  if (REDUCED){ if(cursor) cursor.style.opacity=0; btn.textContent='Installed'; btn.classList.add('done'); return; }
+   Every beat here is sized the way a real button would be, not the way a
+   marketing loop usually is: the press is 140ms and the release snappier still,
+   because that is the moment the interface is proving it heard the click. Only
+   the install itself is slow, because that is the part that actually takes
+   time. The travel is a spring so the pointer decelerates onto its target
+   instead of stopping dead on a schedule. */
+const WF_INSTALL_MS = 1150;   // must match .wf-btn[data-state="1"] .wf-sweep
+
+function setupInstall(slideEl, sd, tl){
+  const btn    = slideEl.querySelector('.wf-btn');
+  const cursor = slideEl.querySelector('.wf-cursor');
+  if (!btn) return;
+  btn.dataset.state = '0';
+  btn.classList.remove('press','pop');
+
+  if (REDUCED){
+    if (cursor) cursor.style.opacity = 0;
+    btn.dataset.state = '2';                 // land on the outcome, no journey
+    return;
+  }
   if (!cursor) return;
   cursor.getAnimations().forEach(a=>a.cancel());
 
-  const START={x:240,y:150}, OVER={x:78,y:26};
-  cursor.style.opacity=0; cursor.style.transform=`translate(${START.x}px,${START.y}px)`;
-  tl.to(cursor, [{opacity:0},{opacity:1}], {dur:.3, at:.8});
-  let arrive = .9;
-  tl.spring(cursor, START, OVER, {at:.9, onArrive:t=>arrive=t});
+  // The pointer lands in the button's lower-right rather than dead centre: the
+  // arrow's body then hangs off the corner instead of sitting on the label,
+  // which is the one thing on this card that has to stay readable while it
+  // changes. START is well clear of the panel, down and to the right, so the
+  // trip is long enough to read as a trip.
+  const TARGET = {x:946, y:776}, START = {x:1428, y:1006};
+  cursor.style.opacity = 0;
+  cursor.style.transform = `translate(${START.x}px,${START.y}px)`;
+
+  // The pointer arrives before it moves, and only starts once it is fully up.
+  // A spring is heavily front-loaded — at the deck's usual response it is half
+  // way across inside 120ms — so fading in over the top of the travel means it
+  // is already on the button by the time you can see it. It has to be a thing
+  // sitting there, and then a thing that moves.
+  tl.to(cursor, [{opacity:0},{opacity:1}], {at:1.0, dur:.25});
+  const GO = 1.42;
+  let arrive = GO;
+  tl.spring(cursor, START, TARGET, {at:GO, response:.8, onArrive:t=>arrive=t});
+
+  // Press: the pointer sinks with the button rather than hovering above it.
+  // fill:'forwards' is not optional — the default 'both' would hold this
+  // tween's first keyframe from t=0, parking the pointer on the button before
+  // the spring ever gets to move it.
+  const CLICK = arrive + .12;
   tl.to(cursor, [
-    {transform:`translate(${OVER.x}px,${OVER.y}px)`},
-    {transform:`translate(${OVER.x}px,${OVER.y+5}px)`},
-    {transform:`translate(${OVER.x}px,${OVER.y}px)`}],
-    {dur:.26, at:arrive, ease:EASE.inOut});
-  const clickAt = arrive + .1;
-  tl.cls(btn, 'press', clickAt);
-  tl.cls(btn, 'press', clickAt+.22, false);
-  tl.at(clickAt+.24, ()=>{ btn.textContent='Installing\u2026'; });
-  tl.at(clickAt+1.5, ()=>{ btn.textContent='Installed \u2713'; btn.classList.add('done'); });
+    {transform:`translate(${TARGET.x}px,${TARGET.y}px)`},
+    {transform:`translate(${TARGET.x}px,${TARGET.y + 3}px)`},
+    {transform:`translate(${TARGET.x}px,${TARGET.y}px)`}],
+    {at:CLICK, dur:.28, ease:EASE.inOut, fill:'forwards'});
+  tl.cls(btn, 'press', CLICK);
+  tl.cls(btn, 'press', CLICK + .14, false);
+
+  // the click registers on release, which is where the state turns over
+  const WORK = CLICK + .16;
+  tl.at(WORK, ()=>{ btn.dataset.state = '1'; });
+  // the pointer's work is done; it leaves rather than sitting on the result
+  tl.to(cursor, [{opacity:1},{opacity:0}], {at:WORK + .30, dur:.28, fill:'forwards'});
+
+  const DONE = WORK + WF_INSTALL_MS/1000;
+  tl.at(DONE, ()=>{ btn.dataset.state = '2'; });
+  tl.cls(btn, 'pop', DONE + .04);
+  tl.cls(btn, 'pop', DONE + .20, false);
 }
 
 /* ---------------- card 1: drag, drop, upload ----------------
@@ -3249,8 +3553,11 @@ function enter(i){
   const cur = nodes[idx];
   const sd = deck.slides[idx];
 
-  // brand glyph sits on every slide (consistent signature, bottom-right grid corner)
-  watermarkEl.classList.toggle('show', !!deck.settings.watermark);
+  // brand glyph sits on every slide (consistent signature, bottom-right grid
+  // corner) — except the outro, where the mark is already the centre of the
+  // composition and a second copy in the corner just reads as a duplicate
+  const signed = !!deck.settings.watermark && sd.layout!=='outro';
+  watermarkEl.classList.toggle('show', signed);
 
   // the board card runs its own globe and dots; the ambient blips would only
   // duplicate that vocabulary, so the substrate steps aside there
@@ -3303,7 +3610,7 @@ const editor = document.getElementById('editor');
 const cardsEl = document.getElementById('cards');
 let expanded = -1;
 
-const TYPE_LABEL = {statement:'Statement', number:'Number', chart:'Chart', stats:'Stats', logo:'Logo', logoAnim:'Logo FX', board:'File board', reveal:'Reveal', mockup:'Mockup', code:'Code / terminal', upload:'Upload demo', chaos:'Chaos graph', install:'Install app', dropin:'Drop-in form', features:'Feature row', quote2:'Quote (calm)', logos:'Logo wall', scale:'Scale / pipeline', pipeline:'How-it-works demo'};
+const TYPE_LABEL = {statement:'Statement', number:'Number', chart:'Chart', stats:'Stats', logo:'Logo', logoAnim:'Logo FX', board:'File board', reveal:'Reveal', mockup:'Mockup', code:'Code / terminal', upload:'Upload demo', chaos:'Chaos graph', install:'Install app', dropin:'Drop-in form', features:'Feature row', quote2:'Customer quote', logos:'Logo wall', scale:'Scale / pipeline', pipeline:'How-it-works demo'};
 const VARIANT_LABEL = {
   'assemble':'Pixel assembly — lockup',
   'rise':'Cinematic rise — lockup',
@@ -3456,8 +3763,13 @@ function fieldsFor(s, i){
       <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">A "File uploaded" node lands first, then the tangled maintenance graph blooms in behind the headline.</p>`;
     case 'install': return dur+`
       <label class="f"><span>Heading (line breaks allowed)</span><textarea data-f="heading">${esc(s.heading||'')}</textarea></label>
-      <label class="f"><span>Footer line (mono)</span><input type="text" data-f="foot" value="${esc(s.foot||'')}"></label>
-      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">The cursor moves onto “Install App” and taps it — the button flips to Installing → Installed.</p>`;
+      <label class="f"><span>Subhead</span><input type="text" data-f="sub" value="${esc(s.sub||'')}"></label>
+      <div class="row2">
+        <label class="f"><span>App name</span><input type="text" data-f="app" value="${esc(s.app||'')}"></label>
+        <label class="f"><span>Downloads</span><input type="text" data-f="downloads" value="${esc(s.downloads||'')}"></label>
+      </div>
+      <label class="f"><span>Listing blurb (wraps to two lines at 313px)</span><textarea data-f="blurb">${esc(s.blurb||'')}</textarea></label>
+      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">The listing rises in, its contents 60ms apart, then the cursor springs across and presses “Install App”. Press is 140ms and release is quicker still; only the install itself is slow (1.15s), because that is the part that would actually take time. The score runs ~4.5s, so give the card 9s or more.</p>`;
     case 'dropin': return dur+`
       <label class="f"><span>Heading</span><textarea data-f="heading">${esc(s.heading||'')}</textarea></label>
       <label class="f"><span>Sub-line</span><input type="text" data-f="sub" value="${esc(s.sub||'')}"></label>
@@ -3471,19 +3783,24 @@ function fieldsFor(s, i){
       </div>
       <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">A stack of two files is dragged in under one cursor and dropped; the widget hands over to the compact uploading panel, each file fills its ring and settles into a checkmark plus a bin, then the window dismisses itself. The score runs ~7s, so give the card 8s or more.</p>`;
     case 'features': return dur+`
-      <label class="f"><span>Status chip (blank hides it and its loader)</span><input type="text" data-f="status" value="${esc(s.status===undefined?'Uploading\u2026':s.status)}"></label>
-      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">Five capability panels rise in sequence, each icon tile landing a beat after its card: ${FEATURES.map(f=>esc(f.label.replace(/\n/g,' '))).join(', ')}. Above them a chip runs the four-square loader on an endless orbit. Labels and icons live in the FEATURES array in the template.</p>`;
+      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">Five capability panels rise in as a row, then the icons land in their wells one after another, left to right: ${FEATURES.map(f=>esc(f.label.replace(/\n/g,' '))).join(', ')}. The whole sequence settles by ~1.8s. Labels and icons live in the FEATURES array in the template.</p>`;
     case 'quote2': return dur+`
-      <label class="f"><span>Quote</span><textarea data-f="quote">${esc(s.quote||'')}</textarea></label>
+      <label class="f"><span>Quote (the lime panel)</span><textarea data-f="quote">${esc(s.quote||'')}</textarea></label>
       <div class="row2">
         <label class="f"><span>Name</span><input type="text" data-f="by" value="${esc(s.by||'')}"></label>
-        <label class="f"><span>Role / company</span><input type="text" data-f="role" value="${esc(s.role||'')}"></label>
+        <label class="f"><span>Role</span><input type="text" data-f="role" value="${esc(s.role||'')}"></label>
       </div>
-      <label class="f"><span>Company mark (wordmark next to attribution)</span><input type="text" data-f="mark" value="${esc(s.mark||'')}"></label>`;
+      <div class="row2">
+        <label class="f"><span>Company</span><input type="text" data-f="company" value="${esc(s.company||'')}"></label>
+        <label class="f"><span>Wordmark (a name in assets/logos)</span><input type="text" data-f="mark" value="${esc(s.mark||'')}"></label>
+      </div>
+      <label class="f"><span>Category chip (blank hides it)</span><input type="text" data-f="tag" value="${esc(s.tag||'')}"></label>
+      <label class="f"><span>About the customer</span><textarea data-f="about">${esc(s.about||'')}</textarea></label>
+      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">Name, role and company are joined with commas into the one attribution line. The lime quote panel enters first and the customer panel follows ~220ms later, each with its own contents a beat behind it; the whole spread settles by ~1.25s.</p>`;
     case 'logos': return dur+`
       <label class="f"><span>Top label (optional)</span><input type="text" data-f="title" value="${esc(s.title||'')}"></label>
       <label class="f"><span>Logos (comma separated — 8 for a 2×4 grid)</span><textarea data-f="logos">${esc(s.logos||'')}</textarea></label>
-      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">Names are matched to the real SVG marks in assets/logos (accents and case are ignored). An unknown name falls back to the wordmark set in type. All eight fade in together.</p>`;
+      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">Names are matched to the real SVG marks in assets/logos (accents and case are ignored); an unknown name falls back to the wordmark set in type. Each mark is centred on its own slot from the storyboard at its own exported size, so the eight are placed optically rather than on a grid — the list fills the slots in reading order and anything past the eighth is dropped. They land 75ms apart.</p>`;
     case 'scale': return dur+`
       <label class="f"><span>Heading</span><textarea data-f="heading">${esc(s.heading||'')}</textarea></label>
       <label class="f"><span>Pipeline steps (comma separated)</span><input type="text" data-f="steps" value="${esc(s.steps||'Upload, Store, Transform, Optimize, Deliver')}"></label>
@@ -3593,10 +3910,10 @@ const NEW = {
   code:{type:'code',duration:10,kicker:'',line:'Ask your coding\nagent about us.',cmd:'uploadcare file upload my-image.jpg',lines:'Uploading my-image.jpg\u2026\n\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588  100%\n\u2713 https://ucarecdn.com/\u2026/my-image.jpg\nDone in 0.4s.',typeSpeed:18,textFx:'weight'},
   upload:{type:'upload',duration:12,kicker:'',heading:'As simple as drag and drop.',heading2:'Then it becomes a side project that never ends.',outcome:true,progressMs:3000,textFx:'weight'},
   chaos:{type:'chaos',duration:12,kicker:'',heading:'Then it becomes\na side project\nthat never ends.',textFx:'stagger'},
-  install:{type:'install',duration:9,heading:'Already in your\nWebflow Marketplace.',foot:'A native, no-code File Uploader app. Approved by Webflow.',textFx:'weight'},
+  install:{type:'install',duration:9,heading:'No code. It\u2019s already\nin your Webflow Marketplace.',sub:'A native File Uploader app, approved by Webflow.',app:'Uploadcare File Uploader',downloads:'1k+',blurb:'Accelerate time to market with a no-code plugin for scalable and secure end-user file uploads.'},
   dropin:{type:'dropin',duration:5,heading:'Uploads that just work.',sub:'Any file, any source, safe.',textFx:'stagger'},
   features:{type:'features',duration:6},
-  quote2:{type:'quote2',duration:6,quote:'It just works out of the box without having to think about it.',by:'Luca Mausberg',role:'Co-founder',mark:'marko'},
+  quote2:{type:'quote2',duration:8,quote:'It just works out of the box without having to think about it.',by:'Luca Mausberg',role:'Co-founder',company:'Marko',mark:'marko',tag:'Secondhand marketplace',about:'Marko is Switzerland\u2019s community-driven secondhand marketplace, built for Gen Z and millennial consumers who care about sustainability, affordability, and style.'},
   logos:{type:'logos',duration:5,title:'Trusted by',logos:'Zapier, SoundCloud, L\u2019Or\u00e9al, Sequoia, UserTesting, Prezly, Aryeo, marko'},
   scale:{type:'scale',duration:6,heading:'Set it up once, use it on every client site, and go beyond uploads with the full pipeline via API.',steps:'Upload, Store, Transform, Optimize, Deliver'},
   pipeline:{type:'pipeline',duration:13,heading:'Set it up once, use it on every client site',subhead:'Go beyond uploads with the full pipeline via API.'}

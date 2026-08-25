@@ -31,11 +31,21 @@ LOGOS = ROOT / "assets" / "logos"
 UPLOADER_UI = ROOT / "assets" / "uploader"
 DEMO = ROOT / "assets" / "demo"
 CAPS = ROOT / "assets" / "caps"
+MARKET = ROOT / "assets" / "marketplace"
+COMPLIANCE = ROOT / "assets" / "compliance"
 
 # Card 2's capability icons, exported from the storyboard with their accent
 # colours baked in — they are not a monochrome set, so they can't be recoloured
 # from CSS. Keys are what FEATURES looks them up by.
 CAP_ICONS = ("large-files", "multi-file", "any-source", "malware", "editor")
+
+# Card 5's marketplace listing chrome. Only the download glyph lives here — the
+# app tile reuses the deck's own Uploadcare glyph, recoloured to brand yellow
+# from CSS, because it is the same mark the storyboard places there.
+MARKET_ICONS = ("downloads",)
+
+# Card 6's trust marks, in the order the storyboard lays them out.
+COMPLIANCE_BADGES = ("soc2", "gdpr", "hipaa")
 
 # The three-panel pipeline card runs on one photo and the three transforms the
 # on-screen URL builds up, so the frames have to match the ops exactly:
@@ -126,6 +136,16 @@ def encode_caps() -> str:
     return json.dumps({n: inline_svg(CAPS / f"{n}.svg") for n in CAP_ICONS})
 
 
+def encode_market() -> str:
+    """JSON map of marketplace-icon name -> inline SVG, for card 5's listing."""
+    return json.dumps({n: inline_svg(MARKET / f"icon-{n}.svg") for n in MARKET_ICONS})
+
+
+def encode_compliance() -> str:
+    """JSON map of card 6's trust-mark name -> inline SVG markup."""
+    return json.dumps({n: inline_svg(COMPLIANCE / f"{n}.svg") for n in COMPLIANCE_BADGES})
+
+
 def encode_demo() -> str:
     """JSON map of pipeline-card frame name -> base64 data URI."""
     out = {}
@@ -195,6 +215,8 @@ def build_simple() -> None:
         "__UPLOADERUI_JSON__": encode_uploader_ui(),
         "__DEMO_JSON__":       encode_demo(),
         "__CAPS_JSON__":       encode_caps(),
+        "__MARKET_JSON__":     encode_market(),
+        "__COMPLIANCE_JSON__": encode_compliance(),
     }
     for token, value in replacements.items():
         if token not in html:
