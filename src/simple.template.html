@@ -615,13 +615,17 @@
        "the bottom of the hand" as 100% puts the pivot in empty space below it.
      - it winds up. The hand tips a few degrees the wrong way before the first
        real swing, the way a gesture loads before it fires.
-     - it damps. 18° → 14 → 14 → 10 → 8 → 3 → rest, because a wave runs out of
-       energy rather than stopping on a beat. The arc is wider than it would be
-       on a desktop UI because this plays on a TV people read from 2–4m; at ±12
-       the hand only travels a few millimetres on the panel.
-     - it comes in bursts. ~1.9s of waving then four and a half seconds of
-       stillness — a person waves, then stops. A metronome reads as a GIF.
-     Half-swings land ~275ms apart, which is the ~2Hz a friendly wave runs at.
+     - it is quick and it holds its energy. Half-swings land 160ms apart — a
+       little over 3Hz, which is an excited wave rather than a polite one — and
+       the arc stays wide for most of the burst (22 → 18 → 20 → 16 → 17) before
+       giving out at the end. Monotonic damping reads as a wave running down;
+       holding the amplitude and then dropping it reads as someone happy to see
+       you who stops because they are done, not because they ran out.
+     - the arc is wider than it would be on a desktop UI because this plays on a
+       TV people read from 2–4m; at ±12 the hand travels a couple of millimetres
+       on the panel and the gesture is lost.
+     - it comes in bursts. ~1.5s of waving then three seconds of stillness — a
+       person waves, then stops. A metronome reads as a GIF.
      ease-in-out between every stop is what makes each end of the arc settle
      and the middle move quickly: that is pendulum motion. */
      Both are scoped to .slide.active so the gesture starts when the card does.
@@ -633,24 +637,26 @@
      noticing you rather than waving before it is there. */
   .hb-wave{display:inline-block}
   .hb-wave i{display:inline-block;font-style:normal;transform-origin:65% 88%}
-  .slide.active .hb-wave{animation:hbWaveLift 6.4s ease-in-out 1.5s infinite}
-  .slide.active .hb-wave i{animation:hbWaveArm 6.4s ease-in-out 1.5s infinite}
+  .slide.active .hb-wave{animation:hbWaveLift 4.4s ease-in-out 1.4s infinite}
+  .slide.active .hb-wave i{animation:hbWaveArm 4.4s ease-in-out 1.4s infinite}
   @keyframes hbWaveArm{
     0%    {transform:rotate(0deg)}
-    3%    {transform:rotate(-5deg)}
-    8%    {transform:rotate(18deg)}
-    12.5% {transform:rotate(-14deg)}
-    17%   {transform:rotate(14deg)}
-    21.5% {transform:rotate(-10deg)}
-    26%   {transform:rotate(8deg)}
-    30%   {transform:rotate(-3deg)}
-    34%,100%{transform:rotate(0deg)}
+    2%    {transform:rotate(-6deg)}
+    5.6%  {transform:rotate(22deg)}
+    9.2%  {transform:rotate(-18deg)}
+    12.8% {transform:rotate(20deg)}
+    16.4% {transform:rotate(-16deg)}
+    20%   {transform:rotate(17deg)}
+    23.6% {transform:rotate(-12deg)}
+    27.2% {transform:rotate(10deg)}
+    30.4% {transform:rotate(-4deg)}
+    33%,100%{transform:rotate(0deg)}
   }
   @keyframes hbWaveLift{
     0%    {transform:translateY(0) scale(1)}
-    8%    {transform:translateY(-2.5px) scale(1.04)}
-    26%   {transform:translateY(-2px) scale(1.03)}
-    36%,100%{transform:translateY(0) scale(1)}
+    5%    {transform:translateY(-4px) scale(1.06)}
+    26%   {transform:translateY(-3.5px) scale(1.05)}
+    35%,100%{transform:translateY(0) scale(1)}
   }
 
   /* The glyph on the centre line. Its own #090909 pad is the storyboard's: it
@@ -897,7 +903,22 @@
      the picture is what gives way */
   .pd-stage{position:relative;flex:none;width:230px;height:297px;margin-top:16px;opacity:0}
   .pd-stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0}
-  .pd-url{margin-top:32px;font-family:var(--mono);font-size:15px;line-height:19.5px}
+  /* Two pages, not one block. The whole tag — bracket, host, UUID, three
+     transforms, closing bracket — is seven rows, and after the picture and its
+     margins the column only has room for about six; the tail was being cut off
+     by .pd-cell's overflow. Paging it fixes the clipping and is the better read
+     anyway: you see the plain file's URL, it clears, and the transforms build in
+     its place, so the ops aren't competing with the address for attention.
+
+     Both pages are absolutely positioned inside a fixed four-row box (four is
+     the taller page: three ops plus the closing bracket). That makes the swap a
+     crossfade with no reflow, so the picture above it never shifts and the ops
+     grow into the space the URL just left. The explicit width is needed because
+     .pd-cell centres its children — with only absolute content the box would
+     collapse to nothing. */
+  .pd-url{position:relative;width:100%;height:78px;margin-top:32px;
+    font-family:var(--mono);font-size:15px;line-height:19.5px}
+  .pd-u1,.pd-u2{position:absolute;left:0;right:0;top:0}
   .pd-url .row{margin:0;display:flex;flex-wrap:nowrap;white-space:nowrap}
   .pd-url .bracket{color:rgba(255,255,255,.25)}
   .pd-url .indent{padding-left:20px}
@@ -908,6 +929,7 @@
   .pd-url .arg{color:#a7a7a7}
   .pd-url .tf{overflow:hidden;height:0;opacity:0}
   .pd-url .st{opacity:0}
+  .pd-url .cl{opacity:0}
 
   /* ---- the compliance marks along the bottom ---- */
   /* pinned at the storyboard's own x/y rather than laid out as a row: the three
@@ -1031,12 +1053,48 @@
   .ft-wrap{position:absolute;inset:0}
   .ft-row{position:absolute;left:266px;top:382px;width:1389px;height:316px;
     display:flex;gap:16px}
-  .ft-card{width:265px;background:#0c0c0c;border:1px solid #181818;border-radius:24px;
+  .ft-card{position:relative;width:265px;background:#0c0c0c;border:1px solid #181818;
+    border-radius:24px;
     padding:40px;display:flex;flex-direction:column;justify-content:space-between;
     opacity:0;transform:translateY(20px);
     transition:opacity var(--dur-2) ease,transform var(--dur-3) var(--ease-out);
     transition-delay:calc(.12s + var(--i)*.06s)}
   .slide.active .ft-card{opacity:1;transform:none}
+
+  /* Once the icons land the row just sits there, which is the one place in the
+     deck that read as a static slide rather than a paused one. A pulse now
+     travels left to right on a loop: each panel washes to 10% of its own icon's
+     accent and back. The colour is the card's, not a house colour, so the sweep
+     reads as five distinct capabilities lighting up in turn instead of one
+     effect painted across the row.
+
+     It rides an overlay's opacity rather than the card's own background-color.
+     Opacity composites; background-color repaints, and this runs forever on a
+     panel nobody ever touches. The overlay carries a full-strength inset ring
+     over a 40%-alpha fill, so at the peak the edge sits at 25% of the accent
+     while the fill stays at the 10% wash — the border is what actually carries
+     the pulse across a room, the fill alone is too quiet at this distance.
+
+     Delayed past the entrance (the last icon lands ~1.7s) and scoped to
+     .slide.active, so the pulse starts once the row is built rather than
+     underneath it, and starts from the top on every visit. */
+  .ft-card::before{
+    content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+    background:color-mix(in srgb, var(--ac) 40%, transparent);
+    box-shadow:inset 0 0 0 1px var(--ac);
+    opacity:0;
+  }
+  .slide.active .ft-card::before{
+    animation:ftPulse 3.4s ease-in-out calc(1.9s + var(--i)*.18s) infinite;
+  }
+  /* the card's own content has to outrank the wash, or the tint lands on top of
+     the label and the icon instead of behind them */
+  .ft-label,.ft-tile{position:relative;z-index:1}
+  @keyframes ftPulse{
+    0%,100%{opacity:0}
+    12%    {opacity:.25}
+    36%    {opacity:0}
+  }
   .ft-label{font-size:28px;font-weight:580;letter-spacing:-.42px;line-height:1.065;
     color:#bcbdc0;text-box-trim:trim-both;text-box-edge:cap alphabetic}
   /* The wells arrive empty with the row; the icons then land in them left to
@@ -1329,6 +1387,10 @@
     .hb-node.float .hb-inner,.hb-globe.spin,.hb-dot.pulse,.hb-cursor{animation:none!important}
     .hb-mark path{animation:none!important;opacity:.62}
     .hb-wave,.hb-wave i{animation:none!important}
+    /* the capability wash is decoration on a settled row; nothing is lost by
+       pinning it off, whereas a looping colour pulse is exactly the sort of
+       thing reduced motion is asking to be spared */
+    .ft-card::before{animation:none!important;opacity:0}
     .pl-shine .pl-pill::after{animation:none!important;opacity:0!important}
     .slide.active .sc-chip{animation:none!important}
     .pd-dots[data-state="working"] i{animation:none!important}
@@ -1821,13 +1883,16 @@ const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="#0b0b0f" stroke-widt
 /* Five product capabilities. Labels break exactly where the storyboard breaks
    them — two lines is the design, not an accident of the column width — so the
    break is written in rather than left to wrapping. Icons are the storyboard's
-   own exports, each with its own accent colour baked in. */
+   own exports, each with its own accent colour baked in.
+   `ac` is the accent already baked into that icon's own artwork, repeated here
+   because CSS cannot read a colour out of an inlined SVG — the pulse tints each
+   panel with its own icon's colour, so the two have to be kept in step. */
 const FEATURES = [
-  { label:'Large files',         icon:'large-files' },
-  { label:'Multi file\nupload',  icon:'multi-file'  },
-  { label:'Any source',          icon:'any-source'  },
-  { label:'Malware\nscanned',    icon:'malware'     },
-  { label:'Built-in\neditor',    icon:'editor'      },
+  { label:'Large files',         icon:'large-files', ac:'#00C5D5' },
+  { label:'Multi file\nupload',  icon:'multi-file',  ac:'#BC7FF6' },
+  { label:'Any source',          icon:'any-source',  ac:'#00DC66' },
+  { label:'Malware\nscanned',    icon:'malware',     ac:'#FF9825' },
+  { label:'Built-in\neditor',    icon:'editor',      ac:'#5978FF' },
 ];
 
 /* The tick on the installed button. Drawn here rather than exported because it
@@ -1978,7 +2043,7 @@ const R = {
   /* ---- card 2: five capability panels, icons landing one at a time ---- */
   features(s){
     const cards = FEATURES.map((f,i)=>`
-      <div class="ft-card" style="--i:${i}">
+      <div class="ft-card" style="--i:${i};--ac:${f.ac}">
         <div class="ft-label">${multiline(f.label)}</div>
         <div class="ft-tile" style="--i:${i}">${CAPS[f.icon]||''}</div>
       </div>`).join('');
@@ -2094,11 +2159,15 @@ const R = {
               <img src="${DEMO.step2}" alt=""><img src="${DEMO.step3}" alt="">
             </div>
             <div class="pd-url">
-              <p class="row bracket st">&lt;img src="</p>
-              <p class="row indent st"><span class="host">https://demo.ucarecd.net/</span></p>
-              <p class="row indent st"><span class="id">${esc(PD_UUID)}</span><span class="dim">/</span></p>
-              ${transforms}
-              <p class="row bracket st">" /&gt;</p>
+              <div class="pd-u1">
+                <p class="row bracket st">&lt;img src="</p>
+                <p class="row indent st"><span class="host">https://demo.ucarecd.net/</span></p>
+                <p class="row indent st"><span class="id">${esc(PD_UUID)}</span><span class="dim">/</span></p>
+              </div>
+              <div class="pd-u2">
+                ${transforms}
+                <p class="row bracket cl">" /&gt;</p>
+              </div>
             </div>
           </div>
 
@@ -3260,7 +3329,9 @@ function setupPipeline(slideEl, sd, tl){
   const lines   = qa('.pd-analysis p');
   const stage   = q('.pd-stage');
   const shots   = qa('.pd-stage img');
-  const statics = qa('.pd-url .st');
+  const page1   = q('.pd-u1');            // bracket + host + UUID
+  const statics = qa('.pd-u1 .st');
+  const close   = q('.pd-url .cl');        // the tag's closing " />
   const tfs     = qa('.pd-url .tf');
   if (!zone || !canvas) return;
 
@@ -3284,7 +3355,9 @@ function setupPipeline(slideEl, sd, tl){
     pixel.style.opacity = '0';
     stage.style.opacity = '0';
     shots.forEach(im=>Object.assign(im.style, {opacity:'0', filter:'blur(20px)', transform:'scale(1.05)'}));
+    page1.style.opacity = '1';
     statics.forEach(p=>p.style.opacity = '0');
+    close.style.opacity = '0';
     tfs.forEach(d=>Object.assign(d.style, {opacity:'0', height:'0px'}));
     lines.forEach(p=>p.style.opacity = '0');
     dots.forEach(d=>d.dataset.state = 'standby');
@@ -3301,7 +3374,9 @@ function setupPipeline(slideEl, sd, tl){
     pixel.style.opacity = '1'; pdGrid.settle();
     stage.style.opacity = '1';
     Object.assign(shots[3].style, {opacity:'1', filter:'none', transform:'none'});
-    statics.forEach(p=>p.style.opacity = '1');
+    // the transforms page is the end of the story, so that is the one to hold
+    page1.style.opacity = '0';
+    close.style.opacity = '1';
     tfs.forEach(d=>Object.assign(d.style, {opacity:'1', height:'auto'}));
     lines.forEach(p=>p.style.opacity = '1');
     donut.forEach(c=>c.classList.add('lit'));
@@ -3350,6 +3425,9 @@ function setupPipeline(slideEl, sd, tl){
   tl.to(shots[0], [{opacity:0, filter:'blur(20px)', transform:'scale(1.05)'},
                    {opacity:1, filter:'blur(0px)',  transform:'scale(1)'}], {at:ANALYSE, dur:.6});
   statics.forEach((p,i)=>tl.to(p, [{opacity:0},{opacity:1}], {at:ANALYSE + .1 + i*.05, dur:.4}));
+  // the address has ~1.2s to be read, then clears exactly as the first
+  // transform lands, so the column is only ever showing one idea at a time
+  tl.to(page1, [{opacity:1},{opacity:0}], {at:ANALYSE + 1.15, dur:.35, fill:'forwards'});
 
   // each transform types itself in and the picture becomes what it describes
   [1.5, 3, 4.5].forEach((off, i)=>{
@@ -3366,6 +3444,9 @@ function setupPipeline(slideEl, sd, tl){
               {duration:400, easing:EASE.out, fill:'both'}));
     });
   });
+  // the tag closes once the last op is in, which is what tells you the URL is
+  // finished rather than still being written
+  tl.to(close, [{opacity:0},{opacity:1}], {at:ANALYSE + 5.1, dur:.4});
 
   // ---- the verdict
   tl.to(status, [{opacity:0},{opacity:1}], {at:STATUS, dur:.4});
@@ -3845,7 +3926,7 @@ function fieldsFor(s, i){
       </div>
       <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">A stack of two files is dragged in under one cursor and dropped; the widget hands over to the compact uploading panel, each file fills its ring and settles into a checkmark plus a bin, then the window dismisses itself. The score runs ~7s, so give the card 8s or more.</p>`;
     case 'features': return dur+`
-      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">Five capability panels rise in as a row, then the icons land in their wells one after another, left to right: ${FEATURES.map(f=>esc(f.label.replace(/\n/g,' '))).join(', ')}. The whole sequence settles by ~1.8s. Labels and icons live in the FEATURES array in the template.</p>`;
+      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">Five capability panels rise in as a row, then the icons land in their wells one after another, left to right: ${FEATURES.map(f=>esc(f.label.replace(/\n/g,' '))).join(', ')}. The whole sequence settles by ~1.8s, after which a pulse loops across the row and tints each panel with its own icon's colour. Labels, icons and accents live in the FEATURES array in the template.</p>`;
     case 'quote2': return dur+`
       <label class="f"><span>Quote (the lime panel)</span><textarea data-f="quote">${esc(s.quote||'')}</textarea></label>
       <div class="row2">

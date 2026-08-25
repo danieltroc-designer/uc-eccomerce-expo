@@ -73,6 +73,20 @@ because it fits, so re-measure rather than assume. `tools/check_pipeline.py`
 asserts every box against the frame and prints the URL row's width next to the
 room it has, which is the check that matters when any of this is touched.
 
+**The URL is paged, not one block.** Width was never the only constraint: the
+whole tag is seven rows (bracket, host, UUID, three transforms, closing
+bracket), and after the 297px picture and its margins the column has room for
+about six, so the tail was being cut off by `.pd-cell`'s `overflow:hidden`.
+`.pd-u1` shows the plain address, clears at `ANALYSE + 1.15`, and `.pd-u2`
+builds the transforms in the space it left, closing the tag once the last op is
+in. Both pages are absolutely positioned inside a fixed four-row (78px) box, so
+the swap is a crossfade with no reflow and the picture above never shifts —
+which also means `.pd-url` needs an explicit width, because `.pd-cell` centres
+its children and a box with only absolute content collapses to nothing. Paging
+is the better read regardless of the clipping: the address and the operations
+stop competing for the same glance. Note the height is sized to the *taller*
+page; adding a fourth transform means growing it and re-checking the column.
+
 The three compliance marks along the bottom come from the storyboard's own logo
 sheet (node 189:493) and keep its relative sizing: `PD_BADGES` draws each at
 .839 of its size there, which is why HIPAA is smaller than the other two — it
@@ -109,6 +123,22 @@ row fills as one travelling wave rather than five separate ticks. An earlier
 version put a spinner chip above the row to signal that something was
 happening; the sequence now carries that itself, so there is nothing above the
 row and it sits centred in the stage.
+
+Once the icons land the row used to just sit there, which was the one card in
+the deck that read as a static slide rather than a paused one. A pulse now
+loops across it left to right: each panel washes to 10% of **its own icon's**
+accent and back, on the same 180ms stagger idea as the icons. Per-card colour
+rather than a house colour is what makes it read as five capabilities lighting
+up in turn instead of one effect painted over the row, so `FEATURES[].ac`
+duplicates the accent baked into each SVG and the two have to be kept in step —
+CSS cannot read a colour out of inlined markup. The wash rides a `::before`
+overlay's opacity rather than the card's `background-color`: opacity composites
+where colour repaints, and this runs forever on a panel nobody touches. The
+overlay pairs a full-strength inset ring with a 40%-alpha fill so the peak sits
+at a 25% edge over a 10% wash — at booth distance the ring is what actually
+carries the pulse across the room; the fill alone is too quiet. It is scoped to
+`.slide.active` and delayed past the entrance so it starts on top of a built
+row, and pinned off under reduced motion.
 
 Card 3 is the customer quote as a two-panel spread: the lime pull-quote at
 229,307 (938x465) beside the customer panel at 1183,307 (507x465). Both are
@@ -240,21 +270,28 @@ Laid out to storyboard frame 184:5666. Four things about it are deliberate:
     forearm. If the emoji font ever changes, re-measure by differencing a frame
     against one with the `<i>` set to `visibility:hidden`; that isolates the
     glyph's ink from the warm pixels in the corner cards nearby.
-  - **The arc damps and winds up.** 18° → 14 → 14 → 10 → 8 → 3 → rest, preceded
-    by a 5° counter-tip, because a gesture loads before it fires and runs out of
-    energy rather than stopping on a beat. Half-swings land ~275ms apart (~1.8Hz,
-    the rate of an actual friendly wave). `ease-in-out` between every stop is
+  - **It winds up, holds its energy, then gives out.** A 6° counter-tip first,
+    because a gesture loads before it fires; then 22 → 18 → 20 → 16 → 17 → 12 →
+    10 → 4 → rest. The arc deliberately does *not* damp monotonically: holding
+    the amplitude and dropping it at the end reads as someone happy to see you
+    who stops because they are done, where a smooth decay reads as a wave
+    running down. Half-swings land 160ms apart, a little over 3Hz, which is an
+    excited wave rather than a polite one. `ease-in-out` between every stop is
     what makes the ends of the arc settle and the middle move quickly; that is
     pendulum motion, and `linear` or `ease-out` here reads mechanical.
-  - **It rests between bursts.** ~2.2s of waving inside a 6.4s cycle. A
+  - **The arc is TV-sized.** ±22° looks large on a laptop and is about right at
+    2–4m; at ±12 the hand covers a couple of millimetres of panel and the
+    gesture is lost.
+  - **It rests between bursts.** ~1.5s of waving inside a 4.4s cycle. A
     continuous wave reads as a looping GIF. The card runs 10s, so a visitor sees
-    the burst, a pause, and the start of a second one.
+    the burst, a pause, and a second one.
   - **Scoped to `.slide.active`.** Unscoped, a CSS animation starts when the deck
     renders, so the card inherits whatever phase it lands on — as likely to
     arrive mid-swing as at rest, and somewhere else again on the next loop. The
     1.5s delay puts the wave just after the sign-off's own entrance (`d5`,
     .46s + .58s) so the hand reads as noticing you rather than waving before it
-    is there. Reduced motion pins it still.
+    is there. Reduced motion pins it still. The same scoping rule applies to
+    card 2's capability pulse and to any looping animation added later.
 - **The corner watermark is suppressed here.** `enter()` skips it on
   `layout:'outro'` — the mark is already the centre of the composition, and the
   frame has no second copy.
