@@ -1752,8 +1752,10 @@ const DEFAULT_DECK = {
       title:'Trusted by',
       logos:'Zapier, SoundCloud, L\u2019Or\u00e9al, Sequoia, UserTesting, Prezly, Aryeo, marko' },
 
-    // 5 — distribution: already in the Webflow marketplace, cursor installs it
-    { type:'install', duration:9,
+    // 5 — distribution: already in the Webflow marketplace, cursor installs it.
+    // The button reads "Installed" at 3.5s and everything is settled by 4.0s,
+    // so the back half is a hold on the outcome — trim here, not in the score.
+    { type:'install', duration:8,
       heading:'No code. It\u2019s already\nin your Webflow Marketplace.',
       sub:'A native File Uploader app, approved by Webflow.',
       app:'Uploadcare File Uploader', downloads:'1k+',
@@ -3116,8 +3118,9 @@ function setupInstall(slideEl, sd, tl){
 /* ---------------- card 1: drag, drop, upload ----------------
    The storyboard's three frames as one run: a stack of two files is dragged
    under a single cursor and dropped, the widget hands over to the compact
-   uploading panel, each file fills its ring and settles into a checkmark plus
-   a bin, and then the window dismisses itself.
+   uploading panel, and each file fills its ring and settles into a checkmark
+   plus a bin. The storyboard dismisses the window at that point; this holds it
+   instead, because that frame is the payoff.
 
    The travel is a spring rather than a tween — a dragged object carries
    momentum, and the pointer should decelerate onto the target instead of
@@ -4162,7 +4165,7 @@ const NEW = {
   code:{type:'code',duration:10,kicker:'',line:'Ask your coding\nagent about us.',cmd:'uploadcare file upload my-image.jpg',lines:'Uploading my-image.jpg\u2026\n\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588  100%\n\u2713 https://ucarecdn.com/\u2026/my-image.jpg\nDone in 0.4s.',typeSpeed:18,textFx:'weight'},
   upload:{type:'upload',duration:12,kicker:'',heading:'As simple as drag and drop.',heading2:'Then it becomes a side project that never ends.',outcome:true,progressMs:3000,textFx:'weight'},
   chaos:{type:'chaos',duration:12,kicker:'',heading:'Then it becomes\na side project\nthat never ends.',textFx:'stagger'},
-  install:{type:'install',duration:9,heading:'No code. It\u2019s already\nin your Webflow Marketplace.',sub:'A native File Uploader app, approved by Webflow.',app:'Uploadcare File Uploader',downloads:'1k+',blurb:'Accelerate time to market with a no-code plugin for scalable and secure end-user file uploads.'},
+  install:{type:'install',duration:8,heading:'No code. It\u2019s already\nin your Webflow Marketplace.',sub:'A native File Uploader app, approved by Webflow.',app:'Uploadcare File Uploader',downloads:'1k+',blurb:'Accelerate time to market with a no-code plugin for scalable and secure end-user file uploads.'},
   dropin:{type:'dropin',duration:7.5,heading:'Uploads that just work.',sub:'Any file, any source, safe.',textFx:'stagger'},
   features:{type:'features',duration:6},
   quote2:{type:'quote2',duration:8,quote:'It just works out of the box without having to think about it.',by:'Luca Mausberg',role:'Co-founder',company:'Marko',mark:'marko',tag:'Secondhand marketplace',about:'Marko is Switzerland\u2019s community-driven secondhand marketplace, built for Gen Z and millennial consumers who care about sustainability, affordability, and style.'},
