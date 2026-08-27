@@ -122,13 +122,36 @@ be unwrapped before it is committed.
 Card 1 is the real uploader widget playing its whole story: a stack of two
 files is dragged in under a single cursor, dropped, and the widget hands over
 to the compact "Uploading N files" panel, where each file fills its ring and
-settles into a checkmark plus a bin before the window dismisses itself. The
-travel is a spring rather than a tween, because a dragged object carries
-momentum; `tl.spring()` reports its settle time synchronously through
-`onArrive`, and the rest of the score is written against that, so the drop
-always follows the landing however the spring is retuned. The progress ring is
-drawn in the template (`DI_RING`) rather than exported, because the storyboard's
-icon is a snapshot at one arbitrary percentage and this one has to fill.
+settles into a checkmark plus a bin. The travel is a spring rather than a
+tween, because a dragged object carries momentum; `tl.spring()` reports its
+settle time synchronously through `onArrive`, and the rest of the score is
+written against that, so the drop always follows the landing however the spring
+is retuned. The progress ring is drawn in the template (`DI_RING`) rather than
+exported, because the storyboard's icon is a snapshot at one arbitrary
+percentage and this one has to fill.
+
+Three things about how it ends and how the zone lights:
+
+- **The window no longer dismisses itself.** The storyboard's third frame has
+  it disappear, but that made the payoff — both files ticked — the one frame
+  you never got to look at, and it left the card empty from 6.9s to its 8s
+  slot. Both files are done at ~5.8s; the card now holds that frame and cuts at
+  7.5s.
+- **The finished panel is pinned to inline style as well as to the tween's
+  fill.** Leaving a card kills its timeline, and a cancelled WAAPI animation
+  reverts to inline style — which `reset()` left at `opacity:0`. Because the
+  kill happens at the *top* of the crossfade, the panel blinked out while the
+  card was still 70% visible. Any card whose closing frame must survive its own
+  exit needs the same treatment; the fill alone is not enough.
+- **The drop zone lights on the frame the pointer tip enters it.** It used to
+  get its `hot` class 350ms before the stack landed and ramp in over a matching
+  350ms transition, which read as lag. The fill is now instant (`transition:
+  none` on `.hot`, with the base rule's transition still running on the way
+  out, where a hard cut would pop under the panel swap), and `springCrossing()`
+  re-integrates the spring to find when the tip actually crosses into the zone
+  rather than guessing an offset back from the settle time. Positions there are
+  `offsetLeft`/`offsetTop`, not `getBoundingClientRect()` — see the note below
+  on why that matters when the stage is scaled.
 
 Card 2 is the storyboard's capability row: five 265x316 panels that rise in a
 60ms stagger, then the icons land in their (already present) wells one after

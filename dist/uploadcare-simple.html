@@ -997,11 +997,17 @@
      on the same 360x196 box. */
   .di-drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
     border:1px dashed rgba(255,255,255,.13);border-radius:7px;padding:48px 24px;
-    transition:border-color .35s ease,background .35s ease}
+    transition:border-color .2s ease,background .2s ease}
   /* while the pointer is over it the zone fills solid and the dashed edge
      drops out — transparent rather than removed, so the border-box keeps the
-     same 196px height and nothing below it shifts */
-  .di-drop.hot{border-color:transparent;background:#242424}
+     same 196px height and nothing below it shifts.
+
+     No transition on the way in. A real drag-over highlight is a state change,
+     not an animation: the browser paints it on the frame the pointer crosses
+     the boundary, and any ramp here reads as lag rather than as softness. The
+     base rule's transition still runs on the way out, where a hard cut would
+     pop under the panel swap that follows it. */
+  .di-drop.hot{border-color:transparent;background:#242424;transition:none}
   .di-dropic{width:64px;height:64px;border-radius:9999px;background:rgba(255,255,255,.05);
     display:flex;align-items:center;justify-content:center;flex:none}
   .di-dropic svg{width:16px;height:16px;display:block}
@@ -1570,6 +1576,24 @@ function springKeyframes(from, to, {response=0.4, bounce=0, velocity={}}={}){
   frames.push(st.map(s=>s.t));                             // snap exactly home
   return { frames, props, duration: frames.length*dt*1000 };
 }
+/* When does a spring first put the thing somewhere? Returns seconds from the
+   spring's own start, or null if it never satisfies `hits`.
+
+   Needed because a scripted pointer has no dragenter to fire: to light a drop
+   zone on the frame the cursor crosses into it, you have to ask the trajectory
+   where it is rather than guess an offset from the settle time. Re-integrating
+   the spring is free next to hand-tuning a constant that silently goes wrong
+   the moment anyone changes `response` or the travel. */
+function springCrossing(from, to, opts, hits){
+  const { frames, props } = springKeyframes(from, to, opts);
+  for (let i = 0; i < frames.length; i++){
+    const o = {};
+    props.forEach((p,j)=>o[p] = frames[i][j]);
+    if (hits(o)) return i/120;                            // springKeyframes steps at 1/120
+  }
+  return null;
+}
+
 /* spring a translated element from {x,y} to {x,y} via WAAPI (easing:'linear',
    the spring is baked into the sampled frames). Extra WAAPI options (delay,
    fill) pass through. */
@@ -1709,7 +1733,10 @@ const DEFAULT_DECK = {
   slides: [
     // 1 — "uploads that just work": a stack of files is dragged in, dropped,
     // uploaded one by one, and the window dismisses itself
-    { type:'dropin', duration:8,
+    // Both files are ticked at ~5.8s and the panel no longer dismisses itself,
+    // so this holds the finished state for ~1.7s and then cuts. It used to run
+    // to 8s, but the window bowed out at 6.9 and left the card empty.
+    { type:'dropin', duration:7.5,
       heading:'Uploads that just work.',
       sub:'Any file, any source, safe.' },
 
@@ -3143,14 +3170,24 @@ function setupDropin(slideEl, sd, tl){
   // spring() reports its settle time synchronously, so the rest of the score
   // can be written against when the stack actually lands.
   const FROM = {x:430, y:-150}, OVER = {x:0, y:0};
+  const FLY = {at:1.3, response:.7, bounce:.06};
   group.style.transform = `translate(${FROM.x}px,${FROM.y}px)`;
   tl.to(group, [{opacity:0},{opacity:1}], {dur:.3, at:1.25});
   let landed = 2.2;
-  tl.spring(group, FROM, OVER, {at:1.3, response:.7, bounce:.06, onArrive:t=>landed=t});
+  tl.spring(group, FROM, OVER, {...FLY, onArrive:t=>landed=t});
 
-  // the zone lights up just before the stack gets there, the way it would if a
-  // real pointer had crossed the boundary
-  tl.cls(drop, 'hot', Math.max(0, landed - .35));
+  // ---- the zone lights the frame the pointer tip enters it, not on a lead-in
+  // measured back from the landing. Everything here is offsetLeft/offsetTop —
+  // layout px, like the spring's own offsets — so the comparison holds however
+  // the stage is scaled to the display.
+  const tip = cur && {x:group.offsetLeft + cur.offsetLeft, y:group.offsetTop + cur.offsetTop};
+  const zx = widget.offsetLeft + drop.offsetLeft, zy = widget.offsetTop + drop.offsetTop;
+  const cross = tip && springCrossing(FROM, OVER, FLY, o=>{
+    const x = tip.x + (o.x||0), y = tip.y + (o.y||0);
+    return x >= zx && x <= zx + drop.offsetWidth
+        && y >= zy && y <= zy + drop.offsetHeight;
+  });
+  tl.cls(drop, 'hot', cross != null ? FLY.at + cross : Math.max(0, landed - .35));
 
   // ---- the drop: each card falls to the middle of the zone and shrinks away
   const DROP = landed + .18;
@@ -3175,6 +3212,14 @@ function setupDropin(slideEl, sd, tl){
         {at:SWAP, dur:.26, fill:'forwards'});
   tl.to(panel,  [{opacity:0, transform:'scale(.97)'},
                  {opacity:1, transform:'scale(1)'}], {at:SWAP + .08, dur:.32});
+  // Write the arrived state to inline style as well as leaving it to the
+  // tween's fill. Leaving the card kills its timeline, and a cancelled WAAPI
+  // animation drops straight back to inline style — which reset() left at
+  // opacity 0. Without this the panel blinks out at the top of the crossfade
+  // and the card spends its last 400ms empty, which is the one frame this
+  // card exists to show. Cheap belt and braces; the tween still owns the
+  // transition itself.
+  tl.at(SWAP + .4, ()=>{ panel.style.opacity = '1'; panel.style.transform = 'none'; });
 
   // ---- one file at a time: the ring fills, then it settles to done
   const FILL = .8, GAP = .3;
@@ -3187,10 +3232,11 @@ function setupDropin(slideEl, sd, tl){
     t += GAP;
   });
 
-  // ---- and the window dismisses itself
-  tl.to(panel, [{opacity:1, transform:'translateY(0px) scale(1)'},
-                {opacity:0, transform:'translateY(6px) scale(.97)'}],
-        {at:t + .55, dur:.32, fill:'forwards'});
+  // ---- and then it just sits there, finished, until the deck moves on.
+  // The window used to dismiss itself, which meant the payoff — two files
+  // uploaded, both ticked — was the one thing you did not get to look at, and
+  // it left the card empty for the rest of its slot. The card's duration is
+  // set to hold this frame for a beat and then cut; see DEFAULT_DECK.
 }
 
 /* ---------------- the analysis grid ----------------
@@ -4122,7 +4168,7 @@ const NEW = {
   upload:{type:'upload',duration:12,kicker:'',heading:'As simple as drag and drop.',heading2:'Then it becomes a side project that never ends.',outcome:true,progressMs:3000,textFx:'weight'},
   chaos:{type:'chaos',duration:12,kicker:'',heading:'Then it becomes\na side project\nthat never ends.',textFx:'stagger'},
   install:{type:'install',duration:9,heading:'No code. It\u2019s already\nin your Webflow Marketplace.',sub:'A native File Uploader app, approved by Webflow.',app:'Uploadcare File Uploader',downloads:'1k+',blurb:'Accelerate time to market with a no-code plugin for scalable and secure end-user file uploads.'},
-  dropin:{type:'dropin',duration:5,heading:'Uploads that just work.',sub:'Any file, any source, safe.',textFx:'stagger'},
+  dropin:{type:'dropin',duration:7.5,heading:'Uploads that just work.',sub:'Any file, any source, safe.',textFx:'stagger'},
   features:{type:'features',duration:6},
   quote2:{type:'quote2',duration:8,quote:'It just works out of the box without having to think about it.',by:'Luca Mausberg',role:'Co-founder',company:'Marko',mark:'marko',tag:'Secondhand marketplace',about:'Marko is Switzerland\u2019s community-driven secondhand marketplace, built for Gen Z and millennial consumers who care about sustainability, affordability, and style.'},
   logos:{type:'logos',duration:5,title:'Trusted by',logos:'Zapier, SoundCloud, L\u2019Or\u00e9al, Sequoia, UserTesting, Prezly, Aryeo, marko'},
