@@ -33,6 +33,7 @@ DEMO = ROOT / "assets" / "demo"
 CAPS = ROOT / "assets" / "caps"
 MARKET = ROOT / "assets" / "marketplace"
 COMPLIANCE = ROOT / "assets" / "compliance"
+ECOMMERCE = ROOT / "assets" / "ecommerce"
 
 # Card 2's capability icons, exported from the storyboard with their accent
 # colours baked in — they are not a monochrome set, so they can't be recoloured
@@ -113,7 +114,11 @@ def inline_svg(path: Path) -> str:
 
 def encode_logos() -> str:
     """JSON map of customer-logo name -> inline SVG, for the trusted-by wall."""
-    return json.dumps({n: inline_svg(LOGOS / f"{n}.svg") for n in LOGO_ORDER})
+    # Scan rather than relying only on the inherited wall's fixed order. The
+    # Ecommerce Expo cut adds Zephyr, Crayola, Samsonite, GemPages and Shogun as
+    # their real exports arrive; dropping `<normalized-name>.svg` here is enough
+    # for both the proof-point attribution and the six-logo wall to pick it up.
+    return json.dumps({p.stem: inline_svg(p) for p in sorted(LOGOS.glob("*.svg"))})
 
 
 def encode_uploader_ui() -> str:
@@ -155,6 +160,29 @@ def encode_demo() -> str:
         mime = "image/png" if path.suffix == ".png" else "image/jpeg"
         b64 = base64.b64encode(path.read_bytes()).decode()
         out[key] = f"data:{mime};base64,{b64}"
+    return json.dumps(out)
+
+
+def encode_ecommerce() -> str:
+    """Inline optional Ecommerce Expo photography when supplied.
+
+    These assets are deliberately optional during layout work. Card 4 must use
+    genuine AI Image Editor output, so the template renders an explicit
+    asset-needed state until both files exist instead of manufacturing a fake
+    before/after in CSS.
+    """
+    files = {
+        "product": "product.jpg",
+        "editorBefore": "editor-before.jpg",
+        "editorAfter": "editor-after.jpg",
+    }
+    out = {}
+    for key, name in files.items():
+        path = ECOMMERCE / name
+        if not path.exists():
+            continue
+        mime = "image/png" if path.suffix.lower() == ".png" else "image/jpeg"
+        out[key] = f"data:{mime};base64," + base64.b64encode(path.read_bytes()).decode()
     return json.dumps(out)
 
 
@@ -214,6 +242,7 @@ def build_simple() -> None:
         "__CAPS_JSON__":       encode_caps(),
         "__MARKET_JSON__":     encode_market(),
         "__COMPLIANCE_JSON__": encode_compliance(),
+        "__ECOMMERCE_JSON__":   encode_ecommerce(),
     }
     for token, value in replacements.items():
         if token not in html:

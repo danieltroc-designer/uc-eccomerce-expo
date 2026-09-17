@@ -17,8 +17,6 @@ CHROME = (pathlib.Path.home()
           / ".cache/ms-playwright-stable/chromium-1223/chrome-mac-arm64"
           / "Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing")
 
-BOARD = 6   # outro board: types telemetry into four nodes over several seconds
-
 fails = []
 
 
@@ -42,19 +40,21 @@ with sync_playwright() as p:
     pg.wait_for_timeout(1200)
     pg.evaluate("playing=false; clearTimeout(timer); clearInterval(tickTimer);")
 
-    print("typewriter stops when the deck moves on")
-    pg.evaluate(f"enter({BOARD})")
-    pg.wait_for_timeout(1400)                      # mid-typing
-    # leave and sample in one round trip: measuring first would race the
-    # typewriter, which can land another character before enter(0) arrives
-    mid = pg.evaluate("""(() => {
-        enter(0);
-        return [...document.querySelectorAll('.hb-meta')].map(e=>e.textContent.length);
+    print("inactive cards retire their CSS choreography")
+    pg.evaluate("enter(0)")
+    pg.wait_for_timeout(1600)
+    before = pg.evaluate("""document.querySelector('.slide.active')
+        .getAnimations({subtree:true}).filter(a=>a.playState==='running').length""")
+    pg.evaluate("enter(1)")
+    pg.wait_for_timeout(900)  # allow the intentional 480ms slide crossfade to retire
+    inactive = pg.evaluate("""(() => {
+        return [...document.querySelectorAll('.slide:not(.active)')]
+          .reduce((n,s)=>n+s.getAnimations({subtree:true})
+            .filter(a=>a.playState==='running').length,0);
     })()""")
-    pg.wait_for_timeout(2500)                      # long enough to finish typing
-    after = pg.evaluate("[...document.querySelectorAll('.hb-meta')].map(e=>e.textContent.length)")
-    check("meta text frozen after leaving", mid == after, f"{sum(mid)} -> {sum(after)} chars")
-    check("typing had actually started", sum(mid) > 0, f"{sum(mid)} chars")
+    check("card 1 animation had started", before > 0, f"{before} running")
+    check("no animation keeps running on inactive cards", inactive == 0,
+          f"{inactive} running")
 
     print("animations do not accumulate across a full loop")
     pg.evaluate("enter(0)")
@@ -69,15 +69,15 @@ with sync_playwright() as p:
     end = pg.evaluate("document.getAnimations().length")
     check("running animation count stable", end <= base * 2 + 8, f"{base} -> {end}")
 
-    print("re-entering a card replays it from the top")
-    pg.evaluate(f"enter({BOARD})")
-    pg.wait_for_timeout(2500)
-    first = pg.evaluate("[...document.querySelectorAll('.hb-meta')].map(e=>e.textContent.length)")
-    pg.evaluate("enter(0)"); pg.wait_for_timeout(200)
-    pg.evaluate(f"enter({BOARD})"); pg.wait_for_timeout(300)
-    early = pg.evaluate("[...document.querySelectorAll('.hb-meta')].map(e=>e.textContent.length)")
-    check("meta restarts empty-ish on re-entry", sum(early) < sum(first),
-          f"{sum(first)} -> {sum(early)} chars")
+    print("re-entering card 1 replays it from the top")
+    pg.evaluate("enter(0)")
+    pg.wait_for_timeout(1500)
+    late = pg.evaluate("document.querySelector('.ef-meter i').getBoundingClientRect().width")
+    pg.evaluate("enter(1)"); pg.wait_for_timeout(150)
+    pg.evaluate("enter(0)"); pg.wait_for_timeout(80)
+    early = pg.evaluate("document.querySelector('.ef-meter i').getBoundingClientRect().width")
+    check("upload meter restarts near empty", early < late * .25,
+          f"{late:.1f}px -> {early:.1f}px")
 
     check("no page errors", not errors, "; ".join(errors[:3]))
     ctx.close()

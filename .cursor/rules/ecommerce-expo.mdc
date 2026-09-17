@@ -1,0 +1,31 @@
+---
+description: Ecommerce Expo booth deck — event isolation and working rules
+alwaysApply: true
+---
+
+# Ecommerce Expo booth
+
+This workspace is the **Ecommerce Expo** cut of the Uploadcare TV booth deck.
+It started as a clone of the latest Webflow Conf / booth project.
+
+## Isolation
+
+- Do **not** edit `../UC-slides/uploadcare-show` from this chat. That is the
+  Webflow Conf project.
+- Do **not** push to the Webflow Conf remote. This clone has no `origin` until
+  a dedicated Ecommerce Expo remote is added.
+- Treat Webflow-specific copy, QR, and marketplace cards as **inherited
+  placeholders** until the user replaces them with Expo context.
+
+## Build rules (unchanged)
+
+- Edit `src/*.template.html` and `assets/`. Never hand-edit `dist/`.
+- Rebuild with `python build.py` / `python build_simple.py` after source changes.
+- Prefer the simple 7-card booth loop (`src/simple.template.html`) unless asked
+  for the full deck.
+
+## Event context
+
+Read `EVENT.md` for confirmed vs TBD notes. When the user adds Expo copy,
+storyboard, QR, or giveaway details, update `EVENT.md` and the deck — do not
+invent event facts.

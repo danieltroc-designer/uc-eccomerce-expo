@@ -1,4 +1,18 @@
-# Uploadcare TV Show
+# Uploadcare — Ecommerce Expo booth
+
+This workspace is the isolated **Ecommerce Expo** cut, based on the latest
+Uploadcare Webflow booth deck. The working presentation is the seven-card loop:
+
+```bash
+python build_simple.py
+# open dist/uploadcare-simple.html
+```
+
+Event copy, confirmed details, missing assets, and open questions live in
+`EVENT.md`. The prior Webflow project remains in `../UC-slides/uploadcare-show`
+and must not be edited from here.
+
+## Original project architecture
 
 A self-contained, auto-playing HTML slide deck for display on external TVs at
 trade fairs. Dark keynote aesthetic (`#090909`), Inter + Commit Mono, animated

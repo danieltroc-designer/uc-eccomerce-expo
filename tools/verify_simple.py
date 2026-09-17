@@ -17,22 +17,13 @@ PROFILE = ROOT / "tools" / "_profile"
 
 # card index -> ms after enter() worth capturing
 SHOTS = {
-    # dropin: stack in flight, landed over the hot zone, dropping, panel taken
-    # over, first ring filling, first file done, both done, window dismissed
-    0: [1700, 2350, 2700, 3400, 3900, 4600, 5900, 7600],
-    # capability panels: row rising, then three points across the icon wave
-    1: [400, 800, 1100, 2200],
-    # quote spread: lime panel alone, customer panel following, settled
-    2: [300, 550, 2200],
-    # trusted-by wall: title in, then three points across the reading-order sweep
-    3: [400, 700, 1000, 2200],
-    # marketplace install: listing settled, pointer waiting at its start point,
-    # mid-travel, landed, pressed, installing mid-sweep, and installed
-    4: [1300, 1600, 2300, 2650, 3200, 4300],
-    # pipeline: mid-drag, bar filling, first delivery frame, two transforms in,
-    # and the settled end state
-    5: [1000, 2400, 4200, 6600, 8200, 11800],
-    6: [3000],               # outro board + QR
+    0: [450, 1200, 1800, 2600, 4200],  # upload → optimize → store
+    1: [250, 700, 1400, 3000],         # benefit row lands
+    2: [250, 700, 1400, 2200],         # headline, then Zephyr mark
+    3: [300, 900, 1900],               # editor wipe / asset state
+    4: [250, 650, 1100],               # six-logo sweep
+    5: [700, 1800, 2900, 3800],        # upload → optimize → deliver → logo
+    6: [400, 1400, 3000],              # booth CTA
 }
 
 # the bundled driver resolves an x64 path on this machine; use the arm64 build

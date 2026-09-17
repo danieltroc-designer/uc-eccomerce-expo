@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Uploadcare — Webflow booth loop</title>
+<title>Uploadcare — Ecommerce Expo booth</title>
 <style>
 /*__COMMIT_MONO__*/
 /*__INTER_VAR__*/
@@ -1399,6 +1399,210 @@
   .hb-outro-mode .hb-led{width:6.72px;height:6.72px;background:#3eff51;border-radius:0}
   .hb-outro-mode .hb-dot{border-radius:0}
 
+  /* =======================================================================
+     Ecommerce Expo — seven-card cut.
+
+     These cards reuse the booth deck's stage, typography, substrate, logo
+     assets and timing model, but carry their own layouts so the inherited
+     Webflow story can remain intact while the Expo cut evolves.
+     ======================================================================= */
+  .ec-head{position:absolute;left:130px;right:130px;top:126px;text-align:center;
+    font-size:72px;font-weight:600;letter-spacing:-1.08px;line-height:1.04;color:#fff;
+    text-box-trim:trim-both;text-box-edge:cap alphabetic}
+  .ec-sub{position:absolute;left:260px;right:260px;top:258px;text-align:center;
+    font-size:28px;font-weight:430;letter-spacing:-.42px;line-height:1.25;color:#a8a9ad}
+  .ec-kicker{font-family:var(--cmono);font-size:13px;letter-spacing:.08em;
+    text-transform:uppercase;color:#84858a}
+
+  /* Card 1 — product image: upload → optimize → live store. */
+  .ef-wrap{position:absolute;inset:0}
+  .ef-flow{position:absolute;left:218px;top:382px;width:1484px;height:480px;
+    display:grid;grid-template-columns:360px 360px 520px;gap:72px;align-items:center}
+  .ef-stage{position:relative;height:360px;border-radius:28px;background:#0e0e10;
+    border:1px solid #1b1b1e;overflow:hidden;
+    opacity:0;transform:translateY(18px);
+    transition:opacity .24s ease,transform .46s var(--ease-out)}
+  .slide.active .ef-stage{opacity:1;transform:none}
+  .ef-stage:nth-child(2){transition-delay:.52s}
+  .ef-stage:nth-child(3){transition-delay:1.55s}
+  .slide:not(.active) .ef-stage{transition-delay:0s}
+  .ef-label{position:absolute;left:24px;top:22px}
+  .ef-photo{position:absolute;left:50%;top:72px;width:180px;height:226px;
+    transform:translateX(-50%);border-radius:18px;overflow:hidden;background:#eee8dc}
+  .ef-photo img{width:100%;height:100%;object-fit:cover;display:block}
+  .slide.active .ef-upload .ef-photo{animation:efUpload 5s var(--ease-out) both}
+  @keyframes efUpload{
+    0%{opacity:0;transform:translate(-50%,-26px) scale(.94)}
+    8%,100%{opacity:1;transform:translate(-50%,0) scale(1)}
+  }
+  .ef-meter{position:absolute;left:28px;right:28px;bottom:26px;height:6px;
+    border-radius:99px;background:#242428;overflow:hidden}
+  .ef-meter i{display:block;height:100%;width:100%;background:#6e8cff;border-radius:inherit;
+    transform:scaleX(0);transform-origin:left center}
+  .slide.active .ef-meter i{animation:efMeter 1s linear .18s forwards}
+  @keyframes efMeter{to{transform:scaleX(1)}}
+  .ef-opt .ef-photo img{filter:saturate(.86) brightness(.82) blur(3px)}
+  .slide.active .ef-opt .ef-photo img{animation:efCrisp .65s var(--ease-out) 1.12s forwards}
+  @keyframes efCrisp{to{filter:saturate(1) brightness(1) blur(0)}}
+  .ef-weight{position:absolute;left:28px;right:28px;bottom:26px;height:52px}
+  .ef-weight-bar{position:absolute;left:0;top:0;width:100%;height:8px;background:#2a2a2d;
+    border-radius:99px;transform-origin:left}
+  .slide.active .ef-weight-bar{animation:efWeight .72s var(--ease-out) 1.04s forwards}
+  @keyframes efWeight{to{transform:scaleX(.32);background:#5fd873}}
+  .ef-weight-copy{position:absolute;left:0;right:0;bottom:0;font-family:var(--cmono);
+    font-size:13px;color:#77797e}
+  .ef-weight-copy span{position:absolute;right:0;transition:opacity .18s ease}
+  .ef-weight-copy .after{opacity:0;color:#70df85}
+  .slide.active .ef-weight-copy .before{animation:efOld .18s ease 1.5s forwards}
+  .slide.active .ef-weight-copy .after{animation:efNew .2s ease 1.56s forwards}
+  @keyframes efOld{to{opacity:0}} @keyframes efNew{to{opacity:1}}
+  .ef-browser{position:absolute;inset:20px;border-radius:18px;background:#f3f2ef;color:#111;
+    overflow:hidden;transform:scale(.96);opacity:0}
+  .slide.active .ef-browser{animation:efStore .34s var(--ease-pop) 2.05s forwards}
+  @keyframes efStore{to{opacity:1;transform:scale(1)}}
+  .ef-chrome{height:38px;background:#fff;border-bottom:1px solid #ddd;
+    display:flex;align-items:center;gap:6px;padding:0 14px}
+  .ef-chrome i{width:7px;height:7px;border-radius:50%;background:#d3d3d3}
+  .ef-product{display:grid;grid-template-columns:202px 1fr;gap:24px;padding:30px}
+  .ef-product img{width:202px;height:250px;object-fit:cover;border-radius:12px}
+  .ef-product-copy{padding-top:24px}
+  .ef-product-copy b{display:block;font-size:26px;line-height:1.08;letter-spacing:-.4px}
+  .ef-product-copy p{margin-top:16px;font-size:14px;line-height:1.5;color:#717171}
+  .ef-buy{margin-top:26px;height:42px;border-radius:7px;background:#111;color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600}
+  .ef-fast{position:absolute;right:22px;top:50px;padding:7px 10px;border-radius:99px;
+    background:#ddff72;color:#172006;font-family:var(--cmono);font-size:11px;
+    opacity:0;transform:translateY(5px)}
+  .slide.active .ef-fast{animation:efNew .2s ease 2.42s forwards}
+  .ef-arrow{position:absolute;top:237px;width:48px;height:1px;background:#34343a}
+  .ef-arrow::after{content:'';position:absolute;right:0;top:-4px;width:8px;height:8px;
+    border-top:1px solid #777;border-right:1px solid #777;transform:rotate(45deg)}
+  .ef-a1{left:372px}.ef-a2{left:804px}
+
+  /* Card 2 — literal benefits, feature explanation kept subordinate. */
+  .eb-wrap{position:absolute;inset:0}
+  .eb-row{position:absolute;left:125px;top:330px;width:1670px;height:430px;
+    display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+  .eb-card{position:relative;padding:40px 30px 34px;border-radius:24px;
+    background:#0d0d0f;border:1px solid #1b1b1e;display:flex;flex-direction:column;
+    opacity:0;transform:translateY(18px);
+    transition:opacity .22s ease,transform .46s var(--ease-out);
+    transition-delay:calc(.08s + var(--i)*.08s)}
+  .slide.active .eb-card{opacity:1;transform:none}
+  .eb-icon{width:88px;height:88px;border-radius:18px;background:#17171a;
+    display:flex;align-items:center;justify-content:center;color:var(--ac)}
+  .eb-icon svg{width:52px;height:52px;display:block;stroke:currentColor}
+  .eb-copy{margin-top:auto}
+  .eb-benefit{font-size:27px;font-weight:600;letter-spacing:-.42px;line-height:1.06;color:#fff}
+  .eb-feature{margin-top:16px;font-size:16px;line-height:1.35;color:#898a8f}
+
+  /* Card 3 — Zephyr proof point, laid out to storyboard frame 204:1081.
+     Type reuses the shared .shd block (88 / 32, Inter 580, cap-trimmed) and
+     only moves its anchor: this card has no supporting art above the line, so
+     the frame sits the title at y=380 rather than the usual 168. The mark is
+     pinned, not stacked, so a copy change cannot shove the diamond. The
+     storyboard also had a 13px cursor over the headline; it is a board
+     leftover, not part of the composition, so it stays out. */
+  .em-wrap{position:absolute;inset:0}
+  .em-wrap .shd{--shd-y:380px}
+  .em-big,.em-small{opacity:0;transform:translateY(14px)}
+  .em-small{transform:translateY(8px)}
+  .em-by{position:absolute;left:863px;top:620px;width:193px;height:157px;
+    opacity:0;transform:translateY(10px)}
+  .em-by svg{display:block;width:193px;height:157px}
+  .em-by-fallback{position:absolute;left:0;right:0;bottom:18px;text-align:center;
+    font-family:var(--cmono);font-size:15px;letter-spacing:.18em;text-transform:uppercase;
+    color:#bcbdc0}
+  .slide.active .em-big{animation:emIn .6s var(--ease-out) .12s forwards}
+  .slide.active .em-small{animation:emIn .58s var(--ease-out) .32s forwards}
+  .slide.active .em-by{animation:emIn .5s var(--ease-out) .55s forwards}
+  @keyframes emIn{to{opacity:1;transform:none}}
+
+  /* Card 4 — shell is complete; imagery stays explicitly pending until genuine
+     AI Image Editor input/output is supplied. Never synthesize the before or
+     imply that a CSS treatment is real editor output. */
+  .ee-wrap{position:absolute;inset:0}
+  .ee-demo{position:absolute;left:350px;top:390px;width:1220px;height:470px;
+    border-radius:28px;background:#0e0e10;border:1px solid #1d1d21;overflow:hidden;
+    display:grid;grid-template-columns:1fr 1fr}
+  .ee-pane{position:relative;overflow:hidden}
+  .ee-pane+ .ee-pane{border-left:1px solid #242429}
+  .ee-pane img{width:100%;height:100%;object-fit:cover;display:block}
+  .ee-pane-label{position:absolute;left:24px;top:22px;padding:6px 9px;border-radius:99px;
+    background:rgba(9,9,9,.72);backdrop-filter:blur(8px);color:#d7d7da;
+    font-family:var(--cmono);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+  .ee-pending{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    background:repeating-linear-gradient(135deg,#101012 0,#101012 18px,#131316 18px,#131316 36px);
+    color:#77787d;text-align:center;font-family:var(--cmono);font-size:13px;line-height:1.6;
+    letter-spacing:.04em;text-transform:uppercase}
+  .ee-wipe{position:absolute;left:50%;top:0;bottom:0;width:2px;background:#fff;z-index:3;
+    box-shadow:0 0 28px rgba(255,255,255,.35);opacity:0}
+  .slide.active .ee-wipe{animation:eeWipe 1.1s var(--ease-in-out) .65s both}
+  @keyframes eeWipe{0%{left:8%;opacity:0}10%{opacity:1}90%{opacity:1}100%{left:92%;opacity:0}}
+
+  /* Card 5 — six-brand wall; actual vectors render when present, missing marks
+     stay as neutral word fallbacks until the booth-wall exports arrive. */
+  .el-wrap{position:absolute;inset:0}
+  .el-title{position:absolute;left:0;right:0;top:182px;text-align:center;
+    font-size:24px;color:#8f9095}
+  .el-row{position:absolute;left:150px;right:150px;top:430px;height:220px;
+    display:grid;grid-template-columns:repeat(6,1fr);align-items:center;gap:34px}
+  .el-logo{display:flex;align-items:center;justify-content:center;color:#fff;
+    opacity:0;transform:translateY(12px);
+    transition:opacity .28s ease,transform .44s var(--ease-out);
+    transition-delay:calc(.12s + var(--i)*.075s)}
+  .slide.active .el-logo{opacity:1;transform:none}
+  .el-logo svg{max-width:190px;max-height:72px;width:100%;height:auto;display:block}
+  .el-word{font-size:27px;font-weight:620;letter-spacing:-.35px;color:#d9d9dc;white-space:nowrap}
+
+  /* Card 6 — the simple system view that closes card 1's story. */
+  .ei-wrap{position:absolute;inset:0;background:
+    radial-gradient(90% 80% at 50% 30%,rgba(31,34,51,.84),rgba(14,15,21,.58) 58%,rgba(9,9,9,0) 100%)}
+  .ei-head{top:128px}
+  .ei-sub{top:245px}
+  .ei-line{position:absolute;left:300px;top:590px;width:1320px;height:2px;background:#343640}
+  .ei-progress{position:absolute;left:0;top:0;height:100%;width:100%;background:#b6b7ff;
+    transform:scaleX(0);transform-origin:left center}
+  .slide.active .ei-progress{animation:eiProgress 2.8s var(--ease-in-out) .55s forwards}
+  @keyframes eiProgress{to{transform:scaleX(1)}}
+  .ei-file{position:absolute;left:-26px;top:-37px;width:74px;height:74px;border-radius:17px;
+    background:#fff;padding:7px;box-shadow:0 12px 36px rgba(0,0,0,.4)}
+  .ei-file img{width:100%;height:100%;object-fit:cover;border-radius:11px;display:block}
+  .slide.active .ei-file{animation:eiMove 2.8s var(--ease-in-out) .55s forwards}
+  @keyframes eiMove{to{transform:translateX(1272px)}}
+  .ei-step{position:absolute;top:-84px;translate:-50% 0;text-align:center}
+  .ei-step i{display:block;margin:0 auto 20px;width:14px;height:14px;border-radius:4px;
+    background:#17181e;border:2px solid #696c79;transition:background .2s,border-color .2s}
+  .ei-step b{font-family:var(--cmono);font-size:14px;font-weight:500;letter-spacing:.08em;
+    text-transform:uppercase;color:#a7a9b3}
+  .ei-s1{left:0}.ei-s2{left:50%}.ei-s3{left:100%}
+  .slide.active .ei-s1 i{animation:eiLit .3s ease .75s forwards}
+  .slide.active .ei-s2 i{animation:eiLit .3s ease 1.75s forwards}
+  .slide.active .ei-s3 i{animation:eiLit .3s ease 2.75s forwards}
+  @keyframes eiLit{to{background:#d8ff6e;border-color:#d8ff6e;box-shadow:0 0 24px rgba(216,255,110,.42)}}
+  .ei-logo{position:absolute;left:50%;top:720px;translate:-50% 0;width:360px;
+    opacity:0;transform:translateY(10px)}
+  .ei-logo svg{width:100%;height:auto;display:block}
+  .slide.active .ei-logo{animation:emIn .42s var(--ease-out) 3.1s forwards}
+
+  /* Card 7 — warm sign-off. QR remains a visible placeholder until its URL is
+     confirmed, so this cut cannot accidentally ship the previous event's code. */
+  .eo-wrap{position:absolute;inset:0;background:
+    radial-gradient(62% 90% at 50% 58%,rgba(66,54,30,.24),rgba(9,9,9,0) 70%)}
+  .eo-logo{position:absolute;left:80px;top:72px;width:185px;opacity:.62}
+  .eo-logo svg{width:100%;height:auto;display:block}
+  .eo-title{position:absolute;left:180px;top:266px;width:1040px;font-size:112px;
+    line-height:.98;letter-spacing:-2.24px;font-weight:650;color:#fff}
+  .eo-sub{position:absolute;left:188px;top:548px;font-size:36px;color:#c7c7ca}
+  .eo-qr{position:absolute;right:224px;top:254px;width:310px;height:310px}
+  .eo-qr svg{width:100%;height:100%;display:block}
+  .eo-qr-pending{width:100%;height:100%;border:1px dashed #55565d;border-radius:20px;
+    display:flex;align-items:center;justify-content:center;text-align:center;
+    color:#77787e;font-family:var(--cmono);font-size:13px;line-height:1.6;
+    letter-spacing:.06em;text-transform:uppercase}
+  .eo-url{position:absolute;right:224px;top:590px;width:310px;text-align:center;
+    font-family:var(--cmono);font-size:12px;color:#66676d}
+
   @media (prefers-reduced-motion:reduce){
     /* entrance choreography collapses to an instant jump to the settled state
        (opacity cross-fades that aid comprehension are kept where they exist) */
@@ -1428,6 +1632,19 @@
     .pl-shine .pl-pill::after{animation:none!important;opacity:0!important}
     .slide.active .sc-chip{animation:none!important}
     .pd-dots[data-state="working"] i{animation:none!important}
+    .ef-stage,.eb-card,.el-logo{transition:none!important;opacity:1!important;transform:none!important}
+    .ef-upload .ef-photo,.ef-meter i,.ef-opt .ef-photo img,.ef-weight-bar,
+    .ef-weight-copy .before,.ef-weight-copy .after,.ef-browser,.ef-fast,
+    .em-big,.em-small,.em-by,.ee-wipe,.ei-progress,.ei-file,.ei-step i,.ei-logo{
+      animation:none!important}
+    .ef-meter i,.ei-progress{transform:scaleX(1)!important}
+    .ef-opt .ef-photo img{filter:none!important}
+    .ef-weight-bar{transform:scaleX(.32)!important;background:#5fd873!important}
+    .ef-weight-copy .before{opacity:0!important}
+    .ef-weight-copy .after,.ef-browser,.ef-fast,.em-big,.em-small,.em-by,.ei-logo{
+      opacity:1!important;transform:none!important}
+    .ei-file{transform:translateX(1272px)!important}
+    .ei-step i{background:#d8ff6e!important;border-color:#d8ff6e!important}
   }
 </style>
 </head>
@@ -1468,6 +1685,13 @@
     <div id="addmenu">
       <button class="btn accent" id="addBtn">+ Add slide</button>
       <div id="addlist">
+        <button data-type="commerceFlow">Expo · Product flow</button>
+        <button data-type="commerceBenefits">Expo · Benefits</button>
+        <button data-type="commerceMetric">Expo · Proof point</button>
+        <button data-type="commerceEditor">Expo · AI Editor</button>
+        <button data-type="commerceLogos">Expo · Logo wall</button>
+        <button data-type="commerceInfrastructure">Expo · Infrastructure</button>
+        <button data-type="commerceOutro">Expo · Booth CTA</button>
         <button data-type="statement">Statement</button>
         <button data-type="number">Big number</button>
         <button data-type="chart">Animated chart</button>
@@ -1520,6 +1744,7 @@
 <script id="caps-src" type="application/json">__CAPS_JSON__</script>
 <script id="market-src" type="application/json">__MARKET_JSON__</script>
 <script id="compliance-src" type="application/json">__COMPLIANCE_JSON__</script>
+<script id="ecommerce-src" type="application/json">__ECOMMERCE_JSON__</script>
 
 <script>
 /* =========================================================
@@ -1538,6 +1763,7 @@ const DEMO = JSON.parse(document.getElementById('demo-src').textContent);
 const CAPS = JSON.parse(document.getElementById('caps-src').textContent);
 const MARKET = JSON.parse(document.getElementById('market-src').textContent);
 const COMPLIANCE = JSON.parse(document.getElementById('compliance-src').textContent);
+const ECOMMERCE = JSON.parse(document.getElementById('ecommerce-src').textContent);
 const PIXEL = JSON.parse(document.getElementById('pixel-src').textContent);
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -1718,61 +1944,39 @@ function Timeline({reduced=false}={}){
 }
 
 /* ---------------- default deck ---------------- */
-/* ---- Simplified 7-card booth loop -------------------------------------
-   A calmer, product-first cut: no brand open, no chaos. The logo only
-   signs off on the final card — everywhere else the product speaks. Timings
-   are the storyboard's (5/6/6/5/5/6/8s) plus two seconds a card, so each one
-   holds after its choreography lands instead of cutting on the last beat. */
+/* ---- Ecommerce Expo — 38-second, seven-card booth loop ----------------
+   Product image in, faster storefront out; benefits and proof; one focused AI
+   Editor demonstration; customer trust; then the system view and booth CTA.
+   Durations are the brief's exact 5/6/6/6/5/6/4 seconds. */
 const DEFAULT_DECK = {
-  settings: { duration: 7, fade: 650, watermark: true },
+  settings: { duration: 6, fade: 480, watermark: true },
   slides: [
-    // 1 — "uploads that just work": a stack of files is dragged in, dropped,
-    // uploaded one by one, and the window dismisses itself
-    // Both files are ticked at ~5.8s and the panel no longer dismisses itself,
-    // so this holds the finished state for ~1.7s and then cuts. It used to run
-    // to 8s, but the window bowed out at 6.9 and left the card empty.
-    { type:'dropin', duration:7.5,
-      heading:'Uploads that just work.',
-      sub:'Any file, any source, safe.' },
+    { type:'commerceFlow', duration:5,
+      heading:'Every product image, optimized and fast. Automatically.' },
 
-    // 2 — five capabilities, one per icon, fast rhythm, settle into a row
-    { type:'features', duration:8 },
+    { type:'commerceBenefits', duration:6 },
 
-    // 3 — customer quote: the lime pull-quote, then who said it
-    { type:'quote2', duration:8,
-      quote:'It just works out of the box without having to think about it.',
-      by:'Luca Mausberg', role:'Co-founder', company:'Marko', mark:'marko',
-      tag:'Secondhand marketplace',
-      about:'Marko is Switzerland\u2019s community-driven secondhand marketplace, '
-          + 'built for Gen Z and millennial consumers who care about '
-          + 'sustainability, affordability, and style.' },
+    { type:'commerceMetric', duration:6,
+      value:'2x faster page loads',
+      line:'faster pages, more sales',
+      by:'Zephyr' },
 
-    // 4 — trusted-by logo wall, soft simultaneous fade-in
-    { type:'logos', duration:7,
+    { type:'commerceEditor', duration:6,
+      heading:'Turn any photo into a catalog-ready product shot.' },
+
+    { type:'commerceLogos', duration:5,
       title:'Trusted by',
-      logos:'Zapier, SoundCloud, L\u2019Or\u00e9al, Sequoia, UserTesting, Prezly, Aryeo, marko' },
+      logos:'L\u2019Or\u00e9al, Crayola, Samsonite, GemPages, Shogun, Marko' },
 
-    // 5 — distribution: already in the Webflow marketplace, cursor installs it.
-    // The button reads "Installed" at 3.5s and everything is settled by 4.0s,
-    // so the back half is a hold on the outcome — trim here, not in the score.
-    { type:'install', duration:8,
-      heading:'No code. It\u2019s already\nin your Webflow Marketplace.',
-      sub:'A native File Uploader app, approved by Webflow.',
-      app:'Uploadcare File Uploader', downloads:'1k+',
-      blurb:'Accelerate time to market with a no-code plugin for scalable '
-          + 'and secure end-user file uploads.' },
+    { type:'commerceInfrastructure', duration:6,
+      heading:'The infrastructure behind every product image.',
+      sub:'One integration. Upload, optimize, and deliver every image, and every other file.',
+      steps:'Upload, Optimize, Deliver' },
 
-    // 6 — the bigger picture: the site's own upload/analyse/deliver demo. The
-    // score runs ~11.5s, so the card holds a beat longer than that.
-    { type:'pipeline', duration:13,
-      heading:'Set it up once, use it on every client site',
-      subhead:'Go beyond uploads with the full pipeline via API.' },
-
-    // 7 — booth invite on the file-board backdrop, QR under the sign-off
-    { type:'board', duration:10, layout:'outro', globe:true, float:true, typing:true, typeSpeed:16,
-      title:'Get more\nout of Webflow.',
-      sub:'Come say hi \ud83d\udc4b\nand enter to win LEGO Polaroid Camera Building Set',
-      qr:true }
+    { type:'commerceOutro', duration:4, layout:'outro',
+      title:'Load faster,\nsell more.',
+      sub:'Come say hi \ud83d\udc4b',
+      qrConfirmed:false, qrLabel:'QR URL to confirm', booth:'' }
   ]
 };
 
@@ -1960,6 +2164,24 @@ const FEATURES = [
   { label:'Built-in\neditor',    icon:'editor',      ac:'#5978FF' },
 ];
 
+/* Ecommerce Expo card 2. Unlike the inherited capability art, these marks are
+   intentionally literal line icons: each one depicts the benefit named below
+   it and carries no abstract product vocabulary a passer-by has to decode. */
+const ECOM_ICONS = {
+  mobile: svgIcon('<rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M9 6h6M10 17l1.5 1.5L15 15"/>',1.7),
+  conversion: svgIcon('<path d="M4 18 10 12l4 4 6-9"/><path d="M15 7h5v5"/>',1.8),
+  peak: svgIcon('<path d="M3 20V5M3 20h18"/><path d="m6 16 4-5 3 3 5-8"/><path d="M16 6h2v2"/>',1.7),
+  handled: svgIcon('<path d="M5 11.5 10 16l9-10"/><path d="M12 2.7a9.3 9.3 0 1 0 9.3 9.3"/>',1.7),
+  stores: svgIcon('<path d="M3 9h18l-2-5H5L3 9Z"/><path d="M5 9v11h14V9M9 20v-6h6v6"/><path d="M3 9c0 2 3 2.5 4.5.5C9 11.5 12 11.5 12 9.5c0 2 3 2 4.5 0C18 11.5 21 11 21 9"/>',1.5),
+};
+const ECOM_BENEFITS = [
+  { benefit:'Fast on mobile',       feature:'Automatic image optimization', icon:'mobile',     ac:'#6f9bff' },
+  { benefit:'More conversions',     feature:'Lighter, faster pages',         icon:'conversion', ac:'#d8ff6e' },
+  { benefit:'Ready for peak season',feature:'Global CDN, scales with traffic',icon:'peak',       ac:'#c38cff' },
+  { benefit:'Nothing to maintain',  feature:'Upload to delivery, handled',   icon:'handled',    ac:'#61dc8b' },
+  { benefit:'Any store',            feature:'Works with any platform',       icon:'stores',     ac:'#ffae66' },
+];
+
 /* The tick on the installed button. Drawn here rather than exported because it
    has to be a single open path: the install animation strokes it on, and a
    filled glyph has no length to animate. 22 is its path length, which is what
@@ -2050,6 +2272,118 @@ const PD_DONUT = (()=>{
 })();
 
 const R = {
+  /* ---- Ecommerce Expo card 1: product image into a live store ---- */
+  commerceFlow(s){
+    const image = ECOMMERCE.product || UI['thumb-flower'];
+    return `<div class="ef-wrap">
+      <div class="ec-head reveal">${esc(s.heading||'')}</div>
+      <div class="ef-flow">
+        <div class="ef-stage ef-upload">
+          <div class="ef-label ec-kicker">Upload</div>
+          <div class="ef-photo"><img src="${image}" alt=""></div>
+          <div class="ef-meter"><i></i></div>
+        </div>
+        <div class="ef-arrow ef-a1"></div>
+        <div class="ef-stage ef-opt">
+          <div class="ef-label ec-kicker">Optimize</div>
+          <div class="ef-photo"><img src="${image}" alt=""></div>
+          <div class="ef-weight">
+            <i class="ef-weight-bar"></i>
+            <div class="ef-weight-copy"><span class="before">Original file</span><span class="after">Optimized file</span></div>
+          </div>
+        </div>
+        <div class="ef-arrow ef-a2"></div>
+        <div class="ef-stage ef-store">
+          <div class="ef-browser">
+            <div class="ef-chrome"><i></i><i></i><i></i></div>
+            <div class="ef-product">
+              <img src="${image}" alt="">
+              <div class="ef-product-copy">
+                <b>Everyday Bloom</b>
+                <p>Clean detail, responsive sizing, ready on every screen.</p>
+                <div class="ef-buy">Add to cart</div>
+              </div>
+            </div>
+            <div class="ef-fast">Delivered instantly</div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  },
+  /* ---- Ecommerce Expo card 2: benefit over feature, five literal icons ---- */
+  commerceBenefits(){
+    const cards = ECOM_BENEFITS.map((f,i)=>`
+      <div class="eb-card" style="--i:${i};--ac:${f.ac}">
+        <div class="eb-icon">${ECOM_ICONS[f.icon]}</div>
+        <div class="eb-copy">
+          <div class="eb-benefit">${esc(f.benefit)}</div>
+          <div class="eb-feature">${esc(f.feature)}</div>
+        </div>
+      </div>`).join('');
+    return `<div class="eb-wrap"><div class="eb-row">${cards}</div></div>`;
+  },
+  /* ---- Ecommerce Expo card 3: quiet proof point ---- */
+  commerceMetric(s){
+    const mark = LOGOS[logoKey(s.by||'')];
+    return `<div class="em-wrap">
+      <div class="shd">
+        <div class="shd-t em-big">${esc(s.value||'')}</div>
+        <div class="shd-s em-small">${esc(s.line||'')}</div>
+      </div>
+      <div class="em-by">${mark||`<span class="em-by-fallback">${esc(s.by||'')}</span>`}</div>
+    </div>`;
+  },
+  /* ---- Ecommerce Expo card 4: real editor output only ---- */
+  commerceEditor(s){
+    const ready = !!(ECOMMERCE.editorBefore && ECOMMERCE.editorAfter);
+    const pane = (src,label)=>ready
+      ? `<div class="ee-pane"><img src="${esc(src)}" alt=""><span class="ee-pane-label">${label}</span></div>`
+      : `<div class="ee-pane"><div class="ee-pending">Genuine AI Image Editor<br>${label.toLowerCase()} asset needed</div><span class="ee-pane-label">${label}</span></div>`;
+    return `<div class="ee-wrap">
+      <div class="ec-head reveal">${esc(s.heading||'')}</div>
+      <div class="ee-demo">${pane(ECOMMERCE.editorBefore,'Before')}${pane(ECOMMERCE.editorAfter,'Catalog ready')}<i class="ee-wipe"></i></div>
+    </div>`;
+  },
+  /* ---- Ecommerce Expo card 5: the six booth-wall customers ---- */
+  commerceLogos(s){
+    const names = (s.logos||'').split(',').map(n=>n.trim()).filter(Boolean);
+    const marks = names.map((n,i)=>{
+      const mark = LOGOS[logoKey(n)];
+      return `<div class="el-logo" style="--i:${i}">${mark||`<span class="el-word">${esc(n)}</span>`}</div>`;
+    }).join('');
+    return `<div class="el-wrap">
+      ${s.title?`<div class="el-title">${esc(s.title)}</div>`:''}
+      <div class="el-row">${marks}</div>
+    </div>`;
+  },
+  /* ---- Ecommerce Expo card 6: system line, ending in the lockup ---- */
+  commerceInfrastructure(s){
+    const steps = (s.steps||'Upload, Optimize, Deliver').split(',').map(x=>x.trim());
+    return `<div class="ei-wrap">
+      <div class="ec-head ei-head reveal">${esc(s.heading||'')}</div>
+      <div class="ec-sub ei-sub reveal d2">${esc(s.sub||'')}</div>
+      <div class="ei-line">
+        <i class="ei-progress"></i>
+        <div class="ei-file"><img src="${UI['thumb-flower']}" alt=""></div>
+        ${steps.slice(0,3).map((st,i)=>`<div class="ei-step ei-s${i+1}"><i></i><b>${esc(st)}</b></div>`).join('')}
+      </div>
+      <div class="ei-logo">${LOGO}</div>
+    </div>`;
+  },
+  /* ---- Ecommerce Expo card 7: human CTA; no inherited-event QR ---- */
+  commerceOutro(s){
+    const qr = s.qrConfirmed
+      ? QR
+      : `<div class="eo-qr-pending">${esc(s.qrLabel||'QR URL to confirm')}</div>`;
+    return `<div class="eo-wrap">
+      <div class="eo-logo">${LOGO}</div>
+      <div class="eo-title reveal">${multiline(s.title||'')}</div>
+      <div class="eo-sub reveal d2">${emojiHTML(s.sub||'','hb-wave')}</div>
+      <div class="eo-qr">${qr}</div>
+      <div class="eo-url">${s.qrConfirmed?'Scan to learn more':esc(s.qrLabel||'')}</div>
+      ${s.booth?`<div class="ec-kicker" style="position:absolute;left:188px;top:640px">Booth ${esc(s.booth)}</div>`:''}
+    </div>`;
+  },
   /* ---- card 1: the real uploader widget, files dragged in and dropped ---- */
   dropin(s){
     const rows = UPLOAD_SOURCES.map(([ic,label],i)=>`
@@ -3865,7 +4199,11 @@ const editor = document.getElementById('editor');
 const cardsEl = document.getElementById('cards');
 let expanded = -1;
 
-const TYPE_LABEL = {statement:'Statement', number:'Number', chart:'Chart', stats:'Stats', logo:'Logo', logoAnim:'Logo FX', board:'File board', reveal:'Reveal', mockup:'Mockup', code:'Code / terminal', upload:'Upload demo', chaos:'Chaos graph', install:'Install app', dropin:'Drop-in form', features:'Feature row', quote2:'Customer quote', logos:'Logo wall', scale:'Scale / pipeline', pipeline:'How-it-works demo'};
+const TYPE_LABEL = {statement:'Statement', number:'Number', chart:'Chart', stats:'Stats', logo:'Logo', logoAnim:'Logo FX', board:'File board', reveal:'Reveal', mockup:'Mockup', code:'Code / terminal', upload:'Upload demo', chaos:'Chaos graph', install:'Install app', dropin:'Drop-in form', features:'Feature row', quote2:'Customer quote', logos:'Logo wall', scale:'Scale / pipeline', pipeline:'How-it-works demo',
+  commerceFlow:'Expo · Product flow', commerceBenefits:'Expo · Benefits',
+  commerceMetric:'Expo · Proof point', commerceEditor:'Expo · AI Editor',
+  commerceLogos:'Expo · Logo wall', commerceInfrastructure:'Expo · Infrastructure',
+  commerceOutro:'Expo · Booth CTA'};
 const VARIANT_LABEL = {
   'assemble':'Pixel assembly — lockup',
   'rise':'Cinematic rise — lockup',
@@ -3876,6 +4214,13 @@ const VARIANT_LABEL = {
 };
 function slideTitle(s){
   switch(s.type){
+    case 'commerceFlow': return (s.heading||'').replace(/\n/g,' ');
+    case 'commerceBenefits': return ECOM_BENEFITS.map(f=>f.benefit).join(' · ');
+    case 'commerceMetric': return s.value||'';
+    case 'commerceEditor': return (s.heading||'').replace(/\n/g,' ');
+    case 'commerceLogos': return (s.logos||'').replace(/\n/g,' ');
+    case 'commerceInfrastructure': return (s.heading||'').replace(/\n/g,' ');
+    case 'commerceOutro': return (s.title||'').replace(/\n/g,' ');
     case 'statement': return headText(s);
     case 'number': return (s.prefix||'')+s.value+(s.suffix||'');
     case 'chart': return s.big+' · '+(s.label||'');
@@ -3917,6 +4262,33 @@ function fieldsFor(s, i){
     <label class="f"><span>Type</span><input type="text" value="${TYPE_LABEL[s.type]}" disabled></label>
   </div>` + textFxFieldHTML(s);
   switch(s.type){
+    case 'commerceFlow': return dur+`
+      <label class="f"><span>Headline</span><textarea data-f="heading">${esc(s.heading||'')}</textarea></label>
+      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">Three fast beats: upload, visibly reduce file weight, then land on a crisp product page. The product image currently reuses the flower asset from the uploader demo.</p>`;
+    case 'commerceBenefits': return dur+`
+      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">Five benefit/feature pairs and literal icons live in ECOM_BENEFITS and ECOM_ICONS in the template.</p>`;
+    case 'commerceMetric': return dur+`
+      <label class="f"><span>Proof point</span><input type="text" data-f="value" value="${esc(s.value||'')}"></label>
+      <label class="f"><span>Supporting line</span><input type="text" data-f="line" value="${esc(s.line||'')}"></label>
+      <label class="f"><span>Attribution</span><input type="text" data-f="by" value="${esc(s.by||'')}"></label>
+      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">Laid out to Figma frame 204:1081. Attribution looks up assets/logos via the name in this field (currently zephyr.svg).</p>`;
+    case 'commerceEditor': return dur+`
+      <label class="f"><span>Headline</span><textarea data-f="heading">${esc(s.heading||'')}</textarea></label>
+      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">Asset status: ${ECOMMERCE.editorBefore&&ECOMMERCE.editorAfter?'ready':'waiting for assets/ecommerce/editor-before.jpg and editor-after.jpg'}. This card never simulates editor output with CSS.</p>`;
+    case 'commerceLogos': return dur+`
+      <label class="f"><span>Small title (optional)</span><input type="text" data-f="title" value="${esc(s.title||'')}"></label>
+      <label class="f"><span>Logo names (comma-separated)</span><textarea data-f="logos">${esc(s.logos||'')}</textarea></label>
+      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">L’Oréal and Marko use real vectors. Crayola, Samsonite, GemPages and Shogun remain neutral word fallbacks until their booth-wall exports are added.</p>`;
+    case 'commerceInfrastructure': return dur+`
+      <label class="f"><span>Headline</span><textarea data-f="heading">${esc(s.heading||'')}</textarea></label>
+      <label class="f"><span>Supporting line</span><textarea data-f="sub">${esc(s.sub||'')}</textarea></label>
+      <label class="f"><span>Steps (three, comma-separated)</span><input type="text" data-f="steps" value="${esc(s.steps||'')}"></label>`;
+    case 'commerceOutro': return dur+`
+      <label class="f"><span>Headline (line breaks allowed)</span><textarea data-f="title">${esc(s.title||'')}</textarea></label>
+      <label class="f"><span>Sign-off</span><input type="text" data-f="sub" value="${esc(s.sub||'')}"></label>
+      <label class="f"><span>Booth number (blank until confirmed)</span><input type="text" data-f="booth" value="${esc(s.booth||'')}"></label>
+      <label class="chk"><input type="checkbox" data-f="qrConfirmed" ${s.qrConfirmed?'checked':''}> QR destination confirmed — show QR</label>
+      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">The inherited Webflow-event QR is suppressed until the Ecommerce Expo destination is confirmed. Add raffle/swag copy only when confirmed.</p>`;
     case 'statement': return dur+`
       <label class="f"><span>Kicker (optional small label)</span><input type="text" data-f="kicker" value="${esc(s.kicker||'')}"></label>
       <label class="f"><span>Heading</span><textarea data-f="heading">${esc(headText(s))}</textarea></label>
@@ -4153,6 +4525,13 @@ gLogo.onchange = ()=>{ deck.settings.watermark=gLogo.checked; enter(idx); };
 
 /* add menu */
 const NEW = {
+  commerceFlow:{type:'commerceFlow',duration:5,heading:'Every product image, optimized and fast. Automatically.'},
+  commerceBenefits:{type:'commerceBenefits',duration:6},
+  commerceMetric:{type:'commerceMetric',duration:6,value:'2x faster page loads',line:'faster pages, more sales',by:'Zephyr'},
+  commerceEditor:{type:'commerceEditor',duration:6,heading:'Turn any photo into a catalog-ready product shot.'},
+  commerceLogos:{type:'commerceLogos',duration:5,title:'Trusted by',logos:'L\u2019Or\u00e9al, Crayola, Samsonite, GemPages, Shogun, Marko'},
+  commerceInfrastructure:{type:'commerceInfrastructure',duration:6,heading:'The infrastructure behind every product image.',sub:'One integration. Upload, optimize, and deliver every image, and every other file.',steps:'Upload, Optimize, Deliver'},
+  commerceOutro:{type:'commerceOutro',duration:4,layout:'outro',title:'Load faster,\nsell more.',sub:'Come say hi \ud83d\udc4b',qrConfirmed:false,qrLabel:'QR URL to confirm',booth:''},
   statement:{type:'statement',duration:8,kicker:'',heading:'Your headline goes here.',line2mono:false},
   number:{type:'number',duration:8,kicker:'',prefix:'',value:100,decimals:0,suffix:'+',label:'describe the number'},
   chart:{type:'chart',duration:11,big:'10X',label:'what grew',startLabel:'1%',endLabel:'10%',points:'1,2,2.5,4,6,7,9,10'},

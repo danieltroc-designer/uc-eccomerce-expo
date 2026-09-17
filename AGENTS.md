@@ -1,4 +1,11 @@
-# AGENTS.md — orientation for coding agents
+# AGENTS.md — Ecommerce Expo booth
+
+This is the **Ecommerce Expo** cut. It was cloned from the latest Webflow booth
+deck, but is now isolated on local branch `ecommerce-expo` with no remote.
+Never edit or push to `../UC-slides/uploadcare-show` from this workspace.
+
+Read `EVENT.md` before changing event copy or assets. Confirmed facts go there;
+never infer booth details, giveaway copy, QR destinations, or customer claims.
 
 Read this before editing. It tells you what this project is, the one rule that
 matters, and exactly where things live.
@@ -23,16 +30,26 @@ python build.py
 directly, your changes are lost on the next build and the source drifts out of
 sync.
 
-### Second deck: the simplified booth loop
+### Ecommerce Expo booth loop
 
-There is a parallel, shorter 7-card cut for the Webflow booth. It has its own
-source + build + output and is fully independent of the main deck:
+The simplified seven-card deck is the Ecommerce Expo working cut. It has its
+own source + build + output and is fully independent of the main deck:
 
 - Source: `src/simple.template.html` (a superset copy of the main template with
   extra card types: `dropin`, `features`, `quote2`, `logos`, `scale`,
   `pipeline`). Card 7 is a `board` slide with `layout:'outro'`.
 - Build: `python build_simple.py` → `dist/uploadcare-simple.html`.
 - Same rule applies: never hand-edit `dist/uploadcare-simple.html`.
+- Current default sequence is 5/6/6/6/5/6/4 seconds (38 seconds total):
+  product flow, benefits, Zephyr proof point, AI Editor, customer logos,
+  infrastructure, booth CTA.
+- Optional event imagery is auto-inlined from `assets/ecommerce/`; see its
+  README for exact filenames. Card 4 intentionally stays in an asset-needed
+  state until genuine editor before/after files exist.
+- `encode_logos()` scans `assets/logos/*.svg`; new customer marks require no
+  build-script registration. Card 3 (the Zephyr proof point) is laid out to
+  Figma frame 204:1081: the shared `.shd` headline sits at `--shd-y:380px` and
+  the mark is pinned at 863,620 in its 193×157 export box.
 - `build_simple.py` reuses every encoder from `build.py` and adds six tokens
   of its own: `__QR_SVG__` (the booth QR, vectorised out of
   `assets/qr/booth-qr.png` — see card 7 below), `__LOGOS_JSON__` (the marks
@@ -360,6 +377,13 @@ Laid out to storyboard frame 184:5666. Four things about it are deliberate:
     .46s + .58s) so the hand reads as noticing you rather than waving before it
     is there. Reduced motion pins it still. The same scoping rule applies to
     card 2's capability pulse and to any looping animation added later.
+    A one-shot `forwards` animation needs it just as much, for the opposite
+    reason: it holds its end frame after the card is left, so unscoped it plays
+    on the first render and every later loop opens on the settled result. Card
+    1's `efCrisp` did exactly that — the photo was already sharp before the
+    optimize beat ran, so the card only told its story once per page load.
+    `tools/check_commerce_flow.py` checks a *second* visit; one pass passes
+    either way.
 - **The corner watermark is suppressed here.** `enter()` skips it on
   `layout:'outro'` — the mark is already the centre of the composition, and the
   frame has no second copy.
