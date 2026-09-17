@@ -49,7 +49,12 @@ own source + build + output and is fully independent of the main deck:
 - `encode_logos()` scans `assets/logos/*.svg`; new customer marks require no
   build-script registration. Card 3 (the Zephyr proof point) is laid out to
   Figma frame 204:1081: the shared `.shd` headline sits at `--shd-y:380px` and
-  the mark is pinned at 863,620 in its 193×157 export box.
+  the mark is pinned at 863,620 in its 193×157 export box. Card 5's wall comes
+  from frame 207:1131 and is two rows of three, **not a grid** — `ECOM_WALL`
+  pins each mark to its own slot at its own export size, because the frame
+  places them optically (row 2's vertical centres differ by 15px) and six
+  wordmarks of unequal weight at one shared width read as ragged. Order in the
+  slide's `logos` field fills those slots in reading order.
 - `build_simple.py` reuses every encoder from `build.py` and adds six tokens
   of its own: `__QR_SVG__` (the booth QR, vectorised out of
   `assets/qr/booth-qr.png` — see card 7 below), `__LOGOS_JSON__` (the marks

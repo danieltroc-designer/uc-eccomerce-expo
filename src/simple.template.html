@@ -1540,20 +1540,28 @@
   .slide.active .ee-wipe{animation:eeWipe 1.1s var(--ease-in-out) .65s both}
   @keyframes eeWipe{0%{left:8%;opacity:0}10%{opacity:1}90%{opacity:1}100%{left:92%;opacity:0}}
 
-  /* Card 5 — six-brand wall; actual vectors render when present, missing marks
-     stay as neutral word fallbacks until the booth-wall exports arrive. */
+  /* Card 5 — the booth wall, laid out to storyboard frame 207:1131.
+     Two rows of three, and the marks are *not* on a grid: the frame places
+     each optically, so row 2's vertical centres alone differ by 15px. Six
+     wordmarks of very different weight at a common size would otherwise read
+     as a ragged line, so each mark is pinned to its own slot at its own
+     exported size (ECOM_WALL, reading order). A three-column grid gets close
+     and is visibly wrong at booth scale — the same reason the inherited
+     Webflow wall carries LW_SLOTS. Sizes are the asset viewBoxes: re-export
+     from this frame or the boxes stop matching. */
   .el-wrap{position:absolute;inset:0}
-  .el-title{position:absolute;left:0;right:0;top:182px;text-align:center;
-    font-size:24px;color:#8f9095}
-  .el-row{position:absolute;left:150px;right:150px;top:430px;height:220px;
-    display:grid;grid-template-columns:repeat(6,1fr);align-items:center;gap:34px}
-  .el-logo{display:flex;align-items:center;justify-content:center;color:#fff;
+  .el-title{position:absolute;left:302px;top:175px;width:1316px;text-align:center;
+    font-size:32px;font-weight:580;letter-spacing:-.48px;line-height:1.065;color:#bcbdc0;
+    text-box-trim:trim-both;text-box-edge:cap alphabetic}
+  .el-logo{position:absolute;color:#fff;
     opacity:0;transform:translateY(12px);
     transition:opacity .28s ease,transform .44s var(--ease-out);
     transition-delay:calc(.12s + var(--i)*.075s)}
   .slide.active .el-logo{opacity:1;transform:none}
-  .el-logo svg{max-width:190px;max-height:72px;width:100%;height:auto;display:block}
-  .el-word{font-size:27px;font-weight:620;letter-spacing:-.35px;color:#d9d9dc;white-space:nowrap}
+  .el-logo svg{width:100%;height:100%;display:block}
+  /* a name with no vector yet: centre a word in the slot the mark would fill */
+  .el-word{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-size:27px;font-weight:620;letter-spacing:-.35px;color:#d9d9dc;white-space:nowrap}
 
   /* Card 6 — the simple system view that closes card 1's story. */
   .ei-wrap{position:absolute;inset:0;background:
@@ -2182,6 +2190,22 @@ const ECOM_BENEFITS = [
   { benefit:'Any store',            feature:'Works with any platform',       icon:'stores',     ac:'#ffae66' },
 ];
 
+/* Ecommerce Expo card 5's wall: x, y, w, h per slot in reading order, straight
+   off storyboard frame 207:1131. Each box is the mark's own export size, so a
+   logo is drawn at the scale it was designed at rather than forced to a shared
+   width — which is what keeps six very differently weighted wordmarks reading
+   as one row. The frame's own centres confirm the placement is optical, not
+   mechanical: the columns land on 510/960/1400 but the second row's vertical
+   centres run 612.5, 627.5 and 620. Order here must match the `logos` field. */
+const ECOM_WALL = [
+  [426, 437, 168, 32],   // L'Oréal
+  [877, 433, 166, 40],   // Crayola
+  [1288, 438, 223, 36],  // Samsonite
+  [390, 591, 239, 43],   // GemPages
+  [884, 600, 152, 55],   // Shogun
+  [1295, 603, 210, 34],  // Marko
+];
+
 /* The tick on the installed button. Drawn here rather than exported because it
    has to be a single open path: the install animation strokes it on, and a
    filled glyph has no length to animate. 22 is its path length, which is what
@@ -2348,12 +2372,16 @@ const R = {
   commerceLogos(s){
     const names = (s.logos||'').split(',').map(n=>n.trim()).filter(Boolean);
     const marks = names.map((n,i)=>{
+      const slot = ECOM_WALL[i];
+      if (!slot) return '';                       // frame has six slots, no more
       const mark = LOGOS[logoKey(n)];
-      return `<div class="el-logo" style="--i:${i}">${mark||`<span class="el-word">${esc(n)}</span>`}</div>`;
+      const box = `left:${slot[0]}px;top:${slot[1]}px;width:${slot[2]}px;height:${slot[3]}px`;
+      return `<div class="el-logo" style="--i:${i};${box}">${
+        mark||`<span class="el-word">${esc(n)}</span>`}</div>`;
     }).join('');
     return `<div class="el-wrap">
       ${s.title?`<div class="el-title">${esc(s.title)}</div>`:''}
-      <div class="el-row">${marks}</div>
+      ${marks}
     </div>`;
   },
   /* ---- Ecommerce Expo card 6: system line, ending in the lockup ---- */
@@ -4278,7 +4306,7 @@ function fieldsFor(s, i){
     case 'commerceLogos': return dur+`
       <label class="f"><span>Small title (optional)</span><input type="text" data-f="title" value="${esc(s.title||'')}"></label>
       <label class="f"><span>Logo names (comma-separated)</span><textarea data-f="logos">${esc(s.logos||'')}</textarea></label>
-      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">L’Oréal and Marko use real vectors. Crayola, Samsonite, GemPages and Shogun remain neutral word fallbacks until their booth-wall exports are added.</p>`;
+      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">Laid out to Figma frame 207:1131. All six marks are real vectors; order here fills the frame's slots left to right, top row first, and names beyond the sixth are ignored.</p>`;
     case 'commerceInfrastructure': return dur+`
       <label class="f"><span>Headline</span><textarea data-f="heading">${esc(s.heading||'')}</textarea></label>
       <label class="f"><span>Supporting line</span><textarea data-f="sub">${esc(s.sub||'')}</textarea></label>

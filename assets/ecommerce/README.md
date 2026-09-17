@@ -17,16 +17,14 @@ exist. Do not synthesize either image or fake the replacement with CSS.
 
 ## Customer logos
 
-Customer SVGs live in `assets/logos/`. Add:
+Customer SVGs live in `assets/logos/`, and the build scans that folder
+automatically — dropping in `<normalized-name>.svg` is all a new mark needs.
 
-- `crayola.svg`
-- `samsonite.svg`
-- `gempages.svg`
-- `shogun.svg`
-
-The build scans that folder automatically. L'Oréal, Marko, and Zephyr already
-have real vectors; missing wall marks render as neutral text in the first
-layout pass.
+All six wall marks and the Zephyr attribution are now real vectors. They are
+exported from storyboard frames 207:1131 and 204:1081 and carry those frames'
+bounding boxes, which `ECOM_WALL` in the template is measured against: re-export
+from the same frames or the slot sizes stop matching. A name with no vector
+still renders as neutral text rather than disappearing.
 
 ## CTA
 

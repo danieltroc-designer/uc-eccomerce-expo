@@ -21,7 +21,7 @@ Working source of truth for this booth cut. Do not invent event facts.
 
 - Ecommerce product image (optional replacement for the current flower)
 - Genuine AI Image Editor before/after pair
-- Crayola, Samsonite, GemPages, and Shogun SVG marks
+- ~~Customer SVG marks~~ — all six wall logos and Zephyr are in
 - Ecommerce Expo QR artwork after its destination is confirmed
 
 See `assets/ecommerce/README.md` for exact filenames.
