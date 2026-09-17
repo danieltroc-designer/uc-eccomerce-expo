@@ -1479,22 +1479,30 @@
     border-top:1px solid #777;border-right:1px solid #777;transform:rotate(45deg)}
   .ef-a1{left:372px}.ef-a2{left:804px}
 
-  /* Card 2 — literal benefits, feature explanation kept subordinate. */
+  /* Card 2 — storyboard frame 212:1213. Five fixed 265x361 panels sit in a
+     1389px row: the 16px gutters are part of the composition, not a responsive
+     grid. Copy comes first and the icon well is pinned to the lower-left by
+     justify-between. The icon art is the frame's own 48px SVG export, inlined
+     through ECOMMERCE so it keeps its baked accent colour. */
   .eb-wrap{position:absolute;inset:0}
-  .eb-row{position:absolute;left:125px;top:330px;width:1670px;height:430px;
-    display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
-  .eb-card{position:relative;padding:40px 30px 34px;border-radius:24px;
-    background:#0d0d0f;border:1px solid #1b1b1e;display:flex;flex-direction:column;
+  .eb-row{position:absolute;left:266px;top:359.5px;width:1389px;height:361px;
+    display:flex;gap:16px;align-items:stretch}
+  .eb-card{position:relative;width:265px;height:361px;padding:40px;border-radius:24px;
+    background:#0c0c0c;border:1px solid #181818;display:flex;flex-direction:column;
+    align-items:flex-start;justify-content:space-between;
     opacity:0;transform:translateY(18px);
     transition:opacity .22s ease,transform .46s var(--ease-out);
     transition-delay:calc(.08s + var(--i)*.08s)}
   .slide.active .eb-card{opacity:1;transform:none}
-  .eb-icon{width:88px;height:88px;border-radius:18px;background:#17171a;
-    display:flex;align-items:center;justify-content:center;color:var(--ac)}
-  .eb-icon svg{width:52px;height:52px;display:block;stroke:currentColor}
-  .eb-copy{margin-top:auto}
-  .eb-benefit{font-size:27px;font-weight:600;letter-spacing:-.42px;line-height:1.06;color:#fff}
-  .eb-feature{margin-top:16px;font-size:16px;line-height:1.35;color:#898a8f}
+  .eb-copy{width:183px;display:flex;flex-direction:column;gap:16px;font-weight:580;
+    line-height:1.065}
+  .eb-benefit{font-size:28px;letter-spacing:-.42px;color:#bcbdc0;
+    text-box-trim:trim-both;text-box-edge:cap alphabetic}
+  .eb-feature{font-size:16px;letter-spacing:-.24px;color:#85868b;
+    text-box-trim:trim-both;text-box-edge:cap alphabetic}
+  .eb-icon{width:96px;height:96px;border-radius:9.433px;background:#181818;
+    display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .eb-icon svg{width:48px;height:48px;display:block}
 
   /* Card 3 — Zephyr proof point, laid out to storyboard frame 204:1081.
      Type reuses the shared .shd block (88 / 32, Inter 580, cap-trimmed) and
@@ -1518,27 +1526,54 @@
   .slide.active .em-by{animation:emIn .5s var(--ease-out) .55s forwards}
   @keyframes emIn{to{opacity:1;transform:none}}
 
-  /* Card 4 — shell is complete; imagery stays explicitly pending until genuine
-     AI Image Editor input/output is supplied. Never synthesize the before or
-     imply that a CSS treatment is real editor output. */
+  /* Card 4 — laid out to Figma frame 213:1313. One well, not two panes: the
+     card's claim is that a single photo changes, and a before beside an after
+     turns a transformation into a comparison — the eye starts hunting for
+     differences instead of watching one happen.
+
+     The pair in assets/ecommerce/ is genuine AI Image Editor output, cropped
+     out of the frame's own export at (9,9) so the chrome below is CSS rather
+     than baked pixels. The two frames register exactly: the bottle and the
+     rock do not move, only the background behind them. That registration is
+     what allows a wipe here at all — re-export both together or the swap
+     turns into a jump cut.
+
+     Imagery stays explicitly pending until both files exist. Never synthesize
+     the before or imply that a CSS treatment is real editor output. */
   .ee-wrap{position:absolute;inset:0}
-  .ee-demo{position:absolute;left:350px;top:390px;width:1220px;height:470px;
-    border-radius:28px;background:#0e0e10;border:1px solid #1d1d21;overflow:hidden;
-    display:grid;grid-template-columns:1fr 1fr}
-  .ee-pane{position:relative;overflow:hidden}
-  .ee-pane+ .ee-pane{border-left:1px solid #242429}
-  .ee-pane img{width:100%;height:100%;object-fit:cover;display:block}
-  .ee-pane-label{position:absolute;left:24px;top:22px;padding:6px 9px;border-radius:99px;
-    background:rgba(9,9,9,.72);backdrop-filter:blur(8px);color:#d7d7da;
-    font-family:var(--cmono);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+  /* 641x473 on the frame's centre (960.5,721.5). Border-box, so the 1px rule
+     and the 8px pad eat inward and leave the well at exactly 623x455 — the
+     pixel size of the exports, so neither frame is ever resampled. */
+  .ee-panel{position:absolute;left:640px;top:485px;width:641px;height:473px;
+    box-sizing:border-box;padding:8px;border:1px solid #181818;border-radius:16px;
+    background:#0c0c0c}
+  .ee-well{position:relative;width:100%;height:100%;border-radius:8px;
+    overflow:hidden;background:#fff}
+  .ee-well img{position:absolute;inset:0;width:100%;height:100%;
+    object-fit:cover;display:block}
+  .ee-after{opacity:0}
+  /* The sweep is the mechanism, not decoration: the after frame is clipped to
+     the light's trailing edge, so the new background arrives *behind* the pass
+     rather than dissolving in everywhere at once. A plain crossfade reads as
+     two photos trading places; this reads as one photo being worked on. Band
+     and clip share a duration, delay and easing on purpose — the band's bright
+     edge sits ~80px ahead of the clip, so light lands just before the change
+     it causes. Retime one and the other has to follow or the light trails the
+     result it is supposed to produce. */
+  .ee-scan{position:absolute;top:0;bottom:0;width:190px;z-index:2;opacity:0;
+    pointer-events:none;mix-blend-mode:screen;
+    background:linear-gradient(90deg,rgba(95,216,115,0) 0%,rgba(95,216,115,.16) 42%,
+      rgba(216,255,110,.55) 76%,rgba(255,255,255,.92) 92%,rgba(255,255,255,0) 100%)}
+  .slide.active .ee-scan{animation:eeScan 1.45s var(--ease-in-out) 1.15s both}
+  .slide.active .ee-after{animation:eeSwap 1.45s var(--ease-in-out) 1.15s both}
+  @keyframes eeScan{0%{left:-190px;opacity:0}8%{opacity:1}
+    88%{opacity:1}100%{left:623px;opacity:0}}
+  @keyframes eeSwap{0%{opacity:1;clip-path:inset(0 100% 0 0)}
+    100%{opacity:1;clip-path:inset(0 0 0 0)}}
   .ee-pending{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
     background:repeating-linear-gradient(135deg,#101012 0,#101012 18px,#131316 18px,#131316 36px);
     color:#77787d;text-align:center;font-family:var(--cmono);font-size:13px;line-height:1.6;
     letter-spacing:.04em;text-transform:uppercase}
-  .ee-wipe{position:absolute;left:50%;top:0;bottom:0;width:2px;background:#fff;z-index:3;
-    box-shadow:0 0 28px rgba(255,255,255,.35);opacity:0}
-  .slide.active .ee-wipe{animation:eeWipe 1.1s var(--ease-in-out) .65s both}
-  @keyframes eeWipe{0%{left:8%;opacity:0}10%{opacity:1}90%{opacity:1}100%{left:92%;opacity:0}}
 
   /* Card 5 — the booth wall, laid out to storyboard frame 207:1131.
      Two rows of three, and the marks are *not* on a grid: the frame places
@@ -1563,53 +1598,55 @@
   .el-word{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
     font-size:27px;font-weight:620;letter-spacing:-.35px;color:#d9d9dc;white-space:nowrap}
 
-  /* Card 6 — the simple system view that closes card 1's story. */
-  .ei-wrap{position:absolute;inset:0;background:
-    radial-gradient(90% 80% at 50% 30%,rgba(31,34,51,.84),rgba(14,15,21,.58) 58%,rgba(9,9,9,0) 100%)}
-  .ei-head{top:128px}
-  .ei-sub{top:245px}
-  .ei-line{position:absolute;left:300px;top:590px;width:1320px;height:2px;background:#343640}
-  .ei-progress{position:absolute;left:0;top:0;height:100%;width:100%;background:#b6b7ff;
-    transform:scaleX(0);transform-origin:left center}
-  .slide.active .ei-progress{animation:eiProgress 2.8s var(--ease-in-out) .55s forwards}
-  @keyframes eiProgress{to{transform:scaleX(1)}}
-  .ei-file{position:absolute;left:-26px;top:-37px;width:74px;height:74px;border-radius:17px;
-    background:#fff;padding:7px;box-shadow:0 12px 36px rgba(0,0,0,.4)}
-  .ei-file img{width:100%;height:100%;object-fit:cover;border-radius:11px;display:block}
-  .slide.active .ei-file{animation:eiMove 2.8s var(--ease-in-out) .55s forwards}
-  @keyframes eiMove{to{transform:translateX(1272px)}}
-  .ei-step{position:absolute;top:-84px;translate:-50% 0;text-align:center}
-  .ei-step i{display:block;margin:0 auto 20px;width:14px;height:14px;border-radius:4px;
-    background:#17181e;border:2px solid #696c79;transition:background .2s,border-color .2s}
-  .ei-step b{font-family:var(--cmono);font-size:14px;font-weight:500;letter-spacing:.08em;
-    text-transform:uppercase;color:#a7a9b3}
-  .ei-s1{left:0}.ei-s2{left:50%}.ei-s3{left:100%}
-  .slide.active .ei-s1 i{animation:eiLit .3s ease .75s forwards}
-  .slide.active .ei-s2 i{animation:eiLit .3s ease 1.75s forwards}
-  .slide.active .ei-s3 i{animation:eiLit .3s ease 2.75s forwards}
-  @keyframes eiLit{to{background:#d8ff6e;border-color:#d8ff6e;box-shadow:0 0 24px rgba(216,255,110,.42)}}
-  .ei-logo{position:absolute;left:50%;top:720px;translate:-50% 0;width:360px;
-    opacity:0;transform:translateY(10px)}
-  .ei-logo svg{width:100%;height:auto;display:block}
-  .slide.active .ei-logo{animation:emIn .42s var(--ease-out) 3.1s forwards}
+  /* Card 6 — frame 218:1470. The rail is the frame's 989px flex row, including
+     its actual 8.14062px nodes and 308.719px line exports. The file travels on
+     a separate layer so translating it never disturbs that geometry. */
+  .ei-wrap{position:absolute;inset:0;background:#090909}
+  .ei-wrap .shd{--shd-y:180px}
+  .ei-rail{position:absolute;left:466px;top:701px;width:989px;height:49px;
+    display:flex;align-items:center}
+  .ei-step{flex:none;box-sizing:border-box;display:flex;align-items:center;justify-content:center;
+    padding:16px 32px;border:1px solid rgba(255,255,255,.09);border-radius:12px;
+    background:#090909;color:#9a9a9a;font-family:var(--cmono);font-size:11.502px;
+    line-height:normal;font-weight:400;text-transform:uppercase;white-space:nowrap;
+    transition:border-color .24s ease,background .24s ease,color .24s ease}
+  .ei-step[data-state="active"]{border-color:#414141;background:#111;color:#fff}
+  .ei-step[data-state="done"]{border-color:#2c2c2c;color:#c7c7c7}
+  .ei-connector{position:relative;min-width:0;flex:1;height:8.141px}
+  .ei-expanded{position:absolute;inset:0;display:flex;align-items:center}
+  .ei-collapsed{position:absolute;left:50%;top:50%;width:66.281px;height:8.141px;
+    transform:translate(-50%,-50%);opacity:0}
+  .ei-collapsed svg{display:block;width:66.281px;height:8.141px}
+  .ei-path-node{width:8.141px;height:8.141px;flex:none}
+  .ei-path-node svg{display:block;width:8.141px;height:8.141px}
+  .ei-path-line{height:1px;min-width:0;flex:1}
+  .ei-path-line svg{display:block;width:100%;height:1px}
+  .ei-expanded path{transition:fill .75s var(--ease-in-out)}
+  .ei-rail[data-phase="collapse"] .ei-step{border-color:#ffe7a0;color:#fff;
+    transition-duration:.75s}
+  .ei-rail[data-phase="collapse"] .ei-expanded path{fill:#ffcf3e}
 
-  /* Card 7 — warm sign-off. QR remains a visible placeholder until its URL is
-     confirmed, so this cut cannot accidentally ship the previous event's code. */
-  .eo-wrap{position:absolute;inset:0;background:
-    radial-gradient(62% 90% at 50% 58%,rgba(66,54,30,.24),rgba(9,9,9,0) 70%)}
-  .eo-logo{position:absolute;left:80px;top:72px;width:185px;opacity:.62}
-  .eo-logo svg{width:100%;height:auto;display:block}
-  .eo-title{position:absolute;left:180px;top:266px;width:1040px;font-size:112px;
-    line-height:.98;letter-spacing:-2.24px;font-weight:650;color:#fff}
-  .eo-sub{position:absolute;left:188px;top:548px;font-size:36px;color:#c7c7ca}
-  .eo-qr{position:absolute;right:224px;top:254px;width:310px;height:310px}
-  .eo-qr svg{width:100%;height:100%;display:block}
-  .eo-qr-pending{width:100%;height:100%;border:1px dashed #55565d;border-radius:20px;
-    display:flex;align-items:center;justify-content:center;text-align:center;
-    color:#77787e;font-family:var(--cmono);font-size:13px;line-height:1.6;
-    letter-spacing:.06em;text-transform:uppercase}
-  .eo-url{position:absolute;right:224px;top:590px;width:310px;text-align:center;
-    font-family:var(--cmono);font-size:12px;color:#66676d}
+  /* In Figma this file sits at 602,529. It stays 120x150 for its whole journey:
+     optimization changes the number, not the physical object. */
+  .ei-file{position:absolute;left:602px;top:529px;width:120px;height:150px;
+    z-index:2;opacity:0;will-change:transform}
+  .ei-card{position:absolute;inset:0;border-radius:12px;background:#0c0c0c;
+    overflow:hidden;box-shadow:0 16px 34px rgba(0,0,0,.32)}
+  .ei-photo-wrap{position:absolute;inset:0;border-radius:12px;overflow:hidden}
+  /* Figma's initial crop: a 1800x2400 source drawn at 118.06% x 125.93%,
+     -9.03% left. At Deliver it settles to a centred cover crop using only a
+     composite transform — no layout or paint on every frame. */
+  .ei-photo{position:absolute;left:-9.03%;top:.07%;width:118.06%;height:125.93%;
+    max-width:none;object-fit:cover;display:block;transform-origin:left top;
+    will-change:transform}
+  .ei-tag{position:absolute;top:6px;padding:4px 8px;border-radius:6px;background:#161616;
+    color:#fff;font-family:var(--cmono);font-size:12px;line-height:normal;font-weight:400}
+  .ei-format{left:6px}.ei-size{left:62px;min-width:42px;box-sizing:border-box;
+    text-align:center;font-variant-numeric:tabular-nums}
+  .ei-size[data-working="true"]{color:#d8ff6e}
+  .ei-lockup{position:absolute;left:791px;top:693px;width:339px;height:61px;
+    opacity:0;transform:scale(.94);z-index:2}
+  .ei-lockup svg{display:block;width:339px;height:61px}
 
   @media (prefers-reduced-motion:reduce){
     /* entrance choreography collapses to an instant jump to the settled state
@@ -1643,16 +1680,18 @@
     .ef-stage,.eb-card,.el-logo{transition:none!important;opacity:1!important;transform:none!important}
     .ef-upload .ef-photo,.ef-meter i,.ef-opt .ef-photo img,.ef-weight-bar,
     .ef-weight-copy .before,.ef-weight-copy .after,.ef-browser,.ef-fast,
-    .em-big,.em-small,.em-by,.ee-wipe,.ei-progress,.ei-file,.ei-step i,.ei-logo{
+    .em-big,.em-small,.em-by,.ee-scan,.ee-after{
       animation:none!important}
-    .ef-meter i,.ei-progress{transform:scaleX(1)!important}
+    /* card 4's payoff is the cleaned shot, so settle on it rather than on the
+       photo the card opens with; the light pass has nothing left to explain */
+    .ee-scan{opacity:0!important}
+    .ee-after{opacity:1!important;clip-path:none!important}
+    .ef-meter i{transform:scaleX(1)!important}
     .ef-opt .ef-photo img{filter:none!important}
     .ef-weight-bar{transform:scaleX(.32)!important;background:#5fd873!important}
     .ef-weight-copy .before{opacity:0!important}
-    .ef-weight-copy .after,.ef-browser,.ef-fast,.em-big,.em-small,.em-by,.ei-logo{
+    .ef-weight-copy .after,.ef-browser,.ef-fast,.em-big,.em-small,.em-by{
       opacity:1!important;transform:none!important}
-    .ei-file{transform:translateX(1272px)!important}
-    .ei-step i{background:#d8ff6e!important;border-color:#d8ff6e!important}
   }
 </style>
 </head>
@@ -1970,21 +2009,21 @@ const DEFAULT_DECK = {
       by:'Zephyr' },
 
     { type:'commerceEditor', duration:6,
-      heading:'Turn any photo into a catalog-ready product shot.' },
+      heading:'Turn any photo\ninto a catalog-ready product shot.' },
 
     { type:'commerceLogos', duration:5,
       title:'Trusted by',
       logos:'L\u2019Or\u00e9al, Crayola, Samsonite, GemPages, Shogun, Marko' },
 
     { type:'commerceInfrastructure', duration:6,
-      heading:'The infrastructure behind every product image.',
+      heading:'The infrastructure\nbehind every product image.',
       sub:'One integration. Upload, optimize, and deliver every image, and every other file.',
       steps:'Upload, Optimize, Deliver' },
 
-    { type:'commerceOutro', duration:4, layout:'outro',
+    { type:'commerceOutro', duration:10, layout:'outro',
       title:'Load faster,\nsell more.',
-      sub:'Come say hi \ud83d\udc4b',
-      qrConfirmed:false, qrLabel:'QR URL to confirm', booth:'' }
+      sub:'Come say hi \ud83d\udc4b\nand enter to win something!',
+      qr:true, qrConfirmed:false, qrLabel:'QR URL to confirm', booth:'' }
   ]
 };
 
@@ -2172,22 +2211,12 @@ const FEATURES = [
   { label:'Built-in\neditor',    icon:'editor',      ac:'#5978FF' },
 ];
 
-/* Ecommerce Expo card 2. Unlike the inherited capability art, these marks are
-   intentionally literal line icons: each one depicts the benefit named below
-   it and carries no abstract product vocabulary a passer-by has to decode. */
-const ECOM_ICONS = {
-  mobile: svgIcon('<rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M9 6h6M10 17l1.5 1.5L15 15"/>',1.7),
-  conversion: svgIcon('<path d="M4 18 10 12l4 4 6-9"/><path d="M15 7h5v5"/>',1.8),
-  peak: svgIcon('<path d="M3 20V5M3 20h18"/><path d="m6 16 4-5 3 3 5-8"/><path d="M16 6h2v2"/>',1.7),
-  handled: svgIcon('<path d="M5 11.5 10 16l9-10"/><path d="M12 2.7a9.3 9.3 0 1 0 9.3 9.3"/>',1.7),
-  stores: svgIcon('<path d="M3 9h18l-2-5H5L3 9Z"/><path d="M5 9v11h14V9M9 20v-6h6v6"/><path d="M3 9c0 2 3 2.5 4.5.5C9 11.5 12 11.5 12 9.5c0 2 3 2 4.5 0C18 11.5 21 11 21 9"/>',1.5),
-};
 const ECOM_BENEFITS = [
-  { benefit:'Fast on mobile',       feature:'Automatic image optimization', icon:'mobile',     ac:'#6f9bff' },
-  { benefit:'More conversions',     feature:'Lighter, faster pages',         icon:'conversion', ac:'#d8ff6e' },
-  { benefit:'Ready for peak season',feature:'Global CDN, scales with traffic',icon:'peak',       ac:'#c38cff' },
-  { benefit:'Nothing to maintain',  feature:'Upload to delivery, handled',   icon:'handled',    ac:'#61dc8b' },
-  { benefit:'Any store',            feature:'Works with any platform',       icon:'stores',     ac:'#ffae66' },
+  { benefit:'Fast on mobile',         feature:'Automatic image\noptimization', icon:'benefit-mobile' },
+  { benefit:'More conversions',       feature:'Lighter, faster pages',         icon:'benefit-conversions' },
+  { benefit:'Ready for\npeak session',feature:'Global CDN,\nscales with traffic',icon:'benefit-peak' },
+  { benefit:'Nothing to\nmaintain',   feature:'Upload to delivery,\nhandled',   icon:'benefit-maintain' },
+  { benefit:'Any\nstore',             feature:'Works with\nany platform',       icon:'benefit-store' },
 ];
 
 /* Ecommerce Expo card 5's wall: x, y, w, h per slot in reading order, straight
@@ -2337,12 +2366,12 @@ const R = {
   /* ---- Ecommerce Expo card 2: benefit over feature, five literal icons ---- */
   commerceBenefits(){
     const cards = ECOM_BENEFITS.map((f,i)=>`
-      <div class="eb-card" style="--i:${i};--ac:${f.ac}">
-        <div class="eb-icon">${ECOM_ICONS[f.icon]}</div>
+      <div class="eb-card" style="--i:${i}">
         <div class="eb-copy">
-          <div class="eb-benefit">${esc(f.benefit)}</div>
-          <div class="eb-feature">${esc(f.feature)}</div>
+          <div class="eb-benefit">${multiline(f.benefit)}</div>
+          <div class="eb-feature">${multiline(f.feature)}</div>
         </div>
+        <div class="eb-icon">${ECOMMERCE[f.icon]}</div>
       </div>`).join('');
     return `<div class="eb-wrap"><div class="eb-row">${cards}</div></div>`;
   },
@@ -2360,12 +2389,14 @@ const R = {
   /* ---- Ecommerce Expo card 4: real editor output only ---- */
   commerceEditor(s){
     const ready = !!(ECOMMERCE.editorBefore && ECOMMERCE.editorAfter);
-    const pane = (src,label)=>ready
-      ? `<div class="ee-pane"><img src="${esc(src)}" alt=""><span class="ee-pane-label">${label}</span></div>`
-      : `<div class="ee-pane"><div class="ee-pending">Genuine AI Image Editor<br>${label.toLowerCase()} asset needed</div><span class="ee-pane-label">${label}</span></div>`;
+    const well = ready
+      ? `<img src="${esc(ECOMMERCE.editorBefore)}" alt="">
+         <img class="ee-after" src="${esc(ECOMMERCE.editorAfter)}" alt="">
+         <i class="ee-scan"></i>`
+      : `<div class="ee-pending">Genuine AI Image Editor<br>before / after assets needed</div>`;
     return `<div class="ee-wrap">
-      <div class="ec-head reveal">${esc(s.heading||'')}</div>
-      <div class="ee-demo">${pane(ECOMMERCE.editorBefore,'Before')}${pane(ECOMMERCE.editorAfter,'Catalog ready')}<i class="ee-wipe"></i></div>
+      <div class="shd" style="--shd-y:203px"><div class="shd-t reveal">${multiline(s.heading||'')}</div></div>
+      <div class="ee-panel reveal d2"><div class="ee-well">${well}</div></div>
     </div>`;
   },
   /* ---- Ecommerce Expo card 5: the six booth-wall customers ---- */
@@ -2384,33 +2415,42 @@ const R = {
       ${marks}
     </div>`;
   },
-  /* ---- Ecommerce Expo card 6: system line, ending in the lockup ---- */
+  /* ---- Ecommerce Expo card 6: the file is the state that crosses the system ---- */
   commerceInfrastructure(s){
     const steps = (s.steps||'Upload, Optimize, Deliver').split(',').map(x=>x.trim());
+    const node = ECOMMERCE['infrastructure-node'];
+    const line = ECOMMERCE['infrastructure-line'];
+    const collapsed = ECOMMERCE['infrastructure-collapsed'];
+    const connector = `<div class="ei-connector" aria-hidden="true">
+      <span class="ei-expanded"><i class="ei-path-node">${node}</i><i class="ei-path-line">${line}</i><i class="ei-path-node">${node}</i></span>
+      <i class="ei-collapsed">${collapsed}</i>
+    </div>`;
     return `<div class="ei-wrap">
-      <div class="ec-head ei-head reveal">${esc(s.heading||'')}</div>
-      <div class="ec-sub ei-sub reveal d2">${esc(s.sub||'')}</div>
-      <div class="ei-line">
-        <i class="ei-progress"></i>
-        <div class="ei-file"><img src="${UI['thumb-flower']}" alt=""></div>
-        ${steps.slice(0,3).map((st,i)=>`<div class="ei-step ei-s${i+1}"><i></i><b>${esc(st)}</b></div>`).join('')}
+      <div class="shd">
+        <div class="shd-t reveal">${multiline(s.heading||'')}</div>
+        <div class="shd-s reveal d2">${esc(s.sub||'')}</div>
       </div>
-      <div class="ei-logo">${LOGO}</div>
+      <div class="ei-rail">
+        ${steps.slice(0,3).map((st,i)=>
+          `${i?connector:''}<div class="ei-step" data-state="idle">${esc(st)}</div>`).join('')}
+      </div>
+      <div class="ei-file">
+        <div class="ei-card">
+          <div class="ei-photo-wrap"><img class="ei-photo" src="${ECOMMERCE.infrastructureProduct}" alt=""></div>
+          <span class="ei-tag ei-format">PNG</span>
+          <span class="ei-tag ei-size">680KB</span>
+        </div>
+      </div>
+      <div class="ei-lockup">${ECOMMERCE['infrastructure-lockup']}</div>
     </div>`;
   },
-  /* ---- Ecommerce Expo card 7: human CTA; no inherited-event QR ---- */
+  /* ---- Ecommerce Expo card 7: reuse the proven Webflow board outro ----
+     Frame 219:1638 is the same composition and geometry; only its title and
+     sign-off belong to Ecommerce Expo. qrConfirmed stays separate from `qr`:
+     the current code is a visible mockup placeholder, not a confirmed event
+     destination. */
   commerceOutro(s){
-    const qr = s.qrConfirmed
-      ? QR
-      : `<div class="eo-qr-pending">${esc(s.qrLabel||'QR URL to confirm')}</div>`;
-    return `<div class="eo-wrap">
-      <div class="eo-logo">${LOGO}</div>
-      <div class="eo-title reveal">${multiline(s.title||'')}</div>
-      <div class="eo-sub reveal d2">${emojiHTML(s.sub||'','hb-wave')}</div>
-      <div class="eo-qr">${qr}</div>
-      <div class="eo-url">${s.qrConfirmed?'Scan to learn more':esc(s.qrLabel||'')}</div>
-      ${s.booth?`<div class="ec-kicker" style="position:absolute;left:188px;top:640px">Booth ${esc(s.booth)}</div>`:''}
-    </div>`;
+    return R.board({...s,layout:'outro',globe:true,float:true,qr:s.qr!==false});
   },
   /* ---- card 1: the real uploader widget, files dragged in and dropped ---- */
   dropin(s){
@@ -3284,13 +3324,29 @@ function typeMeta(metaEl, spec, speed, tl){
 
 function setupBoard(slideEl, sd, tl){
   const globe = slideEl.querySelector('.hb-globe');
+  const mark = slideEl.querySelector('.hb-mark');
+  const dots = [...slideEl.querySelectorAll('.hb-dot')];
+  const nodes = [...slideEl.querySelectorAll('.hb-node')];
+
+  // CSS loops need teardown just as much as Timeline timers do. The board was
+  // previously absent from the default Expo deck, so its unscoped classes
+  // could remain harmlessly dormant; using it as card 7 exposed that all 48
+  // sparkle animations stayed alive after exit and accumulated each loop.
+  const stopMotion = ()=>{
+    globe && globe.classList.remove('spin');
+    mark && mark.classList.remove('twinkle');
+    dots.forEach(d=>d.classList.remove('pulse'));
+    nodes.forEach(n=>n.classList.remove('float'));
+  };
+  stopMotion();                    // reset a prior visit before rebuilding it
+  tl.onKill(stopMotion);
+
   if (globe && sd.globe!==false && !REDUCED) globe.classList.add('spin');
 
   /* Sparkle the centre glyph: every pixel gets its own slow cycle, its own
      phase and its own floor and ceiling, so the mark shimmers without any of
      it reading as a pulse. Negative delays start each square mid-cycle, which
      is what stops all 47 of them lifting together on the first beat. */
-  const mark = slideEl.querySelector('.hb-mark');
   if (mark && !REDUCED){
     const rnd = (a,b)=>a + Math.random()*(b-a);
     mark.querySelectorAll('path').forEach(px=>{
@@ -3303,11 +3359,10 @@ function setupBoard(slideEl, sd, tl){
   }
 
   const floatOn = sd.float!==false && !REDUCED;
-  const dots = slideEl.querySelectorAll('.hb-dot');
   if (floatOn) dots.forEach(d=>d.classList.add('pulse'));
 
   const fdur = {n1:9.5, n2:8, n3:11, n4:8.8};
-  slideEl.querySelectorAll('.hb-node').forEach(node=>{
+  nodes.forEach(node=>{
     const key = node.dataset.meta;
     const spec = BOARD_META[key];
     const metaEl = node.querySelector('.hb-meta');
@@ -3597,6 +3652,140 @@ function setupDropin(slideEl, sd, tl){
   // uploaded, both ticked — was the one thing you did not get to look at, and
   // it left the card empty for the rest of its slot. The card's duration is
   // set to hold this frame for a beat and then cut; see DEFAULT_DECK.
+}
+
+/* ---------------- card 6: upload -> optimize -> deliver ----------------
+   The file itself carries the story across the frame's rail. At Optimize its
+   displayed weight counts down but the 120x150 card does not resize. The crop
+   waits until the file has stopped at Deliver, so the reframing is its own
+   readable beat instead of being swallowed by travel. Once delivered, the
+   file leaves, the 989px rail contracts and warms to yellow like frame
+   219:1578, then hands over to frame 219:1612's 339x61 lockup. */
+function setupCommerceInfrastructure(slideEl, sd, tl){
+  const file  = slideEl.querySelector('.ei-file');
+  const photo = slideEl.querySelector('.ei-photo');
+  const size  = slideEl.querySelector('.ei-size');
+  const rail  = slideEl.querySelector('.ei-rail');
+  const lockup = slideEl.querySelector('.ei-lockup');
+  const steps = [...slideEl.querySelectorAll('.ei-step')];
+  const expanded = [...slideEl.querySelectorAll('.ei-expanded')];
+  const collapsed = [...slideEl.querySelectorAll('.ei-collapsed')];
+  if (!file || !photo || !size || !rail || !lockup || steps.length < 3) return;
+
+  // Measure from layout coordinates only. The stage is CSS-scaled to the
+  // viewport; getBoundingClientRect() would return screen pixels and make the
+  // travel too short on a laptop.
+  const fileCentre = file.offsetLeft + file.offsetWidth/2;
+  const centreOf = step => rail.offsetLeft + step.offsetLeft + step.offsetWidth/2;
+  const atStep = step => Math.round((centreOf(step) - fileCentre)*100)/100;
+  const OPT = atStep(steps[1]);
+  const DELIVER = atStep(steps[2]);
+  const COMPACT_W = steps.reduce((n,s)=>n+s.offsetWidth,0) + 2*66.281;
+  const COMPACT_X = (1920-COMPACT_W)/2;
+
+  // Reset synchronously: on a second loop the DOM still holds the previous
+  // visit's logo and collapsed rail until this score is built.
+  file.style.opacity = '0';
+  file.style.transform = 'translate(0px,10px)';
+  photo.style.transform = 'none';
+  size.textContent = '680KB';
+  size.dataset.working = 'false';
+  rail.style.left = '466px';
+  rail.style.width = '989px';
+  rail.style.opacity = '1';
+  rail.dataset.phase = 'travel';
+  expanded.forEach(e=>e.style.opacity='1');
+  collapsed.forEach(e=>e.style.opacity='0');
+  lockup.style.opacity = '0';
+  lockup.style.transform = 'scale(.94)';
+  steps.forEach(s=>s.dataset.state='idle');
+
+  const countTo = (from, to, ms) => {
+    if (REDUCED){
+      size.textContent = `${to}KB`;
+      size.dataset.working = 'false';
+      return;
+    }
+    const started = performance.now();
+    size.dataset.working = 'true';
+    const tick = ()=>{
+      const p = Math.min(1, (performance.now()-started)/ms);
+      const eased = 1-Math.pow(1-p,3);
+      size.textContent = `${Math.round(from+(to-from)*eased)}KB`;
+      if (p < 1) tl.timeout(16, tick);
+      else size.dataset.working = 'false';
+    };
+    tick();
+  };
+
+  const APPEAR=.35, MOVE_OPT=.70, AT_OPT=1.55;
+  const MOVE_DELIVER=2.35, AT_DELIVER=3.20;
+  const CROP=3.32, CROPPED=3.82, FILE_OUT=3.94;
+  const COLLAPSE=4.22, COMPACT=4.97, LOGO=5.02;
+  tl.at(APPEAR, ()=>steps[0].dataset.state='active');
+  tl.to(file, [{opacity:0,transform:'translate(0px,10px)'},
+               {opacity:1,transform:'translate(0px,0px)'}],
+        {at:APPEAR, dur:.28, fill:'forwards'});
+
+  tl.to(file, [{transform:'translate(0px,0px)'},
+               {transform:`translate(${OPT}px,0px)`}],
+        {at:MOVE_OPT, dur:AT_OPT-MOVE_OPT, ease:EASE.inOut, fill:'forwards'});
+  tl.at(AT_OPT, ()=>{
+    steps[0].dataset.state='done';
+    steps[1].dataset.state='active';
+    countTo(680,118,700);
+  });
+
+  tl.to(file, [{transform:`translate(${OPT}px,0px)`},
+               {transform:`translate(${DELIVER}px,0px)`}],
+        {at:MOVE_DELIVER, dur:AT_DELIVER-MOVE_DELIVER, ease:EASE.inOut, fill:'forwards'});
+  tl.at(AT_DELIVER, ()=>{
+    steps[1].dataset.state='done';
+    steps[2].dataset.state='active';
+  });
+
+  // Travel is completely over before this begins. Figma's initial
+  // 141.67x188.90 image at (-10.84,0.1) becomes a centred 120x160 cover crop.
+  tl.to(photo, [{transform:'translate(0px,0px) scale(1)'},
+                {transform:'translate(10.84px,-5px) scale(.847)'}],
+        {at:CROP, dur:CROPPED-CROP, ease:EASE.inOut, fill:'forwards'});
+
+  // Delivery consumes the file. It fades in place rather than shrinking —
+  // shrinking would reintroduce the exact size change the card has just
+  // stopped using as an optimization metaphor.
+  tl.to(file, [{opacity:1,transform:`translate(${DELIVER}px,0px)`},
+               {opacity:0,transform:`translate(${DELIVER}px,-6px)`}],
+        {at:FILE_OUT, dur:.28, ease:EASE.out, fill:'forwards'});
+
+  // The wide path contracts to the compact frame 219:1578 layout while its
+  // neutral strokes warm to yellow. The exact collapsed 66.281px connector
+  // replaces the expanded node/line/node construction during the contraction.
+  tl.at(COLLAPSE, ()=>{ rail.dataset.phase='collapse'; });
+  tl.to(rail, [{left:'466px',width:'989px'},
+               {left:`${COMPACT_X}px`,width:`${COMPACT_W}px`}],
+        {at:COLLAPSE, dur:COMPACT-COLLAPSE, ease:EASE.inOut, fill:'forwards'});
+  expanded.forEach(e=>tl.to(e,[{opacity:1},{opacity:0}],
+        {at:COLLAPSE+.18,dur:.42,fill:'forwards'}));
+  collapsed.forEach(e=>tl.to(e,[{opacity:0},{opacity:1}],
+        {at:COLLAPSE+.18,dur:.42,fill:'forwards'}));
+
+  // Compact system out, brand answer in. Their centres are identical, so it
+  // reads as the rail resolving into Uploadcare rather than as a new element
+  // appearing elsewhere.
+  tl.to(rail,[{opacity:1},{opacity:0}],
+        {at:LOGO,dur:.30,ease:EASE.out,fill:'forwards'});
+  tl.to(lockup,[{opacity:0,transform:'scale(.94)'},
+                {opacity:1,transform:'scale(1)'}],
+        {at:LOGO+.02,dur:.38,ease:EASE.out,fill:'forwards'});
+
+  // Keep the final lockup through the outgoing slide crossfade after kill().
+  tl.at(LOGO+.42, ()=>{
+    file.style.opacity='0';
+    rail.style.opacity='0';
+    lockup.style.opacity='1';
+    lockup.style.transform='scale(1)';
+    size.textContent='118KB';
+  });
 }
 
 /* ---------------- the analysis grid ----------------
@@ -4178,7 +4367,7 @@ function enter(i){
 
   // the board card runs its own globe and dots; the ambient blips would only
   // duplicate that vocabulary, so the substrate steps aside there
-  stageEl.classList.toggle('sb-off', sd.type==='board');
+  stageEl.classList.toggle('sb-off', sd.type==='board' || sd.type==='commerceOutro');
 
   // fit oversized headlines (measure counters at their final value)
   cur.querySelectorAll('.count').forEach(el=>{
@@ -4193,12 +4382,13 @@ function enter(i){
   cur.querySelectorAll('canvas.lg-canvas').forEach(startMosaic);
   cur.querySelectorAll('canvas.rv-canvas').forEach(c=>startPixelReveal(c, cur.querySelector('.rv-photo')));
   if (sd.type==='logoAnim') animateLogo(cur);
-  if (sd.type==='board') setupBoard(cur, sd, tl);
+  if (sd.type==='board' || sd.type==='commerceOutro') setupBoard(cur, sd, tl);
   if (sd.type==='code') setupCode(cur, sd, tl);
   if (sd.type==='upload') setupUpload(cur, sd);
   if (sd.type==='install') setupInstall(cur, sd, tl);
   if (sd.type==='pipeline') setupPipeline(cur, sd, tl);
   if (sd.type==='dropin') setupDropin(cur, sd, tl);
+  if (sd.type==='commerceInfrastructure') setupCommerceInfrastructure(cur, sd, tl);
   tl.play();
 
   // timing
@@ -4294,7 +4484,7 @@ function fieldsFor(s, i){
       <label class="f"><span>Headline</span><textarea data-f="heading">${esc(s.heading||'')}</textarea></label>
       <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">Three fast beats: upload, visibly reduce file weight, then land on a crisp product page. The product image currently reuses the flower asset from the uploader demo.</p>`;
     case 'commerceBenefits': return dur+`
-      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">Five benefit/feature pairs and literal icons live in ECOM_BENEFITS and ECOM_ICONS in the template.</p>`;
+      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">Laid out to Figma frame 212:1213. Copy and reading order live in ECOM_BENEFITS; the five required 48px SVGs live in assets/ecommerce/benefit-*.svg.</p>`;
     case 'commerceMetric': return dur+`
       <label class="f"><span>Proof point</span><input type="text" data-f="value" value="${esc(s.value||'')}"></label>
       <label class="f"><span>Supporting line</span><input type="text" data-f="line" value="${esc(s.line||'')}"></label>
@@ -4302,7 +4492,7 @@ function fieldsFor(s, i){
       <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">Laid out to Figma frame 204:1081. Attribution looks up assets/logos via the name in this field (currently zephyr.svg).</p>`;
     case 'commerceEditor': return dur+`
       <label class="f"><span>Headline</span><textarea data-f="heading">${esc(s.heading||'')}</textarea></label>
-      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">Asset status: ${ECOMMERCE.editorBefore&&ECOMMERCE.editorAfter?'ready':'waiting for assets/ecommerce/editor-before.jpg and editor-after.jpg'}. This card never simulates editor output with CSS.</p>`;
+      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">Laid out to Figma frame 213:1313 — one 641&times;473 well, the background swapped in place behind a light pass. Asset status: ${ECOMMERCE.editorBefore&&ECOMMERCE.editorAfter?'ready':'waiting for assets/ecommerce/editor-before and editor-after'}. The pair must be the same crop or the wipe becomes a jump cut, and this card never simulates editor output with CSS.</p>`;
     case 'commerceLogos': return dur+`
       <label class="f"><span>Small title (optional)</span><input type="text" data-f="title" value="${esc(s.title||'')}"></label>
       <label class="f"><span>Logo names (comma-separated)</span><textarea data-f="logos">${esc(s.logos||'')}</textarea></label>
@@ -4310,13 +4500,15 @@ function fieldsFor(s, i){
     case 'commerceInfrastructure': return dur+`
       <label class="f"><span>Headline</span><textarea data-f="heading">${esc(s.heading||'')}</textarea></label>
       <label class="f"><span>Supporting line</span><textarea data-f="sub">${esc(s.sub||'')}</textarea></label>
-      <label class="f"><span>Steps (three, comma-separated)</span><input type="text" data-f="steps" value="${esc(s.steps||'')}"></label>`;
+      <label class="f"><span>Steps (three, comma-separated)</span><input type="text" data-f="steps" value="${esc(s.steps||'')}"></label>
+      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">Frames 218:1470 → 219:1578 → 219:1612. The 120×150 file travels Upload → Optimize → Deliver while its displayed size counts 680KB → 118KB. Once stationary, it re-crops, disappears, and the rail contracts through yellow into the 339×61 Uploadcare lockup.</p>`;
     case 'commerceOutro': return dur+`
       <label class="f"><span>Headline (line breaks allowed)</span><textarea data-f="title">${esc(s.title||'')}</textarea></label>
-      <label class="f"><span>Sign-off</span><input type="text" data-f="sub" value="${esc(s.sub||'')}"></label>
+      <label class="f"><span>Sign-off (line breaks allowed)</span><textarea data-f="sub">${esc(s.sub||'')}</textarea></label>
       <label class="f"><span>Booth number (blank until confirmed)</span><input type="text" data-f="booth" value="${esc(s.booth||'')}"></label>
-      <label class="chk"><input type="checkbox" data-f="qrConfirmed" ${s.qrConfirmed?'checked':''}> QR destination confirmed — show QR</label>
-      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">The inherited Webflow-event QR is suppressed until the Ecommerce Expo destination is confirmed. Add raffle/swag copy only when confirmed.</p>`;
+      <label class="chk"><input type="checkbox" data-f="qr" ${s.qr!==false?'checked':''}> Show placeholder QR</label>
+      <label class="chk"><input type="checkbox" data-f="qrConfirmed" ${s.qrConfirmed?'checked':''}> QR destination confirmed</label>
+      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">Frame 219:1638 reuses the complete Webflow board/outro composition: globe, four corner files and telemetry, sparkle glyph, wave and QR. The QR and “something” giveaway line are visible mockup placeholders until their event details are confirmed.</p>`;
     case 'statement': return dur+`
       <label class="f"><span>Kicker (optional small label)</span><input type="text" data-f="kicker" value="${esc(s.kicker||'')}"></label>
       <label class="f"><span>Heading</span><textarea data-f="heading">${esc(headText(s))}</textarea></label>
@@ -4556,10 +4748,10 @@ const NEW = {
   commerceFlow:{type:'commerceFlow',duration:5,heading:'Every product image, optimized and fast. Automatically.'},
   commerceBenefits:{type:'commerceBenefits',duration:6},
   commerceMetric:{type:'commerceMetric',duration:6,value:'2x faster page loads',line:'faster pages, more sales',by:'Zephyr'},
-  commerceEditor:{type:'commerceEditor',duration:6,heading:'Turn any photo into a catalog-ready product shot.'},
+  commerceEditor:{type:'commerceEditor',duration:6,heading:'Turn any photo\ninto a catalog-ready product shot.'},
   commerceLogos:{type:'commerceLogos',duration:5,title:'Trusted by',logos:'L\u2019Or\u00e9al, Crayola, Samsonite, GemPages, Shogun, Marko'},
-  commerceInfrastructure:{type:'commerceInfrastructure',duration:6,heading:'The infrastructure behind every product image.',sub:'One integration. Upload, optimize, and deliver every image, and every other file.',steps:'Upload, Optimize, Deliver'},
-  commerceOutro:{type:'commerceOutro',duration:4,layout:'outro',title:'Load faster,\nsell more.',sub:'Come say hi \ud83d\udc4b',qrConfirmed:false,qrLabel:'QR URL to confirm',booth:''},
+  commerceInfrastructure:{type:'commerceInfrastructure',duration:6,heading:'The infrastructure\nbehind every product image.',sub:'One integration. Upload, optimize, and deliver every image, and every other file.',steps:'Upload, Optimize, Deliver'},
+  commerceOutro:{type:'commerceOutro',duration:10,layout:'outro',title:'Load faster,\nsell more.',sub:'Come say hi \ud83d\udc4b\nand enter to win something!',qr:true,qrConfirmed:false,qrLabel:'QR URL to confirm',booth:''},
   statement:{type:'statement',duration:8,kicker:'',heading:'Your headline goes here.',line2mono:false},
   number:{type:'number',duration:8,kicker:'',prefix:'',value:100,decimals:0,suffix:'+',label:'describe the number'},
   chart:{type:'chart',duration:11,big:'10X',label:'what grew',startLabel:'1%',endLabel:'10%',points:'1,2,2.5,4,6,7,9,10'},

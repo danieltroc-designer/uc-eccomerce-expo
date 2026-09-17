@@ -1,4 +1,7 @@
-"""Measure card 7 against the storyboard frame it was rebuilt from (184:5666).
+"""Measure card 7 against Ecommerce frame 219:1638.
+
+That frame deliberately reuses the Webflow storyboard composition (184:5666),
+so the geometry below remains the same while the title and sign-off change.
 
 Also checks the two things that are easy to get wrong here and invisible in a
 still: that the wireframe globe is fully on stage rather than clipped, and that

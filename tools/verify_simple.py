@@ -20,7 +20,7 @@ SHOTS = {
     0: [450, 1200, 1800, 2600, 4200],  # upload → optimize → store
     1: [250, 700, 1400, 3000],         # benefit row lands
     2: [250, 700, 1400, 2200],         # headline, then Zephyr mark
-    3: [300, 900, 1900],               # editor wipe / asset state
+    3: [300, 1100, 1700, 2100, 3200],  # before → light pass → cleaned shot
     4: [250, 650, 1100],               # six-logo sweep
     5: [700, 1800, 2900, 3800],        # upload → optimize → deliver → logo
     6: [400, 1400, 3000],              # booth CTA

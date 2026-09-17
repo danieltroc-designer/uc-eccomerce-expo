@@ -164,25 +164,48 @@ def encode_demo() -> str:
 
 
 def encode_ecommerce() -> str:
-    """Inline optional Ecommerce Expo photography when supplied.
+    """Inline Ecommerce Expo photography and card-specific vector art.
 
-    These assets are deliberately optional during layout work. Card 4 must use
+    Photography is deliberately optional during layout work. Card 4 must use
     genuine AI Image Editor output, so the template renders an explicit
     asset-needed state until both files exist instead of manufacturing a fake
-    before/after in CSS.
+    before/after in CSS. Cards 2 and 6 use required Figma exports: card 2's
+    accent colours are baked into its five icons, while card 6's product image,
+    expanded rail, 66.281px collapsed connector and 339x61 final lockup are its
+    actual frame assets.
     """
-    files = {
-        "product": "product.jpg",
-        "editorBefore": "editor-before.jpg",
-        "editorAfter": "editor-after.jpg",
+    # stems, not filenames: remove_bg always returns PNG, while the source photo
+    # and the catalog shot are usually JPG, so the extension is not knowable here
+    stems = {
+        "product": "product",
+        "editorBefore": "editor-before",
+        "editorAfter": "editor-after",
+        "infrastructureProduct": "infrastructure-product",
     }
     out = {}
-    for key, name in files.items():
-        path = ECOMMERCE / name
-        if not path.exists():
+    for key, stem in stems.items():
+        found = [p for ext in (".png", ".jpg", ".jpeg")
+                 if (p := ECOMMERCE / f"{stem}{ext}").exists()]
+        if not found:
             continue
+        path = found[0]
         mime = "image/png" if path.suffix.lower() == ".png" else "image/jpeg"
         out[key] = f"data:{mime};base64," + base64.b64encode(path.read_bytes()).decode()
+    for key in ("mobile", "conversions", "peak", "maintain", "store"):
+        path = ECOMMERCE / f"benefit-{key}.svg"
+        if not path.exists():
+            raise SystemExit(f"ERROR: required Ecommerce Expo icon missing: {path}")
+        out[f"benefit-{key}"] = inline_svg(path)
+    for key in ("node", "line", "collapsed", "lockup"):
+        path = ECOMMERCE / f"infrastructure-{key}.svg"
+        if not path.exists():
+            raise SystemExit(f"ERROR: required Ecommerce Expo path asset missing: {path}")
+        out[f"infrastructure-{key}"] = inline_svg(path)
+    if "infrastructureProduct" not in out:
+        raise SystemExit(
+            f"ERROR: required Ecommerce Expo product image missing: "
+            f"{ECOMMERCE / 'infrastructure-product.png'}"
+        )
     return json.dumps(out)
 
 

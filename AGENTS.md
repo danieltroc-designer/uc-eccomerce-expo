@@ -40,12 +40,32 @@ own source + build + output and is fully independent of the main deck:
   `pipeline`). Card 7 is a `board` slide with `layout:'outro'`.
 - Build: `python build_simple.py` → `dist/uploadcare-simple.html`.
 - Same rule applies: never hand-edit `dist/uploadcare-simple.html`.
-- Current default sequence is 5/6/6/6/5/6/4 seconds (38 seconds total):
+- Current default sequence is 5/6/6/6/5/6/10 seconds (44 seconds total):
   product flow, benefits, Zephyr proof point, AI Editor, customer logos,
   infrastructure, booth CTA.
 - Optional event imagery is auto-inlined from `assets/ecommerce/`; see its
-  README for exact filenames. Card 4 intentionally stays in an asset-needed
-  state until genuine editor before/after files exist.
+  README for exact filenames. Card 4 renders an explicit asset-needed state
+  unless *both* editor frames exist, so there is no way to half-ship it.
+
+Ecommerce card 4 is the AI Image Editor swap, laid out to frame 213:1313: a
+641x473 plate at (640,485) whose 1px rule and 8px pad are border-box, leaving
+the well at exactly 623x455 — the pixel size of the exports, so neither frame
+is ever resampled. The current pair is explicitly a layout/motion placeholder;
+replace it with a confirmed editor example before the event. Two things about
+the implementation are load bearing:
+
+- **It is a wipe, not a crossfade, and that is a claim about the assets.** The
+  after frame is clipped to the sweep's trailing edge, so the new background
+  arrives *behind* the light rather than dissolving in everywhere at once. That
+  only reads as "the background changed" because the two exports register on
+  the product: `tools/check_editor.py` cross-correlates the silhouettes and
+  fails unless the best offset is (0,0). Re-export the pair together or the
+  swap becomes a jump cut. The band and the clip share a duration, delay and
+  easing so the light lands just before the change it causes; retime one and
+  the other has to follow.
+- **Measure geometry after `.reveal` settles.** The plate wears `reveal d2`,
+  which animates `transform`, so a panel sampled mid-entrance reads ~16px low
+  and the frame's y looks wrong when only the animation is unfinished.
 - `encode_logos()` scans `assets/logos/*.svg`; new customer marks require no
   build-script registration. Card 3 (the Zephyr proof point) is laid out to
   Figma frame 204:1081: the shared `.shd` headline sits at `--shd-y:380px` and
@@ -55,6 +75,27 @@ own source + build + output and is fully independent of the main deck:
   places them optically (row 2's vertical centres differ by 15px) and six
   wordmarks of unequal weight at one shared width read as ragged. Order in the
   slide's `logos` field fills those slots in reading order.
+- Ecommerce Card 2 comes from frame 212:1213: a fixed 1389×361 row at
+  (266,359.5), made from five 265px panels and 16px gutters. Each panel is
+  `justify-between`, which pins its 96px icon well to (41,224) while keeping
+  the two-line copy at (41,41). Its five 48px icons are the frame's real SVG
+  exports under `assets/ecommerce/benefit-*.svg`; their accent colours are
+  baked into the art, and `encode_ecommerce()` deliberately fails if one is
+  missing rather than silently substituting an approximation.
+- Ecommerce Card 6 comes from frame 218:1470. Its 989px rail is pinned at
+  (466,701) and uses Figma's real 8.14062px endpoint and 308.719px line SVGs.
+  The 120x150 file opens at (602,529), moves to the exact optical centres of
+  Optimize and Deliver, and counts 680KB down to 118KB while staying exactly
+  120x150. The delivery crop starts only after travel stops; combining the two
+  made the reframing disappear inside the larger motion. It turns the export's
+  141.67x188.90 image at (-10.84,0.1) into a centred 120x160 cover crop using
+  `translate(10.84px,-5px) scale(.847)`. After that the file fades without
+  shrinking, the rail contracts to frame 219:1578's centred 475px yellow state
+  using its exact 66.281px connector exports, and hands over to frame
+  219:1612's 339x61 lockup at (791,693). `tools/check_infrastructure.py`
+  asserts every beat and the rail geometry. Target distances are calculated
+  from `offsetLeft`/`offsetWidth`, never screen-space rects, so the file still
+  lands correctly when the 1920px stage is scaled on a laptop.
 - `build_simple.py` reuses every encoder from `build.py` and adds six tokens
   of its own: `__QR_SVG__` (the booth QR, vectorised out of
   `assets/qr/booth-qr.png` — see card 7 below), `__LOGOS_JSON__` (the marks
@@ -303,7 +344,9 @@ Webflow – 2"). Three conventions come from there and are worth keeping:
 
 ### Card 7, the outro
 
-Laid out to storyboard frame 184:5666. Four things about it are deliberate:
+Ecommerce frame 219:1638 deliberately reuses the Webflow storyboard frame
+184:5666 composition and its existing renderer. Four things about it are
+deliberate:
 
 - **The centre line is pinned, not stacked.** Lockup, headline, glyph and
   sign-off each sit at their own `top` from the frame, because the glyph lands
@@ -321,9 +364,10 @@ Laid out to storyboard frame 184:5666. Four things about it are deliberate:
   greys between roughly 20% and 100% of `#454545`. The mark keeps its `#090909`
   pad, which knocks the wireframe's crossing lines out from behind it.
 - **The sign-off is two lines and carries the booth QR.** `Come say hi 👋` runs
-  on over `and enter to win LEGO Polaroid Camera Building Set`, both at the
-  frame's 1.065 leading. The QR under it is pinned at `857,711`, not stacked,
-  for the same reason the rest of the column is.
+  on over the current Figma placeholder `and enter to win something!`, both at
+  the frame's 1.065 leading. Neither the giveaway nor destination is confirmed
+  Expo copy yet. The QR under it is pinned at `857,711`, not stacked, for the
+  same reason the rest of the column is.
   - **The destination lives in the artwork, not in a constant.** `make_qr()`
     reads `assets/qr/booth-qr.png` — design's black-on-white export — recovers
     its module grid via `tools/qr_lib.py` and re-emits it as white vector
