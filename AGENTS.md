@@ -40,9 +40,10 @@ own source + build + output and is fully independent of the main deck:
   `pipeline`). Card 7 is a `board` slide with `layout:'outro'`.
 - Build: `python build_simple.py` → `dist/uploadcare-simple.html`.
 - Same rule applies: never hand-edit `dist/uploadcare-simple.html`.
-- Current default sequence is 5/6/6/6/5/6/10 seconds (44 seconds total):
-  product flow, benefits, Zephyr proof point, AI Editor, customer logos,
-  infrastructure, booth CTA.
+- Current default sequence is 10/6/6/6/5/6/10 seconds (49 seconds total):
+ product flow, benefits, Zephyr proof point, AI Editor, customer logos,
+ infrastructure, booth CTA. Card 1 holds the longest slot with card 7 because
+ it is the only card that demonstrates a process rather than stating a fact.
 - Optional event imagery is auto-inlined from `assets/ecommerce/`; see its
   README for exact filenames. Card 4 renders an explicit asset-needed state
   unless *both* editor frames exist, so there is no way to half-ship it.
@@ -207,6 +208,33 @@ the zone lights from `springCrossing()` when the pointer actually enters it.
 After the large widget confirms “1 file added,” it hands over to the compact
 one-file progress panel, whose ring completes before the right cell resolves
 the frame's two telemetry lines.
+
+**Card 1 is paced for a stand, not for a browser tab, and that is what the 10s
+slot is for.** Everything in it was once sized like UI feedback, which put the
+whole five-step story inside 3.2s and left the `-97%` claim readable for about
+200ms. Phase 1 now runs ~7s. Three numbers carry that and should not be
+quietly trimmed: the upload ring fills over **1.45s** (at .55s it read as the
+card skipping the upload), "1 file added" **holds ~.6s** before the widget
+hands over, and the finished readout **holds ~1.3s** before the storefront
+starts replacing it. The three compliance marks now come up with the card at
+~1s and never fade — the storefront's page covers their strip at y≈1015, so
+they are occluded rather than dimmed, which is why there is no badge exit
+tween any more. Do not reintroduce one: fading them while the browser is
+opening is visible as a dim, since the clip only reaches their row late in the
+reveal.
+
+Two handovers on this card are deliberately *not* straight crossfades, for the
+reason the install card's label swap documents below — two elements of very
+different size dissolving through each other read as both at once:
+
+- **Widget → compact panel.** The widget leaves first (220ms, collapsing to
+ `scale(.94)` under 2px of blur) and the row arrives at +120ms, where the
+ widget's opacity is already under .05. Peak co-visibility is ~.01. The offset
+ is measured: later and the cell blinks empty, earlier and you read a 400px
+ uploader over a 52px row.
+- **"Upload image" → the product photo.** The placeholder leaves on its own
+ (180ms) and the photo starts 140ms later. Run together — as they were — the
+ words stay legible over the incoming shot for ~160ms.
 
 The payoff is Figma frame 234:1415: a 1252x814 browser at (334,426), deliberately
 extending below the stage, with the same source photo in its exact 561x590

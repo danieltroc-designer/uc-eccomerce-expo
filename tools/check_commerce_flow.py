@@ -97,7 +97,8 @@ def main():
             check("upload ring resets empty", early["dash"] > 57,
                   f"dash {early['dash']:.1f}")
 
-            pg.wait_for_timeout(4000)
+            # the storefront settles at ~8.1s on the booth-paced score
+            pg.wait_for_timeout(8600)
             late = read(pg)
             check("compact upload panel completes",
                   late["panelOpacity"] > .98 and late["dash"] < 1,

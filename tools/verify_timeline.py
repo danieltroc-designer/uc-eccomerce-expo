@@ -71,7 +71,7 @@ with sync_playwright() as p:
 
     print("re-entering card 1 replays it from the top")
     pg.evaluate("enter(0)")
-    pg.wait_for_timeout(1500)
+    pg.wait_for_timeout(5200)          # the 1.45s upload ring completes at ~4.4s
     late = pg.evaluate("""parseFloat(getComputedStyle(
         document.querySelector('.ef-uaction .di-ring .arc')).strokeDashoffset)""")
     pg.evaluate("enter(1)"); pg.wait_for_timeout(150)

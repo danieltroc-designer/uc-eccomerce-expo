@@ -2093,14 +2093,16 @@ function Timeline({reduced=false}={}){
 }
 
 /* ---------------- default deck ---------------- */
-/* ---- Ecommerce Expo — 38-second, seven-card booth loop ----------------
-   Product image in, faster storefront out; benefits and proof; one focused AI
-   Editor demonstration; customer trust; then the system view and booth CTA.
-   Durations are the brief's exact 5/6/6/6/5/6/4 seconds. */
+/* ---- Ecommerce Expo — 49-second, seven-card booth loop ----------------
+   Product image in, storefront out; benefits and proof; one focused AI Editor
+   demonstration; customer trust; then the system view and booth CTA.
+   Durations are 10/6/6/6/5/6/10 seconds. Card 1 carries the longest slot on
+   purpose: it is the only card that demonstrates a process rather than stating
+   a fact, and every beat in it has to be legible from across a stand. */
 const DEFAULT_DECK = {
   settings: { duration: 6, fade: 480, watermark: true },
   slides: [
-    { type:'commerceFlow', duration:5,
+    { type:'commerceFlow', duration:10,
       heading:'Every product image, optimized and fast. Automatically.' },
 
     { type:'commerceBenefits', duration:6 },
@@ -3772,8 +3774,8 @@ function setupCommerceFlow(slideEl, sd, tl){
     Object.assign(drag.style, {opacity:'0',transform:'none'});
     Object.assign(dragCard.style, {opacity:'1',transform:'scale(1)'});
     cursor.style.opacity = '1';
-    Object.assign(widget.style, {opacity:'1',transform:'none'});
-    Object.assign(panel.style, {opacity:'0',transform:'scale(.97)'});
+    Object.assign(widget.style, {opacity:'1',transform:'none',filter:'none'});
+    Object.assign(panel.style, {opacity:'0',transform:'scale(.96)'});
     file.dataset.state = 'uploading';
     arc.style.strokeDashoffset = DI_RING_LEN;
     wash.style.clipPath = 'inset(0 0 100% 0)';
@@ -3789,7 +3791,7 @@ function setupCommerceFlow(slideEl, sd, tl){
 
   const settle = ()=>{
     Object.assign(drag.style,{opacity:'0'});
-    Object.assign(widget.style,{opacity:'0',transform:'scale(.97)'});
+    Object.assign(widget.style,{opacity:'0',transform:'scale(.94)',filter:'blur(2px)'});
     Object.assign(panel.style,{opacity:'1',transform:'none'});
     arc.style.strokeDashoffset = 0;
     file.dataset.state = 'done';
@@ -3813,7 +3815,9 @@ function setupCommerceFlow(slideEl, sd, tl){
     });
     Object.assign(sitePhoto.style,{opacity:'1',transform:'none'});
     Object.assign(siteInfo.style,{opacity:'1',transform:'none'});
-    badges.forEach(b=>b.style.opacity='0');
+    // the marks stay up; the browser page covers their strip (y≈1015 sits
+    // inside the 334,426 1252x814 box), so they are occluded, never dimmed
+    badges.forEach(b=>Object.assign(b.style,{opacity:'.5',transform:'none'}));
     process.dataset.state = 'site-live';
   };
 
@@ -3822,10 +3826,20 @@ function setupCommerceFlow(slideEl, sd, tl){
   // The file is a drag, so it keeps the Webflow card's spring. The parent owns
   // travel; its child owns the drop scale, preventing transform contention.
   const FROM = {x:0,y:0}, OVER = {x:235,y:81};
-  const FLY = {at:.30,response:.62,bounce:.12};
-  tl.to(drag,[{opacity:0},{opacity:1}],{at:.20,dur:.18});
-  let landed = 1.15;
+  const FLY = {at:.50,response:.86,bounce:.12};
+  tl.to(drag,[{opacity:0},{opacity:1}],{at:.30,dur:.26});
+  let landed = 1.55;
   tl.spring(drag,FROM,OVER,{...FLY,onArrive:t=>landed=t});
+
+  // The three trust marks come up with the card and never leave. They used to
+  // arrive with the analysis and be faded out again half a second later, which is
+  // not long enough to read three logos across a stand — and because the fade
+  // ran before the browser's clip had grown down to their strip, you watched
+  // them dim rather than being covered. They now hold at the frame's .5 for
+  // the whole card; the storefront page occludes them, which is honest.
+  badges.forEach((b,i)=>tl.to(b,
+    [{opacity:0,transform:'translateY(10px)'},{opacity:.5,transform:'translateY(0)'}],
+    {at:.55+i*.09,dur:.34,ease:EASE.out}));
 
   // Light the drop zone on the exact spring frame where the pointer enters.
   const tip = {x:drag.offsetLeft+cursor.offsetLeft,y:drag.offsetTop+cursor.offsetTop};
@@ -3836,55 +3850,82 @@ function setupCommerceFlow(slideEl, sd, tl){
   });
   tl.cls(drop,'hot',cross!=null ? FLY.at+cross : Math.max(0,landed-.25));
 
-  const DROP = landed + .08;
+  const DROP = landed + .16;
   tl.to(dragCard,[{opacity:1,transform:'scale(1)'},{opacity:0,transform:'scale(.28)'}],
-        {at:DROP,dur:.42,ease:EASE.inOut,fill:'forwards'});
-  tl.to(cursor,[{opacity:1},{opacity:0}],{at:DROP+.04,dur:.20,fill:'forwards'});
-  tl.at(DROP+.18,()=>{ dropText.textContent='1 file added'; });
-  tl.cls(drop,'hot',DROP+.28,false);
+        {at:DROP,dur:.52,ease:EASE.inOut,fill:'forwards'});
+  tl.to(cursor,[{opacity:1},{opacity:0}],{at:DROP+.06,dur:.24,fill:'forwards'});
+  tl.at(DROP+.24,()=>{ dropText.textContent='1 file added'; });
+  tl.cls(drop,'hot',DROP+.40,false);
 
-  // The full widget hands over to the exact compact upload panel from the
-  // Webflow card; the one ring is the complete upload process.
-  const SWAP = DROP + .42;
-  tl.to(widget,[{opacity:1,transform:'scale(1)'},{opacity:0,transform:'scale(.97)'}],
-        {at:SWAP,dur:.20,fill:'forwards'});
-  tl.to(panel,[{opacity:0,transform:'scale(.97)'},{opacity:1,transform:'scale(1)'}],
-        {at:SWAP+.05,dur:.24,ease:EASE.out});
-  const UPLOAD = SWAP + .18;
+  /* The full widget hands over to the exact compact upload panel from the
+     Webflow card; the one ring is the complete upload process.
+
+     The swap is asymmetric and blur-masked, following the install card's label
+     morph rather than a straight crossfade. These two elements are wildly
+     different sizes in the same place, so fading them through each other shows
+     a legible 400px uploader sitting on top of a 52px row — you read both at
+     once and neither becomes the other. The widget now leaves first and
+     collapses slightly as it goes (scale .94, not the old .97, so it reads as
+     receding rather than dimming), the row arrives 160ms later, and 2px of
+     blur covers what overlap is left. "1 file added" also holds for ~.6s
+     before any of this starts, because that confirmation is a beat.
+
+     The 120ms offset is measured, not chosen: the widget's opacity is under
+     .05 by then, so the row rises into a space that still has the widget in
+     it rather than into an empty cell. Pushing it later reads as the uploader
+     blinking out before its replacement arrives — the same failure the
+     inherited dropin card documents, just 80ms of it. */
+  const SWAP = DROP + .85;
+  tl.to(widget,[{opacity:1,transform:'scale(1)',filter:'blur(0)'},
+                {opacity:0,transform:'scale(.94)',filter:'blur(2px)'}],
+        {at:SWAP,dur:.22,fill:'forwards'});
+  tl.to(panel,[{opacity:0,transform:'scale(.96)'},{opacity:1,transform:'scale(1)'}],
+        {at:SWAP+.12,dur:.30,ease:EASE.out});
+
+  /* The upload is the one beat that has to read as work rather than as a state
+     change, so the ring fills over 1.45s. At the old .55s it was over before a
+     passer-by had found it, which made the card look like it skipped the
+     upload entirely. Linear, because it is constant-rate progress. */
+  const UPLOAD = SWAP + .46;
   tl.to(arc,[{strokeDashoffset:DI_RING_LEN},{strokeDashoffset:0}],
-        {at:UPLOAD,dur:.55,ease:'linear'});
-  const ANALYSE = UPLOAD + .62;
+        {at:UPLOAD,dur:1.45,ease:'linear'});
+  const ANALYSE = UPLOAD + 1.85;
   tl.at(ANALYSE,()=>{ file.dataset.state='done'; dots[0].dataset.state='working'; });
 
-  // The right cell receives the same photo, then resolves only the two lines
-  // present in frame 234:979. No extra safety or delivery claims are added.
-  tl.to(placeholder,[{opacity:1},{opacity:0}],{at:ANALYSE,dur:.16,fill:'forwards'});
-  tl.to(image,[{opacity:0},{opacity:1}],{at:ANALYSE,dur:.28});
+  /* The right cell receives the same photo, then resolves only the two lines
+     present in frame 234:979. No extra safety or delivery claims are added.
+
+     The placeholder leaves before the photo arrives rather than with it: run
+     together, "Upload image" stays legible over the incoming product shot for
+     ~160ms and the cell reads as two things at once. */
+  tl.to(placeholder,[{opacity:1},{opacity:0}],{at:ANALYSE,dur:.18,fill:'forwards'});
+  tl.to(image,[{opacity:0},{opacity:1}],{at:ANALYSE+.14,dur:.40});
   tl.to(wash,[{clipPath:'inset(0 0 100% 0)'},{clipPath:'inset(0 0 0% 0)'}],
-        {at:ANALYSE,dur:.60,ease:EASE.out});
-  tl.to(lines[0],[{opacity:0},{opacity:1}],{at:ANALYSE+.10,dur:.20});
-  donut.forEach((c,i)=>tl.cls(c,'lit',ANALYSE+.08+i*.012));
-  tl.to(lines[1],[{opacity:0},{opacity:1}],{at:ANALYSE+.45,dur:.20});
-  tl.to(deleteButton,[{opacity:0},{opacity:.92}],{at:ANALYSE+.40,dur:.20});
-  badges.forEach((b,i)=>tl.to(b,
-    [{opacity:0,transform:'translateY(10px)'},{opacity:.5,transform:'translateY(0)'}],
-    {at:ANALYSE+.36+i*.07,dur:.28,ease:EASE.out}));
-  tl.at(ANALYSE+.64,()=>{ dots[0].dataset.state='standby'; });
+        {at:ANALYSE+.14,dur:.85,ease:EASE.out});
+  tl.to(lines[0],[{opacity:0},{opacity:1}],{at:ANALYSE+.45,dur:.26});
+  donut.forEach((c,i)=>tl.cls(c,'lit',ANALYSE+.20+i*.014));
+  // the optimized size is the card's whole claim, so it lands on its own beat
+  // well after the file's own telemetry rather than 350ms behind it
+  tl.to(deleteButton,[{opacity:0},{opacity:.92}],{at:ANALYSE+1.00,dur:.24});
+  tl.to(lines[1],[{opacity:0},{opacity:1}],{at:ANALYSE+1.15,dur:.26});
+  tl.at(ANALYSE+1.55,()=>{ dots[0].dataset.state='standby'; });
 
   // Pin the completed frame inline so killing the score for the outgoing slide
   // crossfade cannot restore any of the hidden opening styles.
-  tl.at(ANALYSE+.68,settle);
+  tl.at(ANALYSE+1.62,settle);
 
-  // The processing shell and browser overlap briefly: the former recedes while
-  // the latter opens down from its chrome. Photo and details arrive only once
-  // the page has enough height to hold them, so nothing flashes through the
-  // clip. All motion is transform/opacity apart from the sanctioned clip-path.
-  const SITE = ANALYSE + .85;
+  /* The processing shell and browser overlap briefly: the former recedes while
+     the latter opens down from its chrome. Photo and details arrive only once
+     the page has enough height to hold them, so nothing flashes through the
+     clip. All motion is transform/opacity apart from the sanctioned clip-path.
+
+     The hold before this is deliberate: the optimized readout stays finished
+     and still for ~1.3s, so the claim can actually be read before the payoff
+     replaces it. */
+  const SITE = ANALYSE + 2.45;
   tl.to(process,
     [{opacity:1,transform:'translateY(0) scale(1)'},{opacity:0,transform:'translateY(-18px) scale(.985)'}],
     {at:SITE,dur:.38,ease:EASE.out,fill:'forwards'});
-  badges.forEach(b=>tl.to(b,[{opacity:.5},{opacity:0}],
-    {at:SITE,dur:.22,fill:'forwards'}));
   tl.to(site,[
     {opacity:0,transform:'translateY(24px) scale(.985)',clipPath:'inset(0 0 93% 0 round 16px)'},
     {opacity:1,transform:'translateY(0) scale(1)',clipPath:'inset(0 0 0 0 round 16px)'}
@@ -5101,7 +5142,7 @@ gLogo.onchange = ()=>{ deck.settings.watermark=gLogo.checked; enter(idx); };
 
 /* add menu */
 const NEW = {
-  commerceFlow:{type:'commerceFlow',duration:5,heading:'Every product image, optimized and fast. Automatically.'},
+  commerceFlow:{type:'commerceFlow',duration:10,heading:'Every product image, optimized and fast. Automatically.'},
   commerceBenefits:{type:'commerceBenefits',duration:6},
   commerceMetric:{type:'commerceMetric',duration:6,value:'2x faster page loads.',line:'Faster pages, more sales.',quote:'This way, we get the absolute most speed we can when loading our web pages across mobile devices.',attribution:'Sam McKinney, Director of Agency Services at Zephyr',by:'Zephyr'},
   commerceEditor:{type:'commerceEditor',duration:6,heading:'Turn any photo\ninto a catalog-ready product shot.'},

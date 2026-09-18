@@ -17,7 +17,9 @@ PROFILE = ROOT / "tools" / "_profile"
 
 # card index -> ms after enter() worth capturing
 SHOTS = {
-    0: [450, 1200, 1800, 2600, 3500, 3800, 4200],  # upload → optimize → browser opens → store
+    # card 1 runs a 10s slot: drag, drop, handover, the 1.45s upload, the
+    # optimization readout and its hold, then the storefront
+    0: [700, 1600, 2600, 3600, 4900, 6100, 7400, 8600],
     1: [250, 700, 1400, 3000],         # benefit row lands
     2: [250, 700, 1400, 2200],         # headline, then Zephyr mark
     3: [300, 1100, 1700, 2100, 3200],  # before → light pass → cleaned shot

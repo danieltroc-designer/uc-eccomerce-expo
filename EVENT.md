@@ -5,8 +5,8 @@ Working source of truth for this booth cut. Do not invent event facts.
 ## Confirmed
 
 - Event name: **Ecommerce Expo**
-- Seven-card loop, approximately 44 seconds:
-  1. Product image upload → optimization → live store payoff (5s)
+- Seven-card loop, approximately 49 seconds:
+  1. Product image upload → optimization → live store payoff (10s)
   2. Five ecommerce benefits (6s)
   3. Zephyr proof point (6s)
   4. AI Image Editor background replacement (6s)
@@ -21,7 +21,9 @@ Working source of truth for this booth cut. Do not invent event facts.
   photo, then the same photo resolves through the frame's simplified two-line
   optimization readout in the right cell. Its payoff follows frame `234:1415`:
   the completed process shell recedes into a 1252px browser where the same tube
-  photo is already live on the Velour Essentials product page.
+  photo is already live on the Velour Essentials product page. It is paced for
+  booth distance — the upload takes 1.45s and the optimization claim holds ~1.3s
+  before the storefront arrives — which is what the 10s slot buys.
 - Card 3 follows Figma frame `234:1237`: “2x faster page loads. Faster pages,
   more sales.” beside the Zephyr mark and “This way, we get the absolute most
   speed we can when loading our web pages across mobile devices.” attributed
