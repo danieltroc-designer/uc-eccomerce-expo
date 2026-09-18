@@ -85,7 +85,17 @@ the implementation are load bearing:
   the two-line copy at (41,41). Its five 48px icons are the frame's real SVG
   exports under `assets/ecommerce/benefit-*.svg`; their accent colours are
   baked into the art, and `encode_ecommerce()` deliberately fails if one is
-  missing rather than silently substituting an approximation.
+  missing rather than silently substituting an approximation. Once the row is
+  built it runs the **same pulse as the Webflow capability row** — it reuses
+  `ftPulse` outright, so retuning the wash is one edit rather than two that
+  drift. Everything the Webflow note below says about that pulse applies here:
+  per-panel colour from `ECOM_BENEFITS[].ac` (duplicating what is baked into
+  each SVG, because CSS cannot read a colour out of inlined markup), the wash
+  on a `::before` overlay's opacity rather than `background-color`, 300ms
+  between panels against a 1.5s pulse so the row reads as one travelling wave,
+  scoped to `.slide.active`, and pinned off under reduced motion. Only the
+  start delay differs: 1.2s, because this row's entrance ends at ~.86s where
+  the Webflow one waits on icons that land at ~1.7s.
 - Ecommerce Card 6 comes from frame 218:1470. Its 989px rail is pinned at
   (466,701) and uses Figma's real 8.14062px endpoint and 308.719px line SVGs.
   The 120x150 file opens at (602,529), moves to the exact optical centres of

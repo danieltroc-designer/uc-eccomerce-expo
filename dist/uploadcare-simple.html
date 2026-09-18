@@ -1595,6 +1595,36 @@
     display:flex;align-items:center;justify-content:center;overflow:hidden}
   .eb-icon svg{width:48px;height:48px;display:block}
 
+  /* The benefit row is the Expo cut's equivalent of the Webflow capability
+     row, and it sat completely still once built — the one card that read as a
+     static slide rather than a paused one. It now runs the same travelling
+     wash, reusing ftPulse so both rows stay retuned from one place. Each panel
+     washes to 10% of *its own* icon's accent, which is what makes it read as
+     five benefits lighting up in turn rather than one effect painted over the
+     row; `ECOM_BENEFITS[].ac` duplicates the colour baked into each SVG
+     because CSS cannot read one out of inlined markup, so the two have to be
+     kept in step. The wash rides a ::before overlay's opacity rather than the
+     card's background-color — opacity composites where colour repaints, and
+     this loops forever on a panel nobody touches. */
+  .eb-card::before{
+    content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+    background:color-mix(in srgb, var(--ac) 40%, transparent);
+    box-shadow:inset 0 0 0 1px var(--ac);
+    opacity:0;
+  }
+  /* 300ms between panels, as on the Webflow row: each pulse runs far longer
+     than the gap (1.5s against 300ms), so neighbours overlap and the row never
+     breaks into five separate blinks. The start is later than the last panel's
+     entrance (~.86s here, against ~1.7s there) so the wave opens on a built
+     row, and scoping to .slide.active restarts it from the top on every loop
+     instead of inheriting whatever phase the deck happened to render at. */
+  .slide.active .eb-card::before{
+    animation:ftPulse 3.8s ease-in-out calc(1.2s + var(--i)*.30s) infinite;
+  }
+  /* the panel's own content has to outrank the wash, or the tint lands on top
+     of the copy and the icon instead of behind them */
+  .eb-copy,.eb-icon{position:relative;z-index:1}
+
   /* Card 3 — Zephyr testimonial, frame 234:1237. It intentionally reuses the
      Webflow quote card's geometry and choreography above: the lime claim leads,
      the source panel follows 220ms later, and its contents ride on that move. */
@@ -1754,7 +1784,7 @@
     /* the capability wash is decoration on a settled row; nothing is lost by
        pinning it off, whereas a looping colour pulse is exactly the sort of
        thing reduced motion is asking to be spared */
-    .ft-card::before{animation:none!important;opacity:0}
+    .ft-card::before,.eb-card::before{animation:none!important;opacity:0}
     .pl-shine .pl-pill::after{animation:none!important;opacity:0!important}
     .slide.active .sc-chip{animation:none!important}
     .pd-dots[data-state="working"] i,.ef-dots[data-state="working"] i{animation:none!important}
@@ -2285,12 +2315,15 @@ const FEATURES = [
   { label:'Built-in\neditor',    icon:'editor',      ac:'#5978FF' },
 ];
 
+/* `ac` is the accent baked into each icon's own SVG export, repeated here for
+   the pulse: CSS can't read a colour out of inlined markup, so if an icon is
+   re-exported in a different colour this has to follow it. */
 const ECOM_BENEFITS = [
-  { benefit:'Fast on mobile',         feature:'Automatic image\noptimization', icon:'benefit-mobile' },
-  { benefit:'More conversions',       feature:'Lighter, faster pages',         icon:'benefit-conversions' },
-  { benefit:'Ready for\npeak session',feature:'Global CDN,\nscales with traffic',icon:'benefit-peak' },
-  { benefit:'Nothing to\nmaintain',   feature:'Upload to delivery,\nhandled',   icon:'benefit-maintain' },
-  { benefit:'Any\nstore',             feature:'Works with\nany platform',       icon:'benefit-store' },
+  { benefit:'Fast on mobile',         feature:'Automatic image\noptimization', icon:'benefit-mobile',      ac:'#00C5D5' },
+  { benefit:'More conversions',       feature:'Lighter, faster pages',         icon:'benefit-conversions', ac:'#BC7FF6' },
+  { benefit:'Ready for\npeak session',feature:'Global CDN,\nscales with traffic',icon:'benefit-peak',      ac:'#00DC66' },
+  { benefit:'Nothing to\nmaintain',   feature:'Upload to delivery,\nhandled',   icon:'benefit-maintain',   ac:'#FF9825' },
+  { benefit:'Any\nstore',             feature:'Works with\nany platform',       icon:'benefit-store',      ac:'#5978FF' },
 ];
 
 /* Ecommerce Expo card 5's wall: x, y, w, h per slot in reading order, straight
@@ -2502,7 +2535,7 @@ const R = {
   /* ---- Ecommerce Expo card 2: benefit over feature, five literal icons ---- */
   commerceBenefits(){
     const cards = ECOM_BENEFITS.map((f,i)=>`
-      <div class="eb-card" style="--i:${i}">
+      <div class="eb-card" style="--i:${i};--ac:${f.ac}">
         <div class="eb-copy">
           <div class="eb-benefit">${multiline(f.benefit)}</div>
           <div class="eb-feature">${multiline(f.feature)}</div>
@@ -4805,7 +4838,7 @@ function fieldsFor(s, i){
       <label class="f"><span>Headline</span><textarea data-f="heading">${esc(s.heading||'')}</textarea></label>
       <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">Three fast beats: upload, visibly reduce file weight, then land on a crisp product page. The product image currently reuses the flower asset from the uploader demo.</p>`;
     case 'commerceBenefits': return dur+`
-      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">Laid out to Figma frame 212:1213. Copy and reading order live in ECOM_BENEFITS; the five required 48px SVGs live in assets/ecommerce/benefit-*.svg.</p>`;
+      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">Laid out to Figma frame 212:1213. Copy and reading order live in ECOM_BENEFITS; the five required 48px SVGs live in assets/ecommerce/benefit-*.svg. Once the row is built, a pulse loops across it left to right, tinting each panel with its own icon's accent — the same wash as the Webflow capability row.</p>`;
     case 'commerceMetric': return dur+`
       <label class="f"><span>Proof point</span><input type="text" data-f="value" value="${esc(s.value||'')}"></label>
       <label class="f"><span>Supporting line</span><input type="text" data-f="line" value="${esc(s.line||'')}"></label>
