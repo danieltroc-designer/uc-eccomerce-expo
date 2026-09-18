@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
-"""Card 1's two loop-sensitive beats: the optimize sharpen and the upload meter.
+"""Card 1's Figma geometry, storefront handoff, and loop-sensitive reset.
 
-Both are CSS animations with `forwards`, so both hold their end frame after the
-card is left — and a card that keeps its end frame shows the payoff already
-delivered when the deck comes back round. The sharpen was the one that did:
-unscoped, it ran once on first render and every later loop opened on an
-already-crisp photo. Checking a second visit is the whole point; a single pass
-passes either way.
+Frame 234:979 is one 1252x554 process shell: the Webflow uploader runs in its
+left cell, then its compact progress row and the simplified right-hand analysis
+settle together. Frame 234:1415 then opens a 1252x814 browser containing the
+same source at its 561x590 product slot. Checking a second visit proves the
+completed inline state is synchronously reset before the new score plays.
 """
 import pathlib
 import sys
@@ -25,14 +24,35 @@ CARD = 0                                            # commerceFlow
 
 def read(pg):
     return pg.evaluate("""() => {
-      const img = document.querySelector('.slide.active .ef-opt .ef-photo img');
-      const bar = document.querySelector('.slide.active .ef-meter i');
-      const cs = bar && getComputedStyle(bar);
+      const root = document.querySelector('.slide.active .ef-wrap');
+      const process = root && root.querySelector('.ef-process');
+      const site = root && root.querySelector('.ef-site');
+      const sitePhoto = root && root.querySelector('.ef-site-photo');
+      const drag = root && root.querySelector('.ef-drag');
+      const widget = root && root.querySelector('.ef-widget');
+      const panel = root && root.querySelector('.ef-panel');
+      const arc = root && root.querySelector('.ef-uaction .di-ring .arc');
+      const result = root && root.querySelector('.ef-analyse-img');
+      const lines = root ? [...root.querySelectorAll('.ef-analysis p')] : [];
+      const images = root ? [...root.querySelectorAll('img')] : [];
       return {
-        blur: img ? getComputedStyle(img).filter : null,
-        // scaleX lands in the matrix' first component
-        fill: cs ? new DOMMatrix(cs.transform).a : null,
-        width: cs ? parseFloat(cs.width) : null,
+        shell: process ? [process.offsetLeft, process.offsetTop,
+                          process.offsetWidth, process.offsetHeight] : null,
+        shellOpacity: process ? parseFloat(getComputedStyle(process).opacity) : null,
+        site: site ? [site.offsetLeft, site.offsetTop,
+                      site.offsetWidth, site.offsetHeight] : null,
+        siteOpacity: site ? parseFloat(getComputedStyle(site).opacity) : null,
+        sitePhoto: sitePhoto ? [sitePhoto.offsetLeft, sitePhoto.offsetTop,
+                                sitePhoto.offsetWidth, sitePhoto.offsetHeight] : null,
+        dragOpacity: drag ? parseFloat(getComputedStyle(drag).opacity) : null,
+        widgetOpacity: widget ? parseFloat(getComputedStyle(widget).opacity) : null,
+        panelOpacity: panel ? parseFloat(getComputedStyle(panel).opacity) : null,
+        dash: arc ? parseFloat(getComputedStyle(arc).strokeDashoffset) : null,
+        resultOpacity: result ? parseFloat(getComputedStyle(result).opacity) : null,
+        lineOpacity: lines.map(x=>parseFloat(getComputedStyle(x).opacity)),
+        imageSources: [...new Set(images.map(x=>x.src))],
+        imageCount: images.length,
+        state: process ? process.dataset.state || '' : null,
       };
     }""")
 
@@ -66,18 +86,33 @@ def main():
             pg.evaluate(f"enter({CARD})")
             pg.wait_for_timeout(250)
             early = read(pg)
-            check("photo opens soft", "blur(3px)" in (early["blur"] or ""),
-                  early["blur"])
-            check("meter opens empty", early["fill"] < .1, f"scaleX {early['fill']:.2f}")
+            check("process shell matches frame",
+                  early["shell"] == [334, 394, 1252, 554], str(early["shell"]))
+            check("one photo source feeds every view",
+                  len(early["imageSources"]) == 1 and early["imageCount"] == 5,
+                  f"{len(early['imageSources'])} source / {early['imageCount']} views")
+            check("uploader opens before result",
+                  early["widgetOpacity"] > .98 and early["resultOpacity"] < .02,
+                  f"widget {early['widgetOpacity']:.2f}, result {early['resultOpacity']:.2f}")
+            check("upload ring resets empty", early["dash"] > 57,
+                  f"dash {early['dash']:.1f}")
 
-            pg.wait_for_timeout(1900)
+            pg.wait_for_timeout(4000)
             late = read(pg)
-            check("photo resolves crisp", "blur(0px)" in (late["blur"] or "")
-                  or "blur" not in (late["blur"] or ""), late["blur"])
-            check("meter fills", late["fill"] > .98, f"scaleX {late['fill']:.2f}")
-            # scaleX only reads as a full bar if the element is already full width
-            check("meter is laid out full width", late["width"] > 200,
-                  f"{late['width']:.0f}px")
+            check("compact upload panel completes",
+                  late["panelOpacity"] > .98 and late["dash"] < 1,
+                  f"panel {late['panelOpacity']:.2f}, dash {late['dash']:.1f}")
+            check("analysis result resolves",
+                  late["resultOpacity"] > .98 and min(late["lineOpacity"]) > .98,
+                  f"photo {late['resultOpacity']:.2f}, lines {late['lineOpacity']}")
+            check("storefront browser matches frame",
+                  late["site"] == [334, 426, 1252, 814]
+                  and late["sitePhoto"] == [33, 62, 561, 590],
+                  f"browser {late['site']}, photo {late['sitePhoto']}")
+            check("storefront replaces process shell",
+                  late["state"] == "site-live"
+                  and late["shellOpacity"] < .02 and late["siteOpacity"] > .98,
+                  f"{late['state']}, shell {late['shellOpacity']:.2f}, site {late['siteOpacity']:.2f}")
 
         b.close()
 

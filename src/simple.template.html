@@ -1414,14 +1414,57 @@
   .ec-kicker{font-family:var(--cmono);font-size:13px;letter-spacing:.08em;
     text-transform:uppercase;color:#84858a}
 
-  /* Card 1 — storyboard 229:443. Three states share one finished composition:
-     Uploadcare's compact uploader, the optimized file, then the live storefront.
-     The score runs quickly and holds the complete frame. */
-  .ef-wrap{position:absolute;inset:0}
-  .ef-uploader{position:absolute;left:238px;top:585px;width:400px;
-    background:#1a1a1a;border-radius:12px;overflow:hidden;
-    box-shadow:0 6px 20px rgba(0,0,0,.25);
-    font-family:-apple-system,BlinkMacSystemFont,var(--sans)}
+  /* Card 1 — storyboard 234:979. The first phase is one process component:
+     the full Uploadcare uploader runs in the left cell and hands the same file
+     to the reduced optimization readout on the right. `.ef-process` owns the
+     whole phase so the storefront can replace it as one transition unit. */
+  .ef-wrap{position:absolute;inset:0;background:#181818}
+  .ef-wrap>.shd{z-index:3}
+  .ef-process{position:absolute;left:334px;top:394px;width:1252px;height:554px;
+    border-radius:39px;background:#0c0c0c;border:1px solid rgba(255,255,255,.05);
+    padding:11px;overflow:hidden}
+  .ef-grid{position:relative;z-index:1;height:100%;display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,.8fr);gap:24px}
+  .ef-cell{position:relative;height:532px;border-radius:27px;overflow:hidden}
+  .ef-left{background:#000;box-shadow:0 0 0 1px rgba(255,255,255,.05);
+    display:flex;align-items:center;justify-content:center}
+
+  /* Full uploader from the first Webflow card, reduced to the one Figma file. */
+  .ef-widget{position:relative;width:400px;padding:20px;display:flex;flex-direction:column;gap:20px;
+    background:#181818;border-radius:18px;filter:drop-shadow(0 12px 16px rgba(0,0,0,.25))}
+  .ef-drop{height:196px;padding:48px 24px;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:16px;border:1px dashed rgba(255,255,255,.13);
+    border-radius:7px;transition:border-color .2s ease,background .2s ease}
+  .ef-drop.hot{border-color:transparent;background:#242424;transition:none}
+  .ef-dropic{width:64px;height:64px;border-radius:9999px;background:rgba(255,255,255,.05);
+    display:flex;align-items:center;justify-content:center}
+  .ef-dropic svg{width:16px;height:16px;display:block}
+  .ef-droptxt{font-size:15px;line-height:18px;color:#fff}
+  .ef-sources{display:flex;flex-direction:column}
+  .ef-source{height:36px;padding:6px 10px;display:flex;align-items:center;gap:12px;border-radius:8px}
+  .ef-source i{width:24px;height:24px;display:flex;align-items:center;justify-content:center}
+  .ef-source svg{width:16px;height:16px;display:block}
+  .ef-source span{font-size:14px;line-height:normal;color:#fff}
+  .ef-cancel{height:30px;padding:5.5px 0;border-radius:8px;background:rgba(255,255,255,.05);
+    text-align:center;font-size:14px;line-height:normal;color:#fff}
+
+  .ef-drag{position:absolute;left:40px;top:-5px;width:120px;height:150px;z-index:3;opacity:0}
+  .ef-drag-card{position:absolute;inset:0;border-radius:12px;overflow:hidden;
+    filter:drop-shadow(0 12px 16px rgba(0,0,0,.25))}
+  .ef-drag-card img{width:100%;height:100%;object-fit:cover;display:block}
+  .ef-tag{position:absolute;top:6px;padding:4px 8px;border-radius:6px;background:#161616;
+    font-family:var(--cmono);font-size:12px;line-height:normal;color:#fff}
+  .ef-kind{left:6px}
+  .ef-size{right:6px}
+  .ef-cursor{position:absolute;right:7px;bottom:-16px;width:18px;height:25px;
+    filter:drop-shadow(1px 0 1px rgba(0,0,0,.3))}
+  .ef-cursor svg{width:100%;height:100%;display:block}
+
+  /* The compact completion panel replaces the large widget after the drop. */
+  .ef-panel-slot{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    pointer-events:none}
+  .ef-panel{width:400px;background:#1a1a1a;border-radius:12px;overflow:hidden;
+    box-shadow:0 6px 20px rgba(0,0,0,.25);opacity:0;transform:scale(.97)}
   .ef-uhead{height:52px;padding:10px 10px 10px 20px;
     display:flex;align-items:center;justify-content:space-between}
   .ef-utitle{font-size:14px;font-weight:510;line-height:20px;color:#e1e1e1}
@@ -1434,49 +1477,91 @@
   .ef-uthumb{position:relative;width:32px;height:32px;flex:none}
   .ef-uthumb>img{width:100%;height:100%;object-fit:cover;border-radius:8px;display:block}
   .ef-ucheck{position:absolute;left:16px;top:16px;width:14px;height:14px;
-    opacity:0;transform:scale(.55)}
+    opacity:0;transform:scale(.55);
+    transition:opacity .18s ease,transform var(--dur-2) var(--ease-pop)}
   .ef-ucheck svg{width:100%;height:100%;display:block}
   .ef-uname{font-size:13px;line-height:20px;color:#989898}
   .ef-uaction{position:relative;width:21px;height:21px;display:flex;align-items:center;justify-content:center}
   .ef-uaction .di-ring{position:absolute}
-  .ef-ubin{position:absolute;right:0;width:16px;height:16px;opacity:0}
+  .ef-ubin{position:absolute;right:0;width:16px;height:16px;opacity:0;transition:opacity .18s ease}
   .ef-ubin svg{width:100%;height:100%;display:block}
   .ef-ufile[data-state="done"] .ef-ucheck{opacity:1;transform:none}
   .ef-ufile[data-state="done"] .di-ring{opacity:0}
   .ef-ufile[data-state="done"] .ef-ubin{opacity:1}
 
-  .ef-file{position:absolute;left:834px;top:504px;width:220px;height:275px;
-    border-radius:12px;overflow:hidden;opacity:0;transform:translateY(12px) scale(.98)}
-  .ef-file-photo{position:absolute;inset:0;background:rgba(255,255,255,.05)}
-  .ef-file-photo img{width:100%;height:100%;object-fit:cover;display:block}
-  .ef-file-photo::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.05)}
-  .ef-tag{position:absolute;top:6px;padding:4px 8px;border-radius:6px;background:#161616;
-    font-family:var(--cmono);font-size:12px;line-height:normal;color:#fff}
-  .ef-kind{left:6px}
-  .ef-size{right:6px}
+  /* Simplified analysis from the first two columns of the website demo. */
+  .ef-right{display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:20px;overflow:visible}
+  .ef-wash{position:absolute;left:50%;top:50%;width:340px;height:440px;
+    transform:translate(-50%,-50%);filter:blur(15px);opacity:.1;pointer-events:none}
+  .ef-wash-in{width:100%;height:100%;border-radius:32px;overflow:hidden;
+    clip-path:inset(0 0 100% 0)}
+  .ef-wash img{width:100%;height:100%;object-fit:cover;display:block}
+  .ef-analyse-photo{position:relative;width:258px;height:333px;border-radius:27px;
+    border:1px dashed rgba(255,255,255,.13);overflow:hidden}
+  .ef-analyse-ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-family:var(--cmono);font-size:13px;letter-spacing:.65px;text-transform:uppercase;
+    color:rgba(255,255,255,.25)}
+  .ef-analyse-img{position:absolute;left:8px;top:8px;width:240px;height:315px;
+    border-radius:19px;overflow:hidden;opacity:0}
+  .ef-analyse-img img{position:absolute;left:0;top:-10.1%;width:100%;height:113.55%;
+    object-fit:cover;display:block}
+  .ef-delete{position:absolute;right:20px;top:19px;width:32px;height:32px;border-radius:8px;
+    background:rgba(9,9,9,.8);display:flex;align-items:center;justify-content:center;
+    opacity:0}
+  .ef-delete svg{width:14px;height:14px;display:block}
+  .ef-prog{position:relative;width:100%;height:70px;display:flex;align-items:center;justify-content:center}
+  .ef-prog-side{flex:1;display:flex;justify-content:center}
+  .ef-dots{display:flex;align-items:center;gap:4px}
+  .ef-dots i{width:3px;height:3px;background:rgba(255,255,255,.13)}
+  .slide.active .ef-dots[data-state="working"] i{background:rgba(255,255,255,.25);
+    animation:pdDot 1s ease-in-out infinite backwards}
+  .ef-dots[data-state="working"] i:nth-child(2){animation-delay:.12s}
+  .ef-dots[data-state="working"] i:nth-child(3){animation-delay:.24s}
+  .ef-analysis{height:70px;padding-bottom:30px;text-align:center;font-family:var(--cmono);
+    font-size:13px;line-height:20px;text-transform:uppercase;color:#a7a7a7}
+  .ef-analysis p{opacity:0}
+  .ef-analysis b{font-weight:inherit;color:#fff}
+  .ef-badge{position:absolute;opacity:0}
+  .ef-badge svg{width:100%;height:100%;display:block}
 
-  .ef-browser{position:absolute;left:1229px;top:441px;width:514px;height:401px;
-    border-radius:16px;overflow:hidden;opacity:0;transform:scale(.955) translateY(10px);
-    transform-origin:50% 50%;
-    filter:drop-shadow(0 30px 22px rgba(0,0,0,.18))}
-  .ef-chrome{height:56px;padding:4px 24px;background:#353535;
-    display:flex;align-items:center;gap:24px}
-  .ef-os{width:52px;height:12px;display:flex}
-  .ef-os svg{width:52px;height:12px;display:block}
-  .ef-nav{display:flex;gap:12px}
-  .ef-nav i{width:20px;height:20px;display:block}
-  .ef-nav svg{width:20px;height:20px;display:block}
-  .ef-browser-rule{height:1px;background:#4d4d4d}
-  .ef-page{position:relative;height:344px;background:#f3e8dd;color:#000;overflow:hidden}
-  .ef-product-art{position:absolute;left:203px;top:0;width:311px;height:388px}
-  .ef-product-art img{width:100%;height:100%;object-fit:cover;display:block}
-  .ef-product-title{position:absolute;left:32px;top:62px;width:233px;
-    font-size:48px;font-weight:580;line-height:1;letter-spacing:-.72px;
+  /* Storefront payoff — frame 234:1415. It deliberately keeps the process
+     shell's 1252px width, so Card 1 can hand from system work to visible result
+     without the composition changing scale. The 814px browser extends below
+     the stage exactly as it does in the frame and is clipped by the TV. */
+  .ef-site{position:absolute;left:334px;top:426px;width:1252px;height:814px;
+    border-radius:16px;background:#fff;overflow:hidden;opacity:0;pointer-events:none;
+    box-shadow:0 100px 40px rgba(0,0,0,.07),0 41.778px 16.711px rgba(0,0,0,.05),
+      0 22.336px 8.935px rgba(0,0,0,.04),0 12.522px 5.009px rgba(0,0,0,.04),
+      0 6.65px 2.66px rgba(0,0,0,.03),0 2.767px 1.107px rgba(0,0,0,.02)}
+  .ef-sitebar{height:56px;padding:4px 24px;background:#353535;display:flex;
+    align-items:center;gap:72px}
+  .ef-sitecontrols{display:flex;align-items:center;gap:24px}
+  .ef-siteos{width:52px;height:12px}
+  .ef-siteos svg{display:block;width:52px;height:12px}
+  .ef-sitenav{display:flex;align-items:flex-start;gap:12px}
+  .ef-sitenav i{width:20px;height:20px;display:block}
+  .ef-sitenav svg{display:block;width:20px;height:20px}
+  .ef-site-rule{height:1px;background:#4d4d4d}
+  .ef-sitebody{position:relative;height:757px;background:#fff;color:#000}
+  .ef-site-back{position:absolute;left:33px;top:25px;display:flex;align-items:center;gap:5px;
+    color:#5d453c;font-size:14px;font-weight:500;line-height:1.2;letter-spacing:-.21px}
+  .ef-site-back i,.ef-site-back svg{display:block;width:19px;height:19px}
+  .ef-site-photo{position:absolute;left:33px;top:62px;width:561px;height:590px;
+    overflow:hidden}
+  .ef-site-photo img{position:absolute;left:0;top:-27.02%;width:100%;height:142.61%;
+    max-width:none;object-fit:cover;display:block}
+  .ef-site-info{position:absolute;left:647px;top:0;width:519px}
+  .ef-site-title{position:absolute;left:0;top:93px;width:519px;font-size:48px;
+    font-weight:580;line-height:1;letter-spacing:-.72px;color:#000;
     text-box-trim:trim-both;text-box-edge:cap alphabetic}
-  .ef-product-copy{position:absolute;left:32px;top:163px;width:221px;
-    font-size:16px;font-weight:500;line-height:normal;letter-spacing:-.24px;color:#808080;
-    text-box-trim:trim-both;text-box-edge:cap alphabetic}
-  .ef-buy{position:absolute;left:38px;top:225px;padding:16px 48px;border-radius:4px;
+  .ef-site-tags{position:absolute;left:0;top:194px;display:flex;align-items:center;gap:3px}
+  .ef-site-tags span{padding:2px 6px;border-radius:2px;background:#dacfcb;color:#5d453c;
+    font-size:14px;font-weight:500;line-height:1.2;letter-spacing:-.21px;white-space:nowrap}
+  .ef-site-copy{position:absolute;left:0;top:249px;width:465px;color:#5d453c;
+    font-size:14px;font-weight:500;line-height:1.4;letter-spacing:-.21px}
+  .ef-site-copy p+p{margin-top:24px}
+  .ef-site-cta{position:absolute;left:0;top:487px;padding:16px 48px;border-radius:4px;
     background:#000;color:#fff;font-size:16px;font-weight:580;line-height:1;
     letter-spacing:-.24px;text-box-trim:trim-both;text-box-edge:cap alphabetic}
 
@@ -1505,27 +1590,17 @@
     display:flex;align-items:center;justify-content:center;overflow:hidden}
   .eb-icon svg{width:48px;height:48px;display:block}
 
-  /* Card 3 — Zephyr proof point, laid out to storyboard frame 204:1081.
-     Type reuses the shared .shd block (88 / 32, Inter 580, cap-trimmed) and
-     only moves its anchor: this card has no supporting art above the line, so
-     the frame sits the title at y=380 rather than the usual 168. The mark is
-     pinned, not stacked, so a copy change cannot shove the diamond. The
-     storyboard also had a 13px cursor over the headline; it is a board
-     leftover, not part of the composition, so it stays out. */
+  /* Card 3 — Zephyr testimonial, frame 234:1237. It intentionally reuses the
+     Webflow quote card's geometry and choreography above: the lime claim leads,
+     the source panel follows 220ms later, and its contents ride on that move. */
   .em-wrap{position:absolute;inset:0}
-  .em-wrap .shd{--shd-y:380px}
-  .em-big,.em-small{opacity:0;transform:translateY(14px)}
-  .em-small{transform:translateY(8px)}
-  .em-by{position:absolute;left:863px;top:620px;width:193px;height:157px;
-    opacity:0;transform:translateY(10px)}
-  .em-by svg{display:block;width:193px;height:157px}
-  .em-by-fallback{position:absolute;left:0;right:0;bottom:18px;text-align:center;
-    font-family:var(--cmono);font-size:15px;letter-spacing:.18em;text-transform:uppercase;
-    color:#bcbdc0}
-  .slide.active .em-big{animation:emIn .6s var(--ease-out) .12s forwards}
-  .slide.active .em-small{animation:emIn .58s var(--ease-out) .32s forwards}
-  .slide.active .em-by{animation:emIn .5s var(--ease-out) .55s forwards}
-  @keyframes emIn{to{opacity:1;transform:none}}
+  .em-wrap .qt-logo{width:114px;height:93px}
+  .em-wrap .qt-logo svg{display:block;width:114px;height:93px}
+  .em-copy{transition-delay:.66s}
+  .em-quote{margin:0 0 19px;font-size:20px;font-weight:400;line-height:1.4;color:#fff}
+  .em-attribution{margin:0;font-size:14px;font-weight:400;line-height:1.4;color:#bcbdc0}
+  .em-logo-fallback{font-family:var(--cmono);font-size:14px;letter-spacing:.18em;
+    text-transform:uppercase;color:#fff}
 
   /* Card 4 — laid out to Figma frame 213:1313. One well, not two panes: the
      card's claim is that a single photo changes, and a before beside an after
@@ -1677,16 +1752,13 @@
     .ft-card::before{animation:none!important;opacity:0}
     .pl-shine .pl-pill::after{animation:none!important;opacity:0!important}
     .slide.active .sc-chip{animation:none!important}
-    .pd-dots[data-state="working"] i{animation:none!important}
+    .pd-dots[data-state="working"] i,.ef-dots[data-state="working"] i{animation:none!important}
     .eb-card,.el-logo{transition:none!important;opacity:1!important;transform:none!important}
-    .ef-browser,.em-big,.em-small,.em-by,.ee-scan,.ee-after{
-      animation:none!important}
+    .ee-scan,.ee-after{animation:none!important}
     /* card 4's payoff is the cleaned shot, so settle on it rather than on the
        photo the card opens with; the light pass has nothing left to explain */
     .ee-scan{opacity:0!important}
     .ee-after{opacity:1!important;clip-path:none!important}
-    .ef-browser,.em-big,.em-small,.em-by{
-      opacity:1!important;transform:none!important}
   }
 </style>
 </head>
@@ -1999,8 +2071,10 @@ const DEFAULT_DECK = {
     { type:'commerceBenefits', duration:6 },
 
     { type:'commerceMetric', duration:6,
-      value:'2x faster page loads',
-      line:'faster pages, more sales',
+      value:'2x faster page loads.',
+      line:'Faster pages, more sales.',
+      quote:'This way, we get the absolute most speed we can when loading our web pages across mobile devices.',
+      attribution:'Sam McKinney, Director of Agency Services at Zephyr',
       by:'Zephyr' },
 
     { type:'commerceEditor', duration:6,
@@ -2320,43 +2394,102 @@ const PD_DONUT = (()=>{
 })();
 
 const R = {
-  /* ---- Ecommerce Expo card 1: product image into a live store ---- */
+  /* ---- Ecommerce Expo card 1: complete upload + optimization phase ---- */
   commerceFlow(s){
-    const thumb = UI['thumb-flower'];
-    const flower = ECOMMERCE.card1Flower;
+    const image = ECOMMERCE.card1Product;
+    const sources = UPLOAD_SOURCES.map(([ic,label])=>`
+      <div class="ef-source"><i>${UI[ic]}</i><span>${esc(label)}</span></div>`).join('');
+    const cx0 = 960 - (PD_BADGES.length-1)*PD_BADGE_GAP/2;
+    const badges = PD_BADGES.map(([name,w,h],i)=>
+      `<div class="ef-badge" style="left:${cx0+i*PD_BADGE_GAP-w/2}px;`
+      + `top:${PD_BADGE_Y-h/2}px;width:${w}px;height:${h}px">${COMPLIANCE[name]}</div>`).join('');
+    const donut = PD_DONUT.replace(/pdGaps/g,'efGaps');
     return `<div class="ef-wrap">
       <div class="shd"><div class="shd-t reveal">${esc(s.heading||'')}</div></div>
-      <div class="ef-uploader">
-        <div class="ef-uhead">
-          <div class="ef-utitle">Uploading</div>
-          <div class="ef-uclose">${UI.close}</div>
-        </div>
-        <div class="ef-ulist">
-          <div class="ef-ufile" data-state="uploading">
-            <div class="ef-ufleft">
-              <div class="ef-uthumb"><img src="${thumb}" alt=""><i class="ef-ucheck">${UI.check}</i></div>
-              <div class="ef-uname">flower.png</div>
+
+      <div class="ef-process">
+        <div class="ef-grid">
+          <div class="ef-cell ef-left">
+            <div class="ef-widget">
+              <div class="ef-drop">
+                <div class="ef-dropic">${UI.upload}</div>
+                <div class="ef-droptxt">Drop files here</div>
+              </div>
+              <div class="ef-sources">${sources}</div>
+              <div class="ef-cancel">Cancel</div>
             </div>
-            <div class="ef-uaction">${DI_RING}<i class="ef-ubin">${UI.trash}</i></div>
+
+            <div class="ef-drag">
+              <div class="ef-drag-card">
+                <img src="${image}" alt="">
+                <span class="ef-tag ef-kind">PNG</span>
+                <span class="ef-tag ef-size">120KB</span>
+              </div>
+              <i class="ef-cursor">${UI.cursor}</i>
+            </div>
+
+            <div class="ef-panel-slot">
+              <div class="ef-panel">
+                <div class="ef-uhead">
+                  <div class="ef-utitle">Uploading</div>
+                  <div class="ef-uclose">${UI.close}</div>
+                </div>
+                <div class="ef-ulist">
+                  <div class="ef-ufile" data-state="uploading">
+                    <div class="ef-ufleft">
+                      <div class="ef-uthumb"><img src="${image}" alt=""><i class="ef-ucheck">${UI.check}</i></div>
+                      <div class="ef-uname">product.png</div>
+                    </div>
+                    <div class="ef-uaction">${DI_RING}<i class="ef-ubin">${UI.trash}</i></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ef-cell ef-right">
+            <div class="ef-wash"><div class="ef-wash-in"><img src="${image}" alt=""></div></div>
+            <div class="ef-analyse-photo">
+              <div class="ef-analyse-ph">Upload image</div>
+              <div class="ef-analyse-img"><img src="${image}" alt=""></div>
+              <div class="ef-delete">${TRASH_ICON}</div>
+            </div>
+            <div class="ef-prog">
+              <div class="ef-prog-side"><div class="ef-dots" data-state="standby"><i></i><i></i><i></i></div></div>
+              ${donut}
+              <div class="ef-prog-side"><div class="ef-dots" data-state="standby"><i></i><i></i><i></i></div></div>
+            </div>
+            <div class="ef-analysis">
+              <p>IMAGE/JPEG · 290 KB</p>
+              <p>OPTIMIZED: <b>10 KB [-97%]</b></p>
+            </div>
           </div>
         </div>
       </div>
-      <div class="ef-file">
-        <div class="ef-file-photo"><img src="${thumb}" alt=""></div>
-        <span class="ef-tag ef-kind">PNG</span>
-        <span class="ef-tag ef-size">120KB</span>
-      </div>
-      <div class="ef-browser">
-        <div class="ef-chrome">
-          <i class="ef-os">${ECOMMERCE['card1-browser-os']}</i>
-          <div class="ef-nav"><i>${ECOMMERCE['card1-browser-left']}</i><i>${ECOMMERCE['card1-browser-right']}</i></div>
+      ${badges}
+      <div class="ef-site" aria-hidden="true">
+        <div class="ef-sitebar">
+          <div class="ef-sitecontrols">
+            <div class="ef-siteos">${ECOMMERCE['card1-browser-os']}</div>
+            <div class="ef-sitenav">
+              <i>${ECOMMERCE['card1-browser-left']}</i>
+              <i>${ECOMMERCE['card1-browser-right']}</i>
+            </div>
+          </div>
         </div>
-        <div class="ef-browser-rule"></div>
-        <div class="ef-page">
-          <div class="ef-product-art"><img src="${flower}" alt=""></div>
-          <div class="ef-product-title">Everyday<br>Bloom</div>
-          <div class="ef-product-copy">Clean detail, responsive sizing, ready on every screen.</div>
-          <div class="ef-buy">Add to cart</div>
+        <div class="ef-site-rule"></div>
+        <div class="ef-sitebody">
+          <div class="ef-site-back"><i>${ECOMMERCE['card1-browser-back']}</i><span>Back to list</span></div>
+          <div class="ef-site-photo"><img src="${image}" alt=""></div>
+          <div class="ef-site-info">
+            <div class="ef-site-title">Velour<br>Essentials Creme</div>
+            <div class="ef-site-tags"><span>La Roche-Posay</span><span>Derma-Cosmetic</span><span>Professional</span></div>
+            <div class="ef-site-copy">
+              <p>At Velour, we believe true beauty begins with luminous, healthy skin. Our Essentials line was created to honor the Japanese skincare ritual of the essence—that transformative moment where your skin drinks in nourishment and comes alive. We've distilled decades of botanical science and modern peptide technology into a single, indispensable step: the foundation upon which all great skin is built.</p>
+              <p>Velour Essentials isn't another serum in your lineup. It's the essential bridge between cleansing and treatment—the missing piece that makes everything else work better.</p>
+            </div>
+            <div class="ef-site-cta">Shop now</div>
+          </div>
         </div>
       </div>
     </div>`;
@@ -2373,15 +2506,22 @@ const R = {
       </div>`).join('');
     return `<div class="eb-wrap"><div class="eb-row">${cards}</div></div>`;
   },
-  /* ---- Ecommerce Expo card 3: quiet proof point ---- */
+  /* ---- Ecommerce Expo card 3: Zephyr testimonial spread ---- */
   commerceMetric(s){
     const mark = LOGOS[logoKey(s.by||'')];
-    return `<div class="em-wrap">
-      <div class="shd">
-        <div class="shd-t em-big">${esc(s.value||'')}</div>
-        <div class="shd-s em-small">${esc(s.line||'')}</div>
+    return `<div class="em-wrap qt-wrap">
+      <div class="qt-panel qt-say">
+        <p class="qt-in qt-quote">${esc(s.value||'')}<br>${esc(s.line||'')}</p>
       </div>
-      <div class="em-by">${mark||`<span class="em-by-fallback">${esc(s.by||'')}</span>`}</div>
+      <div class="qt-panel qt-who">
+        <div class="qt-head">
+          <div class="qt-in qt-logo">${mark||`<span class="em-logo-fallback">${esc(s.by||'')}</span>`}</div>
+        </div>
+        <div class="qt-in em-copy">
+          <p class="em-quote">\u201c${esc(s.quote||'')}\u201d</p>
+          <p class="em-attribution">${esc(s.attribution||'')}</p>
+        </div>
+      </div>
     </div>`;
   },
   /* ---- Ecommerce Expo card 4: real editor output only ---- */
@@ -3543,65 +3683,181 @@ function setupInstall(slideEl, sd, tl){
    the ring, where stroke-dashoffset is the only way to draw a partial arc. */
 const DI_RING_LEN = 57.6;                       // 2πr at r=9.167, the arc's dasharray
 
-/* ---------------- Expo card 1: upload -> smaller file -> storefront ----------
-   The uploader is already present when the slide arrives: the only motion in
-   step one is meaningful progress. Its checked row is the final Figma state
-   and remains visible while the optimized file and browser join it. The whole
-   story resolves in ~2.2s, leaving more than half the card for the completed
-   composition to be read from across the stand. */
+/* ------------- Expo card 1: upload -> optimization -> storefront -------------
+   Frame 234:979 combines the Webflow uploader's complete interaction with the
+   first two cells of the website pipeline. One 120x150 file moves into the
+   real uploader, hands over to its compact progress row, then resolves in the
+   right-hand analysis cell. The completed shell then recedes as frame 234:1415
+   opens in the same 1252px footprint: browser chrome first, then its product
+   photo and copy. The overlap explains that the processed file is already live
+   without making the image itself teleport across the composition. */
 function setupCommerceFlow(slideEl, sd, tl){
-  const file = slideEl.querySelector('.ef-ufile');
-  const arc = slideEl.querySelector('.ef-uaction .di-ring .arc');
-  const optimized = slideEl.querySelector('.ef-file');
-  const browser = slideEl.querySelector('.ef-browser');
-  if (!file || !arc || !optimized || !browser) return;
+  const q = slideEl.querySelector.bind(slideEl);
+  const qa = sel => [...slideEl.querySelectorAll(sel)];
+  const process = q('.ef-process');
+  const site = q('.ef-site');
+  const sitePhoto = q('.ef-site-photo');
+  const siteInfo = q('.ef-site-info');
+  const left = q('.ef-left');
+  const widget = q('.ef-widget');
+  const drop = q('.ef-drop');
+  const dropText = q('.ef-droptxt');
+  const drag = q('.ef-drag');
+  const dragCard = q('.ef-drag-card');
+  const cursor = q('.ef-cursor');
+  const panel = q('.ef-panel');
+  const file = q('.ef-ufile');
+  const arc = q('.ef-uaction .di-ring .arc');
+  const wash = q('.ef-wash-in');
+  const placeholder = q('.ef-analyse-ph');
+  const image = q('.ef-analyse-img');
+  const deleteButton = q('.ef-delete');
+  const dots = qa('.ef-dots');
+  const donut = qa('.ef-right .pd-donut .c');
+  const lines = qa('.ef-analysis p');
+  const badges = qa('.ef-badge');
+  if (!process || !site || !sitePhoto || !siteInfo || !left || !widget || !drop || !drag || !panel || !file || !arc) return;
 
-  file.dataset.state = 'uploading';
-  arc.style.strokeDashoffset = DI_RING_LEN * .72;
-  optimized.style.opacity = '0';
-  optimized.style.transform = 'translateY(12px) scale(.98)';
-  browser.style.opacity = '0';
-  browser.style.transform = 'scale(.955) translateY(10px)';
+  const reset = ()=>{
+    process.style.opacity = '1';
+    process.style.transform = 'none';
+    delete process.dataset.state;
+    Object.assign(site.style,{
+      opacity:'0',
+      transform:'translateY(24px) scale(.985)',
+      clipPath:'inset(0 0 93% 0 round 16px)'
+    });
+    Object.assign(sitePhoto.style,{opacity:'0',transform:'translateY(12px)'});
+    Object.assign(siteInfo.style,{opacity:'0',transform:'translateY(12px)'});
+    drop.classList.remove('hot');
+    dropText.textContent = 'Drop files here';
+    Object.assign(drag.style, {opacity:'0',transform:'none'});
+    Object.assign(dragCard.style, {opacity:'1',transform:'scale(1)'});
+    cursor.style.opacity = '1';
+    Object.assign(widget.style, {opacity:'1',transform:'none'});
+    Object.assign(panel.style, {opacity:'0',transform:'scale(.97)'});
+    file.dataset.state = 'uploading';
+    arc.style.strokeDashoffset = DI_RING_LEN;
+    wash.style.clipPath = 'inset(0 0 100% 0)';
+    placeholder.style.opacity = '1';
+    image.style.opacity = '0';
+    deleteButton.style.opacity = '0';
+    dots.forEach(d=>d.dataset.state = 'standby');
+    donut.forEach(c=>c.classList.remove('lit'));
+    lines.forEach(p=>p.style.opacity = '0');
+    badges.forEach(b=>Object.assign(b.style,{opacity:'0',transform:'translateY(10px)'}));
+  };
+  reset();
 
-  if (REDUCED){
+  const settle = ()=>{
+    Object.assign(drag.style,{opacity:'0'});
+    Object.assign(widget.style,{opacity:'0',transform:'scale(.97)'});
+    Object.assign(panel.style,{opacity:'1',transform:'none'});
     arc.style.strokeDashoffset = 0;
     file.dataset.state = 'done';
-    optimized.style.opacity = '1';
-    optimized.style.transform = 'none';
-    browser.style.opacity = '1';
-    browser.style.transform = 'none';
-    return;
-  }
+    wash.style.clipPath = 'inset(0 0 0% 0)';
+    placeholder.style.opacity = '0';
+    image.style.opacity = '1';
+    deleteButton.style.opacity = '1';
+    dots.forEach(d=>d.dataset.state = 'standby');
+    donut.forEach(c=>c.classList.add('lit'));
+    lines.forEach(p=>p.style.opacity = '1');
+    badges.forEach(b=>Object.assign(b.style,{opacity:'.5',transform:'none'}));
+    process.dataset.state = 'ready-for-site';
+  };
 
-  // 1. Finish the progress already visible on entry, then keep the exact
-  // checked-file state from frame 229:544.
-  tl.to(arc, [{strokeDashoffset:DI_RING_LEN*.72},{strokeDashoffset:0}],
-        {at:.08, dur:.68, ease:EASE.inOut});
-  tl.at(.78, ()=>{ file.dataset.state = 'done'; });
+  const settleSite = ()=>{
+    Object.assign(process.style,{opacity:'0',transform:'translateY(-18px) scale(.985)'});
+    Object.assign(site.style,{
+      opacity:'1',
+      transform:'none',
+      clipPath:'inset(0 0 0 0 round 16px)'
+    });
+    Object.assign(sitePhoto.style,{opacity:'1',transform:'none'});
+    Object.assign(siteInfo.style,{opacity:'1',transform:'none'});
+    badges.forEach(b=>b.style.opacity='0');
+    process.dataset.state = 'site-live';
+  };
 
-  // 2. The uploaded file lands already optimized at the frame's confirmed
-  // 120KB final value; no unsupported starting size is invented.
-  tl.to(optimized,
-        [{opacity:0,transform:'translateY(12px) scale(.98)'},
-         {opacity:1,transform:'translateY(0) scale(1)'}],
-        {at:.92,dur:.34,ease:EASE.out,fill:'forwards'});
-  tl.to(optimized,
-        [{transform:'scale(1)'},{transform:'scale(.975)'},{transform:'scale(1)'}],
-        {at:1.18,dur:.28,ease:EASE.inOut,fill:'forwards'});
+  if (REDUCED){ settle(); settleSite(); return; }
 
-  // 3. The browser opens with the file already in place. No loading state:
-  // the absence of another step is the point of the card.
-  tl.to(browser,
-        [{opacity:0,transform:'scale(.955) translateY(10px)'},
-         {opacity:1,transform:'scale(1) translateY(0)'}],
-        {at:1.5,dur:.38,ease:EASE.out,fill:'forwards'});
+  // The file is a drag, so it keeps the Webflow card's spring. The parent owns
+  // travel; its child owns the drop scale, preventing transform contention.
+  const FROM = {x:0,y:0}, OVER = {x:235,y:81};
+  const FLY = {at:.30,response:.62,bounce:.12};
+  tl.to(drag,[{opacity:0},{opacity:1}],{at:.20,dur:.18});
+  let landed = 1.15;
+  tl.spring(drag,FROM,OVER,{...FLY,onArrive:t=>landed=t});
 
-  // Preserve the completed frame through the outgoing crossfade after the
-  // timeline is killed; cancelled WAAPI otherwise falls back to reset styles.
-  tl.at(1.92, ()=>{
-    optimized.style.opacity = '1'; optimized.style.transform = 'none';
-    browser.style.opacity = '1'; browser.style.transform = 'none';
+  // Light the drop zone on the exact spring frame where the pointer enters.
+  const tip = {x:drag.offsetLeft+cursor.offsetLeft,y:drag.offsetTop+cursor.offsetTop};
+  const zx = widget.offsetLeft+drop.offsetLeft, zy = widget.offsetTop+drop.offsetTop;
+  const cross = springCrossing(FROM,OVER,FLY,o=>{
+    const x=tip.x+(o.x||0), y=tip.y+(o.y||0);
+    return x>=zx && x<=zx+drop.offsetWidth && y>=zy && y<=zy+drop.offsetHeight;
   });
+  tl.cls(drop,'hot',cross!=null ? FLY.at+cross : Math.max(0,landed-.25));
+
+  const DROP = landed + .08;
+  tl.to(dragCard,[{opacity:1,transform:'scale(1)'},{opacity:0,transform:'scale(.28)'}],
+        {at:DROP,dur:.42,ease:EASE.inOut,fill:'forwards'});
+  tl.to(cursor,[{opacity:1},{opacity:0}],{at:DROP+.04,dur:.20,fill:'forwards'});
+  tl.at(DROP+.18,()=>{ dropText.textContent='1 file added'; });
+  tl.cls(drop,'hot',DROP+.28,false);
+
+  // The full widget hands over to the exact compact upload panel from the
+  // Webflow card; the one ring is the complete upload process.
+  const SWAP = DROP + .42;
+  tl.to(widget,[{opacity:1,transform:'scale(1)'},{opacity:0,transform:'scale(.97)'}],
+        {at:SWAP,dur:.20,fill:'forwards'});
+  tl.to(panel,[{opacity:0,transform:'scale(.97)'},{opacity:1,transform:'scale(1)'}],
+        {at:SWAP+.05,dur:.24,ease:EASE.out});
+  const UPLOAD = SWAP + .18;
+  tl.to(arc,[{strokeDashoffset:DI_RING_LEN},{strokeDashoffset:0}],
+        {at:UPLOAD,dur:.55,ease:'linear'});
+  const ANALYSE = UPLOAD + .62;
+  tl.at(ANALYSE,()=>{ file.dataset.state='done'; dots[0].dataset.state='working'; });
+
+  // The right cell receives the same photo, then resolves only the two lines
+  // present in frame 234:979. No extra safety or delivery claims are added.
+  tl.to(placeholder,[{opacity:1},{opacity:0}],{at:ANALYSE,dur:.16,fill:'forwards'});
+  tl.to(image,[{opacity:0},{opacity:1}],{at:ANALYSE,dur:.28});
+  tl.to(wash,[{clipPath:'inset(0 0 100% 0)'},{clipPath:'inset(0 0 0% 0)'}],
+        {at:ANALYSE,dur:.60,ease:EASE.out});
+  tl.to(lines[0],[{opacity:0},{opacity:1}],{at:ANALYSE+.10,dur:.20});
+  donut.forEach((c,i)=>tl.cls(c,'lit',ANALYSE+.08+i*.012));
+  tl.to(lines[1],[{opacity:0},{opacity:1}],{at:ANALYSE+.45,dur:.20});
+  tl.to(deleteButton,[{opacity:0},{opacity:.92}],{at:ANALYSE+.40,dur:.20});
+  badges.forEach((b,i)=>tl.to(b,
+    [{opacity:0,transform:'translateY(10px)'},{opacity:.5,transform:'translateY(0)'}],
+    {at:ANALYSE+.36+i*.07,dur:.28,ease:EASE.out}));
+  tl.at(ANALYSE+.64,()=>{ dots[0].dataset.state='standby'; });
+
+  // Pin the completed frame inline so killing the score for the outgoing slide
+  // crossfade cannot restore any of the hidden opening styles.
+  tl.at(ANALYSE+.68,settle);
+
+  // The processing shell and browser overlap briefly: the former recedes while
+  // the latter opens down from its chrome. Photo and details arrive only once
+  // the page has enough height to hold them, so nothing flashes through the
+  // clip. All motion is transform/opacity apart from the sanctioned clip-path.
+  const SITE = ANALYSE + .85;
+  tl.to(process,
+    [{opacity:1,transform:'translateY(0) scale(1)'},{opacity:0,transform:'translateY(-18px) scale(.985)'}],
+    {at:SITE,dur:.38,ease:EASE.out,fill:'forwards'});
+  badges.forEach(b=>tl.to(b,[{opacity:.5},{opacity:0}],
+    {at:SITE,dur:.22,fill:'forwards'}));
+  tl.to(site,[
+    {opacity:0,transform:'translateY(24px) scale(.985)',clipPath:'inset(0 0 93% 0 round 16px)'},
+    {opacity:1,transform:'translateY(0) scale(1)',clipPath:'inset(0 0 0 0 round 16px)'}
+  ],{at:SITE+.10,dur:.58,ease:EASE.out});
+  tl.to(sitePhoto,
+    [{opacity:0,transform:'translateY(12px)'},{opacity:1,transform:'translateY(0)'}],
+    {at:SITE+.31,dur:.36,ease:EASE.out});
+  tl.to(siteInfo,
+    [{opacity:0,transform:'translateY(12px)'},{opacity:1,transform:'translateY(0)'}],
+    {at:SITE+.38,dur:.40,ease:EASE.out});
+  tl.at(SITE+.80,settleSite);
 }
 
 function setupDropin(slideEl, sd, tl){
@@ -4548,8 +4804,10 @@ function fieldsFor(s, i){
     case 'commerceMetric': return dur+`
       <label class="f"><span>Proof point</span><input type="text" data-f="value" value="${esc(s.value||'')}"></label>
       <label class="f"><span>Supporting line</span><input type="text" data-f="line" value="${esc(s.line||'')}"></label>
-      <label class="f"><span>Attribution</span><input type="text" data-f="by" value="${esc(s.by||'')}"></label>
-      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">Laid out to Figma frame 204:1081. Attribution looks up assets/logos via the name in this field (currently zephyr.svg).</p>`;
+      <label class="f"><span>Testimonial</span><textarea data-f="quote">${esc(s.quote||'')}</textarea></label>
+      <label class="f"><span>Attribution</span><input type="text" data-f="attribution" value="${esc(s.attribution||'')}"></label>
+      <label class="f"><span>Logo asset name</span><input type="text" data-f="by" value="${esc(s.by||'')}"></label>
+      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">Figma frame 234:1237, using the Webflow testimonial card's exact two-panel geometry and entrance choreography. The logo name looks up assets/logos (currently zephyr.svg).</p>`;
     case 'commerceEditor': return dur+`
       <label class="f"><span>Headline</span><textarea data-f="heading">${esc(s.heading||'')}</textarea></label>
       <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">Laid out to Figma frame 213:1313 — one 641&times;473 well, the background swapped in place behind a light pass. Asset status: ${ECOMMERCE.editorBefore&&ECOMMERCE.editorAfter?'ready':'waiting for assets/ecommerce/editor-before and editor-after'}. The pair must be the same crop or the wipe becomes a jump cut, and this card never simulates editor output with CSS.</p>`;
@@ -4807,7 +5065,7 @@ gLogo.onchange = ()=>{ deck.settings.watermark=gLogo.checked; enter(idx); };
 const NEW = {
   commerceFlow:{type:'commerceFlow',duration:5,heading:'Every product image, optimized and fast. Automatically.'},
   commerceBenefits:{type:'commerceBenefits',duration:6},
-  commerceMetric:{type:'commerceMetric',duration:6,value:'2x faster page loads',line:'faster pages, more sales',by:'Zephyr'},
+  commerceMetric:{type:'commerceMetric',duration:6,value:'2x faster page loads.',line:'Faster pages, more sales.',quote:'This way, we get the absolute most speed we can when loading our web pages across mobile devices.',attribution:'Sam McKinney, Director of Agency Services at Zephyr',by:'Zephyr'},
   commerceEditor:{type:'commerceEditor',duration:6,heading:'Turn any photo\ninto a catalog-ready product shot.'},
   commerceLogos:{type:'commerceLogos',duration:5,title:'Trusted by',logos:'L\u2019Or\u00e9al, Crayola, Samsonite, GemPages, Shogun, Marko'},
   commerceInfrastructure:{type:'commerceInfrastructure',duration:6,heading:'The infrastructure\nbehind every product image.',sub:'One integration. Upload, optimize, and deliver every image, and every other file.',steps:'Upload, Optimize, Deliver'},

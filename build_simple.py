@@ -178,7 +178,7 @@ def encode_ecommerce() -> str:
     # and the catalog shot are usually JPG, so the extension is not knowable here
     stems = {
         "product": "product",
-        "card1Flower": "card1-flower",
+        "card1Product": "card1-product",
         "editorBefore": "editor-before",
         "editorAfter": "editor-after",
         "infrastructureProduct": "infrastructure-product",
@@ -202,15 +202,15 @@ def encode_ecommerce() -> str:
         if not path.exists():
             raise SystemExit(f"ERROR: required Ecommerce Expo path asset missing: {path}")
         out[f"infrastructure-{key}"] = inline_svg(path)
-    for key in ("os", "left", "right"):
+    for key in ("os", "left", "right", "back"):
         path = ECOMMERCE / f"card1-browser-{key}.svg"
         if not path.exists():
             raise SystemExit(f"ERROR: required Ecommerce Expo Card 1 asset missing: {path}")
         out[f"card1-browser-{key}"] = inline_svg(path)
-    if "card1Flower" not in out:
+    if "card1Product" not in out:
         raise SystemExit(
             f"ERROR: required Ecommerce Expo Card 1 image missing: "
-            f"{ECOMMERCE / 'card1-flower.png'}"
+            f"{ECOMMERCE / 'card1-product.jpg'}"
         )
     if "infrastructureProduct" not in out:
         raise SystemExit(

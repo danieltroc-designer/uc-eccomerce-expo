@@ -16,11 +16,16 @@ Working source of truth for this booth cut. Do not invent event facts.
 - Card 4's final version must use genuine AI Image Editor input/output:
   background replacement only, no altered product, mockup, or generated model.
 - Logo wall: L'Oréal, Crayola, Samsonite, GemPages, Shogun, Marko.
-- Card 1 follows Figma frame `229:443`, with uploader final state `229:544`:
-  one visible upload finishes its progress and stays checked, the resulting
-  optimized product card arrives at the frame's 120KB final value, then the
-  storefront browser opens with the image already in place. The three beats
-  resolve quickly and hold as one completed composition.
+- Card 1's first phase follows Figma frame `234:979`: the complete uploader
+  interaction from the Webflow booth card runs in the left cell with one tube
+  photo, then the same photo resolves through the frame's simplified two-line
+  optimization readout in the right cell. Its payoff follows frame `234:1415`:
+  the completed process shell recedes into a 1252px browser where the same tube
+  photo is already live on the Velour Essentials product page.
+- Card 3 follows Figma frame `234:1237`: “2x faster page loads. Faster pages,
+  more sales.” beside the Zephyr mark and “This way, we get the absolute most
+  speed we can when loading our web pages across mobile devices.” attributed
+  to Sam McKinney, Director of Agency Services at Zephyr.
 
 ## Assets still needed
 

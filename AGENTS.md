@@ -67,10 +67,14 @@ the implementation are load bearing:
   which animates `transform`, so a panel sampled mid-entrance reads ~16px low
   and the frame's y looks wrong when only the animation is unfinished.
 - `encode_logos()` scans `assets/logos/*.svg`; new customer marks require no
-  build-script registration. Card 3 (the Zephyr proof point) is laid out to
-  Figma frame 204:1081: the shared `.shd` headline sits at `--shd-y:380px` and
-  the mark is pinned at 863,620 in its 193×157 export box. Card 5's wall comes
-  from frame 207:1131 and is two rows of three, **not a grid** — `ECOM_WALL`
+  build-script registration. Ecommerce Card 3 now follows frame 234:1237 and
+  reuses the inherited Webflow testimonial spread exactly: the 938×465 lime
+  claim panel at (229,307), then the 507×465 source panel at (1183,307). The
+  panels use the existing `.qt-*` choreography — fast opacity, slower 24px
+  rise, source delayed 220ms — and the Zephyr mark is scaled from its real
+  vector to the frame's 114×93 slot. Keep the claim, quote and attribution in
+  `EVENT.md`; do not reconstruct the logo in type. Card 5's wall comes from
+  frame 207:1131 and is two rows of three, **not a grid** — `ECOM_WALL`
   pins each mark to its own slot at its own export size, because the frame
   places them optically (row 2's vertical centres differ by 15px) and six
   wordmarks of unequal weight at one shared width read as ragged. Order in the
@@ -182,19 +186,27 @@ Figma exports these wrapped in whatever artboard they were sitting on — a
 viewBox. Only the named `<g>` is the mark, so anything re-exported here has to
 be unwrapped before it is committed.
 
-Ecommerce Card 1 follows Figma frame 229:443, with its uploader completion
-state from 229:544. The three beats share one final composition rather than
-replacing each other: the compact uploader is already visible and finishes its
-ring, the 220x275 optimized file lands at the frame's confirmed 120KB value,
-then the 514x401 browser opens with the product already present. The score
-resolves in ~1.9s and
-holds for the rest of the 5s card. `setupCommerceFlow()` resets all three beats
-synchronously and writes the completed file/browser state inline before the
-outgoing crossfade, because killing a WAAPI animation otherwise restores the
-hidden opening styles. The reduced-motion state is the completed composition.
-The browser's transparent flower and exact chrome vectors are required offline
-assets under `assets/ecommerce/card1-*`; do not replace them with the full-frame
-Figma screenshot.
+Ecommerce Card 1's first phase follows Figma frame 234:979. Its 1252x554 shell
+contains only the frame's first two columns: the complete Webflow uploader in
+the left cell and the simplified optimization result in the right. One tube
+photo is reused everywhere — dragged 120x150 card, compact upload row, 240x315
+analysis preview and blurred wash — from the required offline asset
+`assets/ecommerce/card1-product.jpg`. The file travels under a spring on a
+parent while its child owns the drop scale, so the transforms never compete;
+the zone lights from `springCrossing()` when the pointer actually enters it.
+After the large widget confirms “1 file added,” it hands over to the compact
+one-file progress panel, whose ring completes before the right cell resolves
+the frame's two telemetry lines.
+
+The payoff is Figma frame 234:1415: a 1252x814 browser at (334,426), deliberately
+extending below the stage, with the same source photo in its exact 561x590
+product slot. `.ef-process` lifts and recedes while `.ef-site` opens down from
+its 56px chrome with `clip-path`; the page photo and details settle after the
+reveal has made room for them. This overlap is the explanation that the
+optimized image is already live, so do not turn it into a hard cut or a
+long-lived blank between phases. `setupCommerceFlow()` resets synchronously
+and pins the storefront inline before exit. Reduced motion opens on that final
+storefront state.
 
 The inherited `dropin` card type is a separate, reusable uploader demo: a stack
 of two files is dragged in under a single cursor, dropped, and the widget hands
