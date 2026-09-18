@@ -7,6 +7,10 @@ Drop final event artwork here using these exact filenames, then run
 
 - `product.jpg` — catalog product image used by cards 1 and 6. Until supplied,
   both cards reuse the existing flower thumbnail.
+- `card1-flower.png` — the transparent storefront flower from Figma frame
+  `229:443`. `card1-browser-{os,left,right}.svg` are that frame's browser
+  controls. These four assets are required by Card 1 and inlined for offline
+  playback.
 - `editor-before` — the AI Image Editor input: the product on its original
   background.
 - `editor-after` — the editor's own output for that exact file.

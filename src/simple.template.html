@@ -1414,70 +1414,71 @@
   .ec-kicker{font-family:var(--cmono);font-size:13px;letter-spacing:.08em;
     text-transform:uppercase;color:#84858a}
 
-  /* Card 1 — product image: upload → optimize → live store. */
+  /* Card 1 — storyboard 229:443. Three states share one finished composition:
+     Uploadcare's compact uploader, the optimized file, then the live storefront.
+     The score runs quickly and holds the complete frame. */
   .ef-wrap{position:absolute;inset:0}
-  .ef-flow{position:absolute;left:218px;top:382px;width:1484px;height:480px;
-    display:grid;grid-template-columns:360px 360px 520px;gap:72px;align-items:center}
-  .ef-stage{position:relative;height:360px;border-radius:28px;background:#0e0e10;
-    border:1px solid #1b1b1e;overflow:hidden;
-    opacity:0;transform:translateY(18px);
-    transition:opacity .24s ease,transform .46s var(--ease-out)}
-  .slide.active .ef-stage{opacity:1;transform:none}
-  .ef-stage:nth-child(2){transition-delay:.52s}
-  .ef-stage:nth-child(3){transition-delay:1.55s}
-  .slide:not(.active) .ef-stage{transition-delay:0s}
-  .ef-label{position:absolute;left:24px;top:22px}
-  .ef-photo{position:absolute;left:50%;top:72px;width:180px;height:226px;
-    transform:translateX(-50%);border-radius:18px;overflow:hidden;background:#eee8dc}
-  .ef-photo img{width:100%;height:100%;object-fit:cover;display:block}
-  .slide.active .ef-upload .ef-photo{animation:efUpload 5s var(--ease-out) both}
-  @keyframes efUpload{
-    0%{opacity:0;transform:translate(-50%,-26px) scale(.94)}
-    8%,100%{opacity:1;transform:translate(-50%,0) scale(1)}
-  }
-  .ef-meter{position:absolute;left:28px;right:28px;bottom:26px;height:6px;
-    border-radius:99px;background:#242428;overflow:hidden}
-  .ef-meter i{display:block;height:100%;width:100%;background:#6e8cff;border-radius:inherit;
-    transform:scaleX(0);transform-origin:left center}
-  .slide.active .ef-meter i{animation:efMeter 1s linear .18s forwards}
-  @keyframes efMeter{to{transform:scaleX(1)}}
-  .ef-opt .ef-photo img{filter:saturate(.86) brightness(.82) blur(3px)}
-  .slide.active .ef-opt .ef-photo img{animation:efCrisp .65s var(--ease-out) 1.12s forwards}
-  @keyframes efCrisp{to{filter:saturate(1) brightness(1) blur(0)}}
-  .ef-weight{position:absolute;left:28px;right:28px;bottom:26px;height:52px}
-  .ef-weight-bar{position:absolute;left:0;top:0;width:100%;height:8px;background:#2a2a2d;
-    border-radius:99px;transform-origin:left}
-  .slide.active .ef-weight-bar{animation:efWeight .72s var(--ease-out) 1.04s forwards}
-  @keyframes efWeight{to{transform:scaleX(.32);background:#5fd873}}
-  .ef-weight-copy{position:absolute;left:0;right:0;bottom:0;font-family:var(--cmono);
-    font-size:13px;color:#77797e}
-  .ef-weight-copy span{position:absolute;right:0;transition:opacity .18s ease}
-  .ef-weight-copy .after{opacity:0;color:#70df85}
-  .slide.active .ef-weight-copy .before{animation:efOld .18s ease 1.5s forwards}
-  .slide.active .ef-weight-copy .after{animation:efNew .2s ease 1.56s forwards}
-  @keyframes efOld{to{opacity:0}} @keyframes efNew{to{opacity:1}}
-  .ef-browser{position:absolute;inset:20px;border-radius:18px;background:#f3f2ef;color:#111;
-    overflow:hidden;transform:scale(.96);opacity:0}
-  .slide.active .ef-browser{animation:efStore .34s var(--ease-pop) 2.05s forwards}
-  @keyframes efStore{to{opacity:1;transform:scale(1)}}
-  .ef-chrome{height:38px;background:#fff;border-bottom:1px solid #ddd;
-    display:flex;align-items:center;gap:6px;padding:0 14px}
-  .ef-chrome i{width:7px;height:7px;border-radius:50%;background:#d3d3d3}
-  .ef-product{display:grid;grid-template-columns:202px 1fr;gap:24px;padding:30px}
-  .ef-product img{width:202px;height:250px;object-fit:cover;border-radius:12px}
-  .ef-product-copy{padding-top:24px}
-  .ef-product-copy b{display:block;font-size:26px;line-height:1.08;letter-spacing:-.4px}
-  .ef-product-copy p{margin-top:16px;font-size:14px;line-height:1.5;color:#717171}
-  .ef-buy{margin-top:26px;height:42px;border-radius:7px;background:#111;color:#fff;
-    display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600}
-  .ef-fast{position:absolute;right:22px;top:50px;padding:7px 10px;border-radius:99px;
-    background:#ddff72;color:#172006;font-family:var(--cmono);font-size:11px;
-    opacity:0;transform:translateY(5px)}
-  .slide.active .ef-fast{animation:efNew .2s ease 2.42s forwards}
-  .ef-arrow{position:absolute;top:237px;width:48px;height:1px;background:#34343a}
-  .ef-arrow::after{content:'';position:absolute;right:0;top:-4px;width:8px;height:8px;
-    border-top:1px solid #777;border-right:1px solid #777;transform:rotate(45deg)}
-  .ef-a1{left:372px}.ef-a2{left:804px}
+  .ef-uploader{position:absolute;left:238px;top:585px;width:400px;
+    background:#1a1a1a;border-radius:12px;overflow:hidden;
+    box-shadow:0 6px 20px rgba(0,0,0,.25);
+    font-family:-apple-system,BlinkMacSystemFont,var(--sans)}
+  .ef-uhead{height:52px;padding:10px 10px 10px 20px;
+    display:flex;align-items:center;justify-content:space-between}
+  .ef-utitle{font-size:14px;font-weight:510;line-height:20px;color:#e1e1e1}
+  .ef-uclose{padding:8px;display:flex}
+  .ef-uclose svg{width:16px;height:16px;display:block}
+  .ef-ulist{padding:0 10px 10px}
+  .ef-ufile{height:52px;padding:10px;background:#242424;border-radius:8px;
+    display:flex;align-items:center;justify-content:space-between}
+  .ef-ufleft{display:flex;align-items:center;gap:12px}
+  .ef-uthumb{position:relative;width:32px;height:32px;flex:none}
+  .ef-uthumb>img{width:100%;height:100%;object-fit:cover;border-radius:8px;display:block}
+  .ef-ucheck{position:absolute;left:16px;top:16px;width:14px;height:14px;
+    opacity:0;transform:scale(.55)}
+  .ef-ucheck svg{width:100%;height:100%;display:block}
+  .ef-uname{font-size:13px;line-height:20px;color:#989898}
+  .ef-uaction{position:relative;width:21px;height:21px;display:flex;align-items:center;justify-content:center}
+  .ef-uaction .di-ring{position:absolute}
+  .ef-ubin{position:absolute;right:0;width:16px;height:16px;opacity:0}
+  .ef-ubin svg{width:100%;height:100%;display:block}
+  .ef-ufile[data-state="done"] .ef-ucheck{opacity:1;transform:none}
+  .ef-ufile[data-state="done"] .di-ring{opacity:0}
+  .ef-ufile[data-state="done"] .ef-ubin{opacity:1}
+
+  .ef-file{position:absolute;left:834px;top:504px;width:220px;height:275px;
+    border-radius:12px;overflow:hidden;opacity:0;transform:translateY(12px) scale(.98)}
+  .ef-file-photo{position:absolute;inset:0;background:rgba(255,255,255,.05)}
+  .ef-file-photo img{width:100%;height:100%;object-fit:cover;display:block}
+  .ef-file-photo::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.05)}
+  .ef-tag{position:absolute;top:6px;padding:4px 8px;border-radius:6px;background:#161616;
+    font-family:var(--cmono);font-size:12px;line-height:normal;color:#fff}
+  .ef-kind{left:6px}
+  .ef-size{right:6px}
+
+  .ef-browser{position:absolute;left:1229px;top:441px;width:514px;height:401px;
+    border-radius:16px;overflow:hidden;opacity:0;transform:scale(.955) translateY(10px);
+    transform-origin:50% 50%;
+    filter:drop-shadow(0 30px 22px rgba(0,0,0,.18))}
+  .ef-chrome{height:56px;padding:4px 24px;background:#353535;
+    display:flex;align-items:center;gap:24px}
+  .ef-os{width:52px;height:12px;display:flex}
+  .ef-os svg{width:52px;height:12px;display:block}
+  .ef-nav{display:flex;gap:12px}
+  .ef-nav i{width:20px;height:20px;display:block}
+  .ef-nav svg{width:20px;height:20px;display:block}
+  .ef-browser-rule{height:1px;background:#4d4d4d}
+  .ef-page{position:relative;height:344px;background:#f3e8dd;color:#000;overflow:hidden}
+  .ef-product-art{position:absolute;left:203px;top:0;width:311px;height:388px}
+  .ef-product-art img{width:100%;height:100%;object-fit:cover;display:block}
+  .ef-product-title{position:absolute;left:32px;top:62px;width:233px;
+    font-size:48px;font-weight:580;line-height:1;letter-spacing:-.72px;
+    text-box-trim:trim-both;text-box-edge:cap alphabetic}
+  .ef-product-copy{position:absolute;left:32px;top:163px;width:221px;
+    font-size:16px;font-weight:500;line-height:normal;letter-spacing:-.24px;color:#808080;
+    text-box-trim:trim-both;text-box-edge:cap alphabetic}
+  .ef-buy{position:absolute;left:38px;top:225px;padding:16px 48px;border-radius:4px;
+    background:#000;color:#fff;font-size:16px;font-weight:580;line-height:1;
+    letter-spacing:-.24px;text-box-trim:trim-both;text-box-edge:cap alphabetic}
 
   /* Card 2 — storyboard frame 212:1213. Five fixed 265x361 panels sit in a
      1389px row: the 16px gutters are part of the composition, not a responsive
@@ -1677,20 +1678,14 @@
     .pl-shine .pl-pill::after{animation:none!important;opacity:0!important}
     .slide.active .sc-chip{animation:none!important}
     .pd-dots[data-state="working"] i{animation:none!important}
-    .ef-stage,.eb-card,.el-logo{transition:none!important;opacity:1!important;transform:none!important}
-    .ef-upload .ef-photo,.ef-meter i,.ef-opt .ef-photo img,.ef-weight-bar,
-    .ef-weight-copy .before,.ef-weight-copy .after,.ef-browser,.ef-fast,
-    .em-big,.em-small,.em-by,.ee-scan,.ee-after{
+    .eb-card,.el-logo{transition:none!important;opacity:1!important;transform:none!important}
+    .ef-browser,.em-big,.em-small,.em-by,.ee-scan,.ee-after{
       animation:none!important}
     /* card 4's payoff is the cleaned shot, so settle on it rather than on the
        photo the card opens with; the light pass has nothing left to explain */
     .ee-scan{opacity:0!important}
     .ee-after{opacity:1!important;clip-path:none!important}
-    .ef-meter i{transform:scaleX(1)!important}
-    .ef-opt .ef-photo img{filter:none!important}
-    .ef-weight-bar{transform:scaleX(.32)!important;background:#5fd873!important}
-    .ef-weight-copy .before{opacity:0!important}
-    .ef-weight-copy .after,.ef-browser,.ef-fast,.em-big,.em-small,.em-by{
+    .ef-browser,.em-big,.em-small,.em-by{
       opacity:1!important;transform:none!important}
   }
 </style>
@@ -2327,38 +2322,41 @@ const PD_DONUT = (()=>{
 const R = {
   /* ---- Ecommerce Expo card 1: product image into a live store ---- */
   commerceFlow(s){
-    const image = ECOMMERCE.product || UI['thumb-flower'];
+    const thumb = UI['thumb-flower'];
+    const flower = ECOMMERCE.card1Flower;
     return `<div class="ef-wrap">
-      <div class="ec-head reveal">${esc(s.heading||'')}</div>
-      <div class="ef-flow">
-        <div class="ef-stage ef-upload">
-          <div class="ef-label ec-kicker">Upload</div>
-          <div class="ef-photo"><img src="${image}" alt=""></div>
-          <div class="ef-meter"><i></i></div>
+      <div class="shd"><div class="shd-t reveal">${esc(s.heading||'')}</div></div>
+      <div class="ef-uploader">
+        <div class="ef-uhead">
+          <div class="ef-utitle">Uploading</div>
+          <div class="ef-uclose">${UI.close}</div>
         </div>
-        <div class="ef-arrow ef-a1"></div>
-        <div class="ef-stage ef-opt">
-          <div class="ef-label ec-kicker">Optimize</div>
-          <div class="ef-photo"><img src="${image}" alt=""></div>
-          <div class="ef-weight">
-            <i class="ef-weight-bar"></i>
-            <div class="ef-weight-copy"><span class="before">Original file</span><span class="after">Optimized file</span></div>
-          </div>
-        </div>
-        <div class="ef-arrow ef-a2"></div>
-        <div class="ef-stage ef-store">
-          <div class="ef-browser">
-            <div class="ef-chrome"><i></i><i></i><i></i></div>
-            <div class="ef-product">
-              <img src="${image}" alt="">
-              <div class="ef-product-copy">
-                <b>Everyday Bloom</b>
-                <p>Clean detail, responsive sizing, ready on every screen.</p>
-                <div class="ef-buy">Add to cart</div>
-              </div>
+        <div class="ef-ulist">
+          <div class="ef-ufile" data-state="uploading">
+            <div class="ef-ufleft">
+              <div class="ef-uthumb"><img src="${thumb}" alt=""><i class="ef-ucheck">${UI.check}</i></div>
+              <div class="ef-uname">flower.png</div>
             </div>
-            <div class="ef-fast">Delivered instantly</div>
+            <div class="ef-uaction">${DI_RING}<i class="ef-ubin">${UI.trash}</i></div>
           </div>
+        </div>
+      </div>
+      <div class="ef-file">
+        <div class="ef-file-photo"><img src="${thumb}" alt=""></div>
+        <span class="ef-tag ef-kind">PNG</span>
+        <span class="ef-tag ef-size">120KB</span>
+      </div>
+      <div class="ef-browser">
+        <div class="ef-chrome">
+          <i class="ef-os">${ECOMMERCE['card1-browser-os']}</i>
+          <div class="ef-nav"><i>${ECOMMERCE['card1-browser-left']}</i><i>${ECOMMERCE['card1-browser-right']}</i></div>
+        </div>
+        <div class="ef-browser-rule"></div>
+        <div class="ef-page">
+          <div class="ef-product-art"><img src="${flower}" alt=""></div>
+          <div class="ef-product-title">Everyday<br>Bloom</div>
+          <div class="ef-product-copy">Clean detail, responsive sizing, ready on every screen.</div>
+          <div class="ef-buy">Add to cart</div>
         </div>
       </div>
     </div>`;
@@ -3545,6 +3543,67 @@ function setupInstall(slideEl, sd, tl){
    the ring, where stroke-dashoffset is the only way to draw a partial arc. */
 const DI_RING_LEN = 57.6;                       // 2πr at r=9.167, the arc's dasharray
 
+/* ---------------- Expo card 1: upload -> smaller file -> storefront ----------
+   The uploader is already present when the slide arrives: the only motion in
+   step one is meaningful progress. Its checked row is the final Figma state
+   and remains visible while the optimized file and browser join it. The whole
+   story resolves in ~2.2s, leaving more than half the card for the completed
+   composition to be read from across the stand. */
+function setupCommerceFlow(slideEl, sd, tl){
+  const file = slideEl.querySelector('.ef-ufile');
+  const arc = slideEl.querySelector('.ef-uaction .di-ring .arc');
+  const optimized = slideEl.querySelector('.ef-file');
+  const browser = slideEl.querySelector('.ef-browser');
+  if (!file || !arc || !optimized || !browser) return;
+
+  file.dataset.state = 'uploading';
+  arc.style.strokeDashoffset = DI_RING_LEN * .72;
+  optimized.style.opacity = '0';
+  optimized.style.transform = 'translateY(12px) scale(.98)';
+  browser.style.opacity = '0';
+  browser.style.transform = 'scale(.955) translateY(10px)';
+
+  if (REDUCED){
+    arc.style.strokeDashoffset = 0;
+    file.dataset.state = 'done';
+    optimized.style.opacity = '1';
+    optimized.style.transform = 'none';
+    browser.style.opacity = '1';
+    browser.style.transform = 'none';
+    return;
+  }
+
+  // 1. Finish the progress already visible on entry, then keep the exact
+  // checked-file state from frame 229:544.
+  tl.to(arc, [{strokeDashoffset:DI_RING_LEN*.72},{strokeDashoffset:0}],
+        {at:.08, dur:.68, ease:EASE.inOut});
+  tl.at(.78, ()=>{ file.dataset.state = 'done'; });
+
+  // 2. The uploaded file lands already optimized at the frame's confirmed
+  // 120KB final value; no unsupported starting size is invented.
+  tl.to(optimized,
+        [{opacity:0,transform:'translateY(12px) scale(.98)'},
+         {opacity:1,transform:'translateY(0) scale(1)'}],
+        {at:.92,dur:.34,ease:EASE.out,fill:'forwards'});
+  tl.to(optimized,
+        [{transform:'scale(1)'},{transform:'scale(.975)'},{transform:'scale(1)'}],
+        {at:1.18,dur:.28,ease:EASE.inOut,fill:'forwards'});
+
+  // 3. The browser opens with the file already in place. No loading state:
+  // the absence of another step is the point of the card.
+  tl.to(browser,
+        [{opacity:0,transform:'scale(.955) translateY(10px)'},
+         {opacity:1,transform:'scale(1) translateY(0)'}],
+        {at:1.5,dur:.38,ease:EASE.out,fill:'forwards'});
+
+  // Preserve the completed frame through the outgoing crossfade after the
+  // timeline is killed; cancelled WAAPI otherwise falls back to reset styles.
+  tl.at(1.92, ()=>{
+    optimized.style.opacity = '1'; optimized.style.transform = 'none';
+    browser.style.opacity = '1'; browser.style.transform = 'none';
+  });
+}
+
 function setupDropin(slideEl, sd, tl){
   const drop   = slideEl.querySelector('.di-drop');
   const txt    = slideEl.querySelector('.di-droptxt');
@@ -4388,6 +4447,7 @@ function enter(i){
   if (sd.type==='install') setupInstall(cur, sd, tl);
   if (sd.type==='pipeline') setupPipeline(cur, sd, tl);
   if (sd.type==='dropin') setupDropin(cur, sd, tl);
+  if (sd.type==='commerceFlow') setupCommerceFlow(cur, sd, tl);
   if (sd.type==='commerceInfrastructure') setupCommerceInfrastructure(cur, sd, tl);
   tl.play();
 

@@ -182,10 +182,24 @@ Figma exports these wrapped in whatever artboard they were sitting on — a
 viewBox. Only the named `<g>` is the mark, so anything re-exported here has to
 be unwrapped before it is committed.
 
-Card 1 is the real uploader widget playing its whole story: a stack of two
-files is dragged in under a single cursor, dropped, and the widget hands over
-to the compact "Uploading N files" panel, where each file fills its ring and
-settles into a checkmark plus a bin. The travel is a spring rather than a
+Ecommerce Card 1 follows Figma frame 229:443, with its uploader completion
+state from 229:544. The three beats share one final composition rather than
+replacing each other: the compact uploader is already visible and finishes its
+ring, the 220x275 optimized file lands at the frame's confirmed 120KB value,
+then the 514x401 browser opens with the product already present. The score
+resolves in ~1.9s and
+holds for the rest of the 5s card. `setupCommerceFlow()` resets all three beats
+synchronously and writes the completed file/browser state inline before the
+outgoing crossfade, because killing a WAAPI animation otherwise restores the
+hidden opening styles. The reduced-motion state is the completed composition.
+The browser's transparent flower and exact chrome vectors are required offline
+assets under `assets/ecommerce/card1-*`; do not replace them with the full-frame
+Figma screenshot.
+
+The inherited `dropin` card type is a separate, reusable uploader demo: a stack
+of two files is dragged in under a single cursor, dropped, and the widget hands
+over to the compact "Uploading N files" panel, where each file fills its ring
+and settles into a checkmark plus a bin. The travel is a spring rather than a
 tween, because a dragged object carries momentum; `tl.spring()` reports its
 settle time synchronously through `onArrive`, and the rest of the score is
 written against that, so the drop always follows the landing however the spring

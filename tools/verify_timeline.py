@@ -72,12 +72,14 @@ with sync_playwright() as p:
     print("re-entering card 1 replays it from the top")
     pg.evaluate("enter(0)")
     pg.wait_for_timeout(1500)
-    late = pg.evaluate("document.querySelector('.ef-meter i').getBoundingClientRect().width")
+    late = pg.evaluate("""parseFloat(getComputedStyle(
+        document.querySelector('.ef-uaction .di-ring .arc')).strokeDashoffset)""")
     pg.evaluate("enter(1)"); pg.wait_for_timeout(150)
     pg.evaluate("enter(0)"); pg.wait_for_timeout(80)
-    early = pg.evaluate("document.querySelector('.ef-meter i').getBoundingClientRect().width")
-    check("upload meter restarts near empty", early < late * .25,
-          f"{late:.1f}px -> {early:.1f}px")
+    early = pg.evaluate("""parseFloat(getComputedStyle(
+        document.querySelector('.ef-uaction .di-ring .arc')).strokeDashoffset)""")
+    check("upload ring restarts in progress", late < 2 and early > 30,
+          f"{late:.1f} -> {early:.1f} dash offset")
 
     check("no page errors", not errors, "; ".join(errors[:3]))
     ctx.close()

@@ -16,6 +16,11 @@ Working source of truth for this booth cut. Do not invent event facts.
 - Card 4's final version must use genuine AI Image Editor input/output:
   background replacement only, no altered product, mockup, or generated model.
 - Logo wall: L'Oréal, Crayola, Samsonite, GemPages, Shogun, Marko.
+- Card 1 follows Figma frame `229:443`, with uploader final state `229:544`:
+  one visible upload finishes its progress and stays checked, the resulting
+  optimized product card arrives at the frame's 120KB final value, then the
+  storefront browser opens with the image already in place. The three beats
+  resolve quickly and hold as one completed composition.
 
 ## Assets still needed
 
