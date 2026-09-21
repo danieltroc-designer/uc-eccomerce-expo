@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Card 4: verify backend -> Edit with AI -> genuine catalog result.
+"""Card 4: verify backend -> Edit with AI -> result -> storefront.
 
 The slide records the production ai-catalog-admin interaction offline. This
 check protects the sequence, the exact preset prompt, source/result
@@ -66,6 +66,12 @@ def read(pg):
         veil: opacity(q('.ce-veil')),
         shimmer: opacity(q('.ce-shimmer')),
         done: q('.ce-done') ? getComputedStyle(q('.ce-done')).backgroundColor : '',
+        site: opacity(q('.ce-site')),
+        siteBox: q('.ce-site') ? [q('.ce-site').offsetLeft, q('.ce-site').offsetTop,
+                                  q('.ce-site').offsetWidth, q('.ce-site').offsetHeight] : null,
+        sitePhoto: opacity(q('.ce-site .ef-site-photo')),
+        sitePhotoNatural: natural(q('.ce-site .ef-site-photo img')),
+        siteTitle: q('.ce-site .ef-site-title')?.textContent || '',
         sourceNatural: natural(q('.ce-before')),
         afterNatural: natural(q('.ce-after')),
       };
@@ -119,7 +125,7 @@ def main():
             # 125ms, not 250: the click ripple is only readable for ~230ms, and
             # a cadence longer than the shortest beat turns this into a coin toss
             samples = []
-            for _ in range(72):
+            for _ in range(84):
                 pg.wait_for_timeout(125)
                 samples.append(read(pg))
 
@@ -162,18 +168,40 @@ def main():
                   (f"veil {pending['veil']:.2f}, shimmer {pending['shimmer']:.2f}"
                    if pending else "no pending-state sample"))
 
-            final = samples[-1]
+            # the editor's own last frame, not the slide's: the storefront has
+            # replaced it by the time sampling ends
+            done_editing = [s for s in samples if s["editor"] > .98][-1]
             check("generated result settles",
-                  final["after"] > .98 and final["veil"] < .02
-                  and final["shimmer"] < .02,
-                  f"after {final['after']:.2f}, veil {final['veil']:.2f}")
+                  done_editing["after"] > .98 and done_editing["veil"] < .02
+                  and done_editing["shimmer"] < .02,
+                  f"after {done_editing['after']:.2f}, veil {done_editing['veil']:.2f}")
             check("production prompt is shown",
-                  final["prompt"] == PROMPT, f"{len(final['prompt'])} chars")
+                  done_editing["prompt"] == PROMPT,
+                  f"{len(done_editing['prompt'])} chars")
             check("genuine result asset is loaded",
-                  final["afterNatural"] == [880, 1168],
-                  str(final["afterNatural"]))
+                  done_editing["afterNatural"] == [880, 1168],
+                  str(done_editing["afterNatural"]))
             check("Add to media resolves active",
-                  final["done"] == "rgb(24, 24, 24)", final["done"])
+                  done_editing["done"] == "rgb(24, 24, 24)", done_editing["done"])
+
+            # the payoff: the generated variant live on the storefront
+            hold = [s for s in samples if s["editor"] < .02 and s["site"] > .98]
+            check("result holds before the storefront opens",
+                  len([s for s in samples if s["editor"] > .98
+                       and s["after"] > .98 and s["site"] < .02]) >= 6,
+                  f"{len([s for s in samples if s['editor'] > .98 and s['after'] > .98 and s['site'] < .02])} samples")
+            check("storefront replaces the editor",
+                  bool(hold), f"{len(hold)} settled sample(s)")
+            final = samples[-1]
+            check("storefront matches card 1's browser at this card's y",
+                  final["siteBox"] == [334, 360, 1252, 814], str(final["siteBox"]))
+            check("the storefront shows the generated variant",
+                  final["sitePhotoNatural"] == [880, 1168]
+                  and final["sitePhoto"] > .98,
+                  f"{final['sitePhotoNatural']}, photo {final['sitePhoto']:.2f}")
+            check("product page carries its own copy",
+                  final["siteTitle"].startswith("Ashfold Resurfacing"),
+                  repr(final["siteTitle"]))
 
         check("no page errors", not errors, "; ".join(errors[:3]))
         browser.close()
@@ -188,10 +216,11 @@ def main():
         enter(pg)
         pg.wait_for_timeout(100)
         state = read(pg)
-        check("reduced motion opens on final result",
-              state["editor"] > .98 and state["backend"] < .02
+        check("reduced motion opens on the storefront",
+              state["site"] > .98 and state["sitePhoto"] > .98
+              and state["editor"] < .02 and state["backend"] < .02
               and state["after"] > .98 and state["prompt"] == PROMPT,
-              f"editor {state['editor']}, after {state['after']}")
+              f"site {state['site']}, editor {state['editor']}")
         red.close()
 
     print()

@@ -5,11 +5,11 @@ Working source of truth for this booth cut. Do not invent event facts.
 ## Confirmed
 
 - Event name: **Ecommerce Expo**
-- Seven-card loop, approximately 53 seconds:
+- Seven-card loop, approximately 55 seconds:
   1. Product image upload → optimization → live store payoff (10s)
   2. Five ecommerce benefits (6s)
   3. Zephyr proof point (6s)
-  4. Marketplace backend → Edit with AI → catalog variant (10s)
+  4. Marketplace backend → Edit with AI → catalog variant → storefront (12s)
   5. Customer logo wall (5s)
   6. Upload → Optimize → Deliver infrastructure view (6s)
   7. Booth CTA / file-board outro (10s)
@@ -22,7 +22,10 @@ Working source of truth for this booth cut. Do not invent event facts.
   generated result UUID `3d5bbd80-9f76-46d0-b7ff-263dbb1ec4fe` with:
   “Replace the background with a flat sage green studio backdrop, keep the
   bottle and its natural shadow”. The committed 1536×2048 source and 880×1168
-  result are `assets/ecommerce/catalog-source.jpg` and `editor-after.jpg`.
+  result are `assets/ecommerce/catalog-source.jpg` and `editor-after.jpg`. The
+  card ends with that result live on an Ashfold product page, reusing Card 1's
+  storefront frame; its copy and €49.00 price come from the demo's own backend
+  record, not from invented catalogue data.
 - Logo wall: L'Oréal, Crayola, Samsonite, GemPages, Shogun, Marko.
 - Card 1's first phase follows Figma frame `234:979`: the complete uploader
   interaction from the Webflow booth card runs in the left cell with one tube

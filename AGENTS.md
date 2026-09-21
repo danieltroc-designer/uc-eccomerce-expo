@@ -40,7 +40,7 @@ own source + build + output and is fully independent of the main deck:
   `pipeline`). Card 7 is a `board` slide with `layout:'outro'`.
 - Build: `python build_simple.py` → `dist/uploadcare-simple.html`.
 - Same rule applies: never hand-edit `dist/uploadcare-simple.html`.
-- Current default sequence is 10/6/6/10/5/6/10 seconds (53 seconds total):
+- Current default sequence is 10/6/6/12/5/6/10 seconds (55 seconds total):
  product flow, benefits, Zephyr proof point, AI Enhancer, customer logos,
  infrastructure, booth CTA. Cards 1, 4 and 7 hold the longest slots; the first
  two demonstrate processes rather than stating a fact.
@@ -49,13 +49,14 @@ own source + build + output and is fully independent of the main deck:
   required; a missing asset fails the build.
 
 Ecommerce Card 4 is the real `ai-catalog-admin` flow, rebuilt offline inside a
-fixed 1252x640 stage at (334,400). It opens on the product backend, moves the
+fixed 1252x640 stage at (334,360). It opens on the product backend, moves the
 pointer across the catalogue image so “Edit with AI” surfaces under it, clicks,
-then hands over to the white editor UI. `CE_PROMPT` is the exact “Brand sage
-backdrop” preset and the final frame is its real generated UUID recorded in
-`EVENT.md`; prompt and result must change together.
+hands over to the white editor UI, and ends with the generated variant live on
+the storefront. `CE_PROMPT` is the exact “Brand sage backdrop” preset and the
+result is its real generated UUID recorded in `EVENT.md`; prompt and result
+must change together.
 
-Four things about the implementation are load bearing:
+Five things about the implementation are load bearing:
 
 - **The backend is live DOM, not the captures.**
   `catalog-admin.png` and `catalog-media-hover.png` stay in `assets/ecommerce/`
@@ -87,10 +88,25 @@ Four things about the implementation are load bearing:
   the result crossfades only while that veil is near peak opacity, and
   `.ce-shimmer` gives the field a travelling bright edge. Showing the dissolve
   without the veil turns it into a visible product morph.
+- **The payoff is card 1's browser, reused rather than copied.** The card ends
+  on the generated variant live on the storefront, because that is the claim:
+  the AI output is not a preview, it is the product page. It renders the same
+  `.ef-site*` markup at this card's own y, so the frame's chrome and shadow
+  stack have one definition. Three things differ and are deliberate: the
+  product slot takes a centred cover crop (card 1's -27.02%/142.61% is tuned to
+  its tube shot and would cut the pump off a 3:4 bottle), the copy is the
+  Ashfold page's own, and the CTA carries the backend's €49.00.
+  **The slide runs 12s, not 10.** The extra two seconds are the ~1.05s the
+  finished result holds before the handover plus the storefront's own hold.
+  That first hold is the only time the generated frame is on screen with
+  nothing happening to it — do not reclaim it by starting the handover earlier,
+  and do not pay for the payoff by speeding up the beats before it.
 - **Prompt typing is Timeline-owned.** Its recursive 18ms ticks go through
   `tl.timeout()`, so leaving the card stops them and re-entry resets to an empty
-  prompt synchronously. Reduced motion opens directly on the genuine result.
-  `tools/check_editor.py` checks normal motion twice and that reduced state.
+  prompt synchronously. Reduced motion opens directly on the storefront, the
+  same way card 1 does. `tools/check_editor.py` checks normal motion twice and
+  that reduced state; the storefront is pinned inline by `settleSite()` for the
+  reason card 1's is.
 - **The backend pointer uses `UPLOADER.cursor` as a data URI.** Card 1 already
   inlines the same SVG; another inline copy collides on the mask id and renders
   invisible even though its box and opacity are correct. It rests on the pill's

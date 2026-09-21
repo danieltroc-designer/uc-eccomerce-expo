@@ -1795,6 +1795,19 @@
   .ce-cancel{left:12px}
   .ce-done{right:12px;background:#8f8f8f;color:#fff}
 
+  /* The payoff: the variant that was just generated, live on the storefront.
+     This is card 1's browser reused outright — every .ef-site* rule, including
+     the frame's shadow stack and 56px chrome — because the two cards make the
+     same promise and a second copy of it would drift. Only three things differ:
+     it opens at this card's own y, the product slot takes a centred cover crop
+     (card 1's -27.02%/142.61% is tuned to its tube shot, and applying that to a
+     3:4 bottle cuts the pump off), and the CTA carries the backend's price. */
+  .ce-wrap>.shd{z-index:3}
+  .ce-site{top:360px}
+  .ce-site .ef-site-photo img{top:0;height:100%}
+  .ce-site .ef-site-cta{display:flex;align-items:baseline;gap:14px}
+  .ce-site-price{font-weight:500;opacity:.72}
+
   /* Card 5 — the booth wall, laid out to storyboard frame 207:1131.
      Two rows of three, and the marks are *not* on a grid: the frame places
      each optically, so row 2's vertical centres alone differ by 15px. Six
@@ -2198,12 +2211,13 @@ function Timeline({reduced=false}={}){
 }
 
 /* ---------------- default deck ---------------- */
-/* ---- Ecommerce Expo — 53-second, seven-card booth loop ----------------
+/* ---- Ecommerce Expo — 55-second, seven-card booth loop ----------------
    Product image in, storefront out; benefits and proof; one focused AI Editor
    demonstration; customer trust; then the system view and booth CTA.
-   Durations are 10/6/6/10/5/6/10 seconds. Cards 1 and 4 carry longer slots
+   Durations are 10/6/6/12/5/6/10 seconds. Cards 1 and 4 carry longer slots
    because they demonstrate processes rather than stating a fact, and every
-   beat has to be legible from across a stand. */
+   beat has to be legible from across a stand. Card 4 is the longest because it
+   runs two payoffs: the generated result, then that result live on a page. */
 const DEFAULT_DECK = {
   settings: { duration: 6, fade: 480, watermark: true },
   slides: [
@@ -2219,7 +2233,7 @@ const DEFAULT_DECK = {
       attribution:'Sam McKinney, Director of Agency Services at Zephyr',
       by:'Zephyr' },
 
-    { type:'commerceEditor', duration:10,
+    { type:'commerceEditor', duration:12,
       heading:'Turn any photo\ninto a catalog-ready product shot.' },
 
     { type:'commerceLogos', duration:5,
@@ -2790,6 +2804,32 @@ const R = {
           </div>
           <span class="ce-action ce-cancel">Cancel</span>
           <span class="ce-action ce-done">Add to media</span>
+        </div>
+      </div>
+
+      <div class="ef-site ce-site" aria-hidden="true">
+        <div class="ef-sitebar">
+          <div class="ef-sitecontrols">
+            <div class="ef-siteos">${ECOMMERCE['card1-browser-os']}</div>
+            <div class="ef-sitenav">
+              <i>${ECOMMERCE['card1-browser-left']}</i>
+              <i>${ECOMMERCE['card1-browser-right']}</i>
+            </div>
+          </div>
+        </div>
+        <div class="ef-site-rule"></div>
+        <div class="ef-sitebody">
+          <div class="ef-site-back"><i>${ECOMMERCE['card1-browser-back']}</i><span>Back to list</span></div>
+          <div class="ef-site-photo"><img src="${result}" alt=""></div>
+          <div class="ef-site-info">
+            <div class="ef-site-title">Ashfold Resurfacing<br>Body Lotion</div>
+            <div class="ef-site-tags"><span>Body</span><span>Bestsellers</span><span>Resurfacing</span></div>
+            <div class="ef-site-copy">
+              <p>A resurfacing body lotion with a 10% acid and hydrating complex. Smooths rough, uneven texture on arms, legs and body while keeping skin comfortable. The acid blend works overnight while humectants hold water in the barrier, so the surface is smoother by morning without the tightness stronger exfoliants leave behind.</p>
+              <p>Use in the evening on clean, dry skin, three times a week to start, and follow with SPF in the morning. Safe on arms, legs and body; avoid broken skin. Each bottle is 300 ml / 10.1 fl oz and ships in recyclable cartons.</p>
+            </div>
+            <div class="ef-site-cta">Add to cart<span class="ce-site-price">\u20ac49.00</span></div>
+          </div>
         </div>
       </div>
     </div>`;
@@ -4175,8 +4215,14 @@ function setupCommerceEditor(slideEl, sd, tl){
   const after = q('.ce-after');
   const veil = q('.ce-veil');
   const shimmer = q('.ce-shimmer');
+  const site = q('.ce-site');
+  const sitePhoto = q('.ce-site .ef-site-photo');
+  const siteInfo = q('.ce-site .ef-site-info');
   if (!backend || !shot || !cursor || !clickRing || !editor ||
-      !prompt || !after || !veil || !shimmer) return;
+      !prompt || !after || !veil || !shimmer || !site) return;
+
+  const SITE_SHUT = 'inset(0 0 93% 0 round 16px)';
+  const SITE_OPEN = 'inset(0 0 0 0 round 16px)';
 
   // Pointer path in tip coordinates, as offsets from its resting place on the
   // Edit with AI pill: it enters over the empty page margin, crosses the
@@ -4199,6 +4245,10 @@ function setupCommerceEditor(slideEl, sd, tl){
     after.style.opacity = '0';
     veil.style.opacity = '0';
     Object.assign(shimmer.style,{opacity:'0',transform:'translateX(0)'});
+    Object.assign(site.style,{opacity:'0',clipPath:SITE_SHUT,
+      transform:'translateY(24px) scale(.985)'});
+    [sitePhoto,siteInfo].forEach(el=>el && Object.assign(el.style,
+      {opacity:'0',transform:'translateY(12px)'}));
   };
   reset();
 
@@ -4217,7 +4267,18 @@ function setupCommerceEditor(slideEl, sd, tl){
     Object.assign(shimmer.style,{opacity:'0',transform:'translateX(660px)'});
   };
 
-  if (REDUCED){ settle(); return; }
+  // Same reason card 1 pins its storefront inline: leaving a card kills its
+  // timeline, and a cancelled WAAPI animation reverts to inline style — which
+  // reset() left hidden. The kill happens at the top of the outgoing crossfade,
+  // so without this the payoff blinks out while the card is still on screen.
+  const settleSite = ()=>{
+    Object.assign(editor.style,{opacity:'0',transform:'translateY(-18px) scale(.985)'});
+    Object.assign(site.style,{opacity:'1',clipPath:SITE_OPEN,transform:'none'});
+    [sitePhoto,siteInfo].forEach(el=>el && Object.assign(el.style,
+      {opacity:'1',transform:'none'}));
+  };
+
+  if (REDUCED){ settle(); settleSite(); return; }
 
   // The card stays on the product backend: no zoom, no cut. The pointer does
   // the explaining, so the page it is working in never leaves the screen.
@@ -4308,9 +4369,35 @@ function setupCommerceEditor(slideEl, sd, tl){
   tl.to(done,[{background:'#8f8f8f'},{background:'#181818'}],
     {at:GENERATE+1.45,dur:.24,ease:EASE.out});
 
-  // Pin the final frame so killing WAAPI during the outgoing slide crossfade
-  // cannot blink back to the source image.
+  // Pin the finished editor frame: killing WAAPI during the outgoing slide
+  // crossfade must not blink back to the source image.
   tl.at(GENERATE+1.95,settle);
+
+  /* The variant goes live. This is card 1's payoff played in this card's
+     vocabulary — the working surface lifts and recedes while the storefront
+     opens down from its 56px chrome — and it is the point of the whole card:
+     the generated image is not a preview, it is already the product page.
+
+     The result holds finished and still for ~1.05s first. That hold is the
+     only time the generated frame is on screen without something else
+     happening to it, and it is what the slide's extra two seconds bought; do
+     not reclaim them by starting the handover earlier. */
+  const SITE = GENERATE + 3.0;
+  tl.to(editor,
+    [{opacity:1,transform:'translateY(0) scale(1)'},
+     {opacity:0,transform:'translateY(-18px) scale(.985)'}],
+    {at:SITE,dur:.38,ease:EASE.out,fill:'forwards'});
+  tl.to(site,[
+    {opacity:0,transform:'translateY(24px) scale(.985)',clipPath:SITE_SHUT},
+    {opacity:1,transform:'translateY(0) scale(1)',clipPath:SITE_OPEN}
+  ],{at:SITE+.10,dur:.58,ease:EASE.out});
+  tl.to(sitePhoto,
+    [{opacity:0,transform:'translateY(12px)'},{opacity:1,transform:'translateY(0)'}],
+    {at:SITE+.31,dur:.36,ease:EASE.out});
+  tl.to(siteInfo,
+    [{opacity:0,transform:'translateY(12px)'},{opacity:1,transform:'translateY(0)'}],
+    {at:SITE+.38,dur:.40,ease:EASE.out});
+  tl.at(SITE+.80,settleSite);
 }
 
 function setupDropin(slideEl, sd, tl){
@@ -5264,7 +5351,7 @@ function fieldsFor(s, i){
       <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">Figma frame 234:1237, using the Webflow testimonial card's exact two-panel geometry and entrance choreography. The logo name looks up assets/logos (currently zephyr.svg).</p>`;
     case 'commerceEditor': return dur+`
       <label class="f"><span>Headline</span><textarea data-f="heading">${esc(s.heading||'')}</textarea></label>
-      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">The real AI catalog-admin flow, rebuilt as live DOM: product backend → pointer crosses the catalogue image → Edit with AI → preset prompt → dot-grid processing → genuine result. Prompt: “${esc(CE_PROMPT)}” Source and result assets: ${ECOMMERCE.catalogSource&&ECOMMERCE.editorAfter?'ready':'missing catalog-source/editor-after'}.</p>`;
+      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">The real AI catalog-admin flow, rebuilt as live DOM: product backend → pointer crosses the catalogue image → Edit with AI → preset prompt → dot-grid processing → genuine result → the variant live on the storefront. Prompt: “${esc(CE_PROMPT)}” Source and result assets: ${ECOMMERCE.catalogSource&&ECOMMERCE.editorAfter?'ready':'missing catalog-source/editor-after'}.</p>`;
     case 'commerceLogos': return dur+`
       <label class="f"><span>Small title (optional)</span><input type="text" data-f="title" value="${esc(s.title||'')}"></label>
       <label class="f"><span>Logo names (comma-separated)</span><textarea data-f="logos">${esc(s.logos||'')}</textarea></label>
@@ -5520,7 +5607,7 @@ const NEW = {
   commerceFlow:{type:'commerceFlow',duration:10,heading:'Every product image, optimized and fast. Automatically.'},
   commerceBenefits:{type:'commerceBenefits',duration:6},
   commerceMetric:{type:'commerceMetric',duration:6,value:'2x faster page loads.',line:'Faster pages, more sales.',quote:'This way, we get the absolute most speed we can when loading our web pages across mobile devices.',attribution:'Sam McKinney, Director of Agency Services at Zephyr',by:'Zephyr'},
-  commerceEditor:{type:'commerceEditor',duration:10,heading:'Turn any photo\ninto a catalog-ready product shot.'},
+  commerceEditor:{type:'commerceEditor',duration:12,heading:'Turn any photo\ninto a catalog-ready product shot.'},
   commerceLogos:{type:'commerceLogos',duration:5,title:'Trusted by',logos:'L\u2019Or\u00e9al, Crayola, Samsonite, GemPages, Shogun, Marko'},
   commerceInfrastructure:{type:'commerceInfrastructure',duration:6,heading:'The infrastructure\nbehind every product image.',sub:'One integration. Upload, optimize, and deliver every image, and every other file.',steps:'Upload, Optimize, Deliver'},
   commerceOutro:{type:'commerceOutro',duration:10,layout:'outro',title:'Load faster,\nsell more.',sub:'Come say hi \ud83d\udc4b\nand enter to win LEGO Polaroid Camera Building Set',qr:true,qrConfirmed:false,qrLabel:'QR URL to confirm',booth:''},
