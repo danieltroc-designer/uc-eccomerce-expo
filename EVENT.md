@@ -14,8 +14,10 @@ Working source of truth for this booth cut. Do not invent event facts.
   6. Upload → Optimize → Deliver infrastructure view (6s)
   7. Booth CTA / file-board outro (10s)
 - Card 4 records the production `ai-catalog-admin` demo: the Ashfold product
-  backend opens on its Media card, focuses the “Edit with AI” action, and hands
-  over to the editor. Its real source UUID is
+  backend opens, the pointer crosses its catalogue image so “Edit with AI”
+  appears under it, and the click hands over to the editor. The backend is
+  rebuilt as live DOM from the reference captures in `assets/ecommerce/`, so it
+  stays sharp on the booth panel and the page never zooms. Its real source UUID is
   `01362b9d-462f-4db4-8c8a-acd0b4c2a06a`; the “Brand sage backdrop” preset
   generated result UUID `3d5bbd80-9f76-46d0-b7ff-263dbb1ec4fe` with:
   “Replace the background with a flat sage green studio backdrop, keep the

@@ -12,17 +12,21 @@ Drop final event artwork here using these exact filenames, then run
   required and inlined for offline playback.
 - `card1-browser-{os,left,right,back}.svg` — exact browser controls for Card 1's
   storefront payoff.
-- `catalog-admin.png` — supplied full product-backend view for Card 4.
-- `catalog-media-hover.png` — supplied Media-card focus with “Edit with AI”.
+- `catalog-admin.png` — reference capture of the product-backend view. **Not
+  inlined**: Card 4's backend is rebuilt as DOM so it stays sharp on the TV.
+  Keep it as the source of truth for that page's layout, copy and colour.
+- `catalog-media-hover.png` — reference capture of the Media card's hover
+  state, with “Edit with AI”. Also documentation only, for the same reason.
 - `catalog-source.jpg` — the production Ashfold source image, UUID
-  `01362b9d-462f-4db4-8c8a-acd0b4c2a06a`.
+  `01362b9d-462f-4db4-8c8a-acd0b4c2a06a`. Required and inlined; it is the photo
+  in the Media slot, the catalogue preview and the editor canvas.
 - `editor-after.jpg` — the real “Brand sage backdrop” result, UUID
-  `3d5bbd80-9f76-46d0-b7ff-263dbb1ec4fe`.
+  `3d5bbd80-9f76-46d0-b7ff-263dbb1ec4fe`. Required and inlined.
 
-The backend frames establish where AI editing lives in the marketplace flow;
-the source and result are the real images loaded by that demo. The exact preset
-prompt is stored as `CE_PROMPT` in `src/simple.template.html` and documented in
-`EVENT.md`.
+The reference captures establish where AI editing lives in the marketplace
+flow; the source and result are the real images loaded by that demo. The exact
+preset prompt is stored as `CE_PROMPT` in `src/simple.template.html` and
+documented in `EVENT.md`.
 
 The 1536×2048 source and 880×1168 result both use the same 3:4 editor crop. The
 tool's dense dot-grid pending state covers the generative swap. Do not replace

@@ -1632,25 +1632,114 @@
   .em-logo-fallback{font-family:var(--cmono);font-size:14px;letter-spacing:.18em;
     text-transform:uppercase;color:#fff}
 
-  /* Card 4 — the real AI catalog-admin flow. The supplied backend overview
-     opens first, focuses into its Media card with "Edit with AI" exposed, then
-     hands over to the editor modal observed in the production demo. The source
-     and result UUIDs are recorded in EVENT.md; CSS never manufactures output. */
+  /* Card 4 — the real AI catalog-admin flow. The product backend opens, the
+     pointer crosses its catalogue image, "Edit with AI" surfaces under the
+     pointer, and the editor modal takes over. The source and result UUIDs are
+     recorded in EVENT.md; CSS never manufactures output.
+
+     The backend is live DOM, not the captures in assets/ecommerce/. Those are
+     the reference and stay in the repo, but a 1024px screenshot on a 1252px
+     stage is resampled twice — once into the stage, again by the TV — and this
+     UI's smallest type is 13px, where that softness stops reading as a photo
+     of an interface and starts reading as a broken render. Rebuilt, every
+     glyph and border is resolution-independent, and the Media card can hold a
+     real hover state instead of cutting to a second screenshot of one.
+
+     Geometry is the capture's at 1.22x (1024 -> 1252). The page is taller than
+     it is in the browser too: the stage is a window onto it, so Product
+     details and Organisation run off the bottom edge exactly as they do in the
+     demo rather than being squeezed to fit. */
   .ce-wrap{position:absolute;inset:0}
   .ce-stage{position:absolute;left:334px;top:400px;width:1252px;height:640px}
 
   .ce-backend{position:absolute;inset:0;border-radius:16px;overflow:hidden;
-    background:#f7f7f7;box-shadow:0 18px 50px rgba(0,0,0,.28)}
-  .ce-backend img{position:absolute;left:0;width:100%;height:auto;max-width:none;
-    display:block}
-  .ce-admin-overview{top:0;opacity:1}
-  .ce-admin-focus{top:-54px;opacity:0;transform:scale(.985)}
-  .ce-admin-cursor{position:absolute;left:1010px;top:238px;width:44px;height:61px;
-    z-index:4;opacity:0;will-change:transform}
-  .ce-admin-cursor svg,.ce-admin-cursor img{width:100%;height:100%;display:block}
-  .ce-click-ring{position:absolute;left:332px;top:556px;width:52px;height:52px;
+    background:#f5f5f5;box-shadow:0 18px 50px rgba(0,0,0,.28);
+    font-family:var(--sans);color:#141414;text-align:left}
+  .ce-bar{position:absolute;left:0;right:0;top:0;height:64px;padding:0 26px;
+    display:flex;align-items:center;gap:9px;
+    background:#fff;border-bottom:1px solid #ebebeb}
+  .ce-crumb{font-size:15px;color:#8c8c8c}
+  .ce-crumb-sep{color:#c8c8c8}
+  .ce-crumb-now{font-size:16px;font-weight:600;letter-spacing:-.1px}
+  .ce-live{margin-left:5px;padding:5px 10px;border-radius:9px;background:#e4f3e9;
+    color:#1a7a4c;font-size:13px;font-weight:600;line-height:1}
+  .ce-page{position:absolute;left:26px;right:26px;top:84px;bottom:0;
+    display:grid;grid-template-columns:1fr 315px;gap:21px;align-content:start}
+  .ce-col{display:flex;flex-direction:column;gap:22px;min-width:0}
+  .ce-card{background:#fff;border:1px solid #ececec;border-radius:12px;
+    box-shadow:0 1px 2px rgba(0,0,0,.04)}
+  .ce-card-h{display:flex;align-items:baseline;justify-content:space-between;
+    padding:18px 20px 0}
+  .ce-card-t{font-size:17px;font-weight:600;letter-spacing:-.1px;white-space:nowrap}
+  .ce-card-n{font-size:14px;color:#8c8c8c}
+
+  .ce-slots{display:flex;gap:15px;padding:14px 20px 0}
+  .ce-slot{box-sizing:border-box;width:243px;height:242px;border-radius:8px}
+  .ce-shot{position:relative;overflow:hidden;background:#fff;border:1.5px solid #1b1b1b;
+    transition:box-shadow .22s ease}
+  .ce-shot img{width:100%;height:100%;object-fit:contain;display:block}
+  .ce-tag{position:absolute;left:8px;top:9px;padding:4px 9px;border-radius:7px;
+    background:#101010;color:#fff;font-size:12px;font-weight:500;line-height:1}
+  .ce-new{display:flex;align-items:center;justify-content:center;
+    border:1.5px dashed #d6d6d6}
+  .ce-addvar{display:flex;align-items:center;gap:8px;padding:11px 16px;border-radius:9px;
+    background:#f5c451;color:#171717;font-size:15px;font-weight:600;line-height:1}
+  .ce-spark{width:16px;height:16px;flex:none;display:block}
+  .ce-cap{padding:13px 20px 16px}
+  .ce-cap-t{font-size:16px;line-height:1;color:#1b1b1b}
+  .ce-cap-s{margin-top:8px;font-size:13px;line-height:1;color:#9a9a9a}
+
+  /* The action the card is about. It belongs to the hover state, so it arrives
+     with the pointer rather than sitting on the page waiting to be pressed. */
+  .ce-edit{position:absolute;left:8px;bottom:10px;display:flex;align-items:center;gap:8px;
+    padding:9px 13px;border-radius:9px;background:#e9e0fd;color:#6a3fd6;
+    font-size:15px;font-weight:600;line-height:1;white-space:nowrap;
+    opacity:0;transform:translateY(6px);
+    transition:opacity .18s ease,transform .22s var(--ease-out)}
+  .ce-shot.hot{box-shadow:0 10px 24px rgba(0,0,0,.14)}
+  .ce-shot.hot .ce-edit{opacity:1;transform:none}
+
+  .ce-field{padding:0 20px 14px}
+  .ce-label{margin-bottom:8px;font-size:13px;color:#8c8c8c;line-height:1}
+  .ce-input{box-sizing:border-box;height:38px;padding:0 12px;display:flex;align-items:center;
+    border:1px solid #e6e6e6;border-radius:8px;font-size:15px;color:#1c1c1c}
+  .ce-area{box-sizing:border-box;height:92px;padding:10px 12px;
+    border:1px solid #e6e6e6;border-radius:8px;font-size:14px;line-height:1.5;color:#1c1c1c}
+  .ce-row3{display:flex;gap:15px;padding:0 20px 18px}
+  .ce-row3 .ce-field{flex:none;width:243px;padding:0}
+
+  /* header and control share 279px of the right column, so the title holds the
+     card's 17px and the control gives up the difference rather than wrapping */
+  .ce-preview-card .ce-card-t{font-size:16px}
+  .ce-seg{flex:none;display:flex;gap:3px;padding:3px;border-radius:9px;background:#f0f0f0}
+  .ce-seg span{padding:5px 8px;border-radius:6px;font-size:12px;font-weight:500;
+    line-height:1;color:#6e6e6e;white-space:nowrap}
+  .ce-seg .on{background:#171717;color:#fff}
+  .ce-preview{height:244px;padding:12px 18px 0;display:flex;align-items:center;
+    justify-content:center}
+  .ce-preview img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+  .ce-pv-name{padding:12px 18px 0;text-align:center;font-size:15px;line-height:1}
+  .ce-pv-price{padding:8px 18px 0;text-align:center;font-size:14px;line-height:1;color:#8c8c8c}
+  .ce-pv-note{padding:14px 18px 18px;font-size:13px;line-height:1.45;color:#a3a3a3}
+  .ce-pv-note b{color:#4a4a4a;font-weight:600}
+  .ce-org{display:flex;padding:0 18px 12px;font-size:14px;line-height:1.5}
+  .ce-org .k{flex:none;width:104px;color:#8e8e8e}
+  .ce-org .v{color:#242424}
+  .ce-chips{display:flex;flex-wrap:wrap;gap:6px}
+  .ce-chips span{padding:5px 9px;border-radius:999px;background:#f0f0f0;color:#3a3a3a;
+    font-size:13px;line-height:1}
+
+  /* left/top is where the pointer finishes and the score translates it back to
+     its entry point; the tip sits at the element's top-left, so these are tip
+     coordinates. It rests on the pill's trailing edge rather than its middle:
+     the arrow is 44x61 and drawn down-right of the tip, so parking it on the
+     label covers the two words the whole beat exists to show. */
+  .ce-admin-cursor{position:absolute;left:165px;top:352px;width:44px;height:61px;
+    z-index:5;opacity:0;will-change:transform}
+  .ce-admin-cursor img{width:100%;height:100%;display:block}
+  .ce-click-ring{position:absolute;left:139px;top:326px;width:52px;height:52px;
     border:2px solid #8064d8;border-radius:50%;opacity:0;transform:scale(.4);
-    z-index:3;pointer-events:none}
+    z-index:4;pointer-events:none}
 
   /* Editor phase, rebuilt from the supplied screenshot and the live production
      tool. The white shell is deliberately one layer: it arrives as a complete
@@ -2350,6 +2439,14 @@ const ECOM_BENEFITS = [
    claim an operation that did not produce the frame it reveals. */
 const CE_PROMPT = 'Replace the background with a flat sage green studio backdrop, keep the bottle and its natural shadow';
 
+/* The demo marks both of its generative actions with this pair of stars. It is
+   drawn rather than exported so it inherits currentColor — purple on the Edit
+   with AI pill, near-black on the yellow Add variation button. */
+const CE_SPARK = '<svg class="ce-spark" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">'
+  + '<path d="M6.3 1.1 7.4 4.0 10.3 5.1 7.4 6.2 6.3 9.1 5.2 6.2 2.3 5.1 5.2 4.0Z"/>'
+  + '<path d="M11.9 8.3 12.6 10.1 14.4 10.8 12.6 11.5 11.9 13.3 11.2 11.5 9.4 10.8 11.2 10.1Z"/>'
+  + '</svg>';
+
 /* Ecommerce Expo card 5's wall: x, y, w, h per slot in reading order, straight
    off storyboard frame 207:1131. Each box is the mark's own export size, so a
    logo is drawn at the scale it was designed at rather than forced to a shared
@@ -2594,8 +2691,76 @@ const R = {
       <div class="shd" style="--shd-y:203px"><div class="shd-t reveal">${multiline(s.heading||'')}</div></div>
       <div class="ce-stage">
         <div class="ce-backend">
-          <img class="ce-admin-overview" src="${ECOMMERCE.catalogAdmin}" alt="">
-          <img class="ce-admin-focus" src="${ECOMMERCE.catalogMediaHover}" alt="">
+          <div class="ce-bar">
+            <span class="ce-crumb">Products</span>
+            <span class="ce-crumb-sep">/</span>
+            <span class="ce-crumb-now">Resurfacing Body Lotion</span>
+            <span class="ce-live">Active</span>
+          </div>
+          <div class="ce-page">
+            <div class="ce-col">
+              <div class="ce-card">
+                <div class="ce-card-h"><span class="ce-card-t">Media</span>
+                  <span class="ce-card-n">1 image</span></div>
+                <div class="ce-slots">
+                  <div class="ce-slot ce-shot">
+                    <img src="${image}" alt="">
+                    <span class="ce-tag">Catalogue image</span>
+                    <span class="ce-edit">${CE_SPARK}Edit with AI</span>
+                  </div>
+                  <div class="ce-slot ce-new">
+                    <span class="ce-addvar">${CE_SPARK}Add variation</span>
+                  </div>
+                </div>
+                <div class="ce-cap">
+                  <div class="ce-cap-t">Studio original</div>
+                  <div class="ce-cap-s">1536 \u00d7 2048</div>
+                </div>
+              </div>
+              <div class="ce-card">
+                <div class="ce-card-h"><span class="ce-card-t">Product details</span></div>
+                <div class="ce-field" style="padding-top:14px">
+                  <div class="ce-label">Title</div>
+                  <div class="ce-input">Resurfacing Body Lotion</div>
+                </div>
+                <div class="ce-field">
+                  <div class="ce-label">Description</div>
+                  <div class="ce-area">A resurfacing body lotion with a 10% acid and hydrating
+                    complex. Smooths rough, uneven texture on arms, legs and body while keeping
+                    skin comfortable.</div>
+                </div>
+                <div class="ce-row3">
+                  <div class="ce-field"><div class="ce-label">Price</div>
+                    <div class="ce-input">\u20ac49.00</div></div>
+                  <div class="ce-field"><div class="ce-label">SKU</div>
+                    <div class="ce-input">ASH-BL-300</div></div>
+                  <div class="ce-field"><div class="ce-label">Inventory</div>
+                    <div class="ce-input">128</div></div>
+                </div>
+              </div>
+            </div>
+            <div class="ce-col">
+              <div class="ce-card ce-preview-card">
+                <div class="ce-card-h"><span class="ce-card-t">Catalogue preview</span>
+                  <span class="ce-seg"><span class="on">Square</span><span>Portrait</span></span>
+                </div>
+                <div class="ce-preview"><img src="${image}" alt=""></div>
+                <div class="ce-pv-name">Resurfacing Body Lotion</div>
+                <div class="ce-pv-price">\u20ac49.00</div>
+                <div class="ce-pv-note">Using <b>Studio original</b>. The storefront requests a
+                  smart crop for each slot, so any variant fits both formats.</div>
+              </div>
+              <div class="ce-card">
+                <div class="ce-card-h" style="padding-bottom:14px">
+                  <span class="ce-card-t">Organisation</span></div>
+                <div class="ce-org"><span class="k">Vendor</span><span class="v">Ashfold</span></div>
+                <div class="ce-org"><span class="k">Type</span><span class="v">Body care</span></div>
+                <div class="ce-org"><span class="k">Collections</span>
+                  <span class="ce-chips"><span>Body</span><span>Bestsellers</span>
+                    <span>Resurfacing</span></span></div>
+              </div>
+            </div>
+          </div>
           <i class="ce-admin-cursor"><img src="${UPLOADER.cursor}" alt=""></i>
           <i class="ce-click-ring"></i>
         </div>
@@ -3987,15 +4152,14 @@ function setupCommerceFlow(slideEl, sd, tl){
 }
 
 /* ------------ Expo card 4: catalog backend -> Edit with AI -> result ----------
-   This is a recording of the real ai-catalog-admin flow, rebuilt offline from
-   the supplied backend frames. The source, preset prompt and generated result
-   are the production demo's own; the dot-grid veil reproduces its pending
-   state and masks small generative differences while the result arrives. */
+   This is a recording of the real ai-catalog-admin flow, rebuilt offline as
+   live DOM. The source, preset prompt and generated result are the production
+   demo's own; the dot-grid veil reproduces its pending state and masks small
+   generative differences while the result arrives. */
 function setupCommerceEditor(slideEl, sd, tl){
   const q = slideEl.querySelector.bind(slideEl);
   const backend = q('.ce-backend');
-  const overview = q('.ce-admin-overview');
-  const focus = q('.ce-admin-focus');
+  const shot = q('.ce-shot');
   const cursor = q('.ce-admin-cursor');
   const clickRing = q('.ce-click-ring');
   const editor = q('.ce-editor');
@@ -4006,14 +4170,21 @@ function setupCommerceEditor(slideEl, sd, tl){
   const after = q('.ce-after');
   const veil = q('.ce-veil');
   const shimmer = q('.ce-shimmer');
-  if (!backend || !overview || !focus || !cursor || !clickRing || !editor ||
+  if (!backend || !shot || !cursor || !clickRing || !editor ||
       !prompt || !after || !veil || !shimmer) return;
+
+  // Pointer path in tip coordinates, as offsets from its resting place on the
+  // Edit with AI pill: it enters over the empty page margin, crosses the
+  // catalogue image, then drops onto the action that the crossing revealed.
+  const ENTER = 'translate(845px,168px)';
+  const EDGE  = 'translate(145px,-103px)';    // tip just right of the image slot
+  const OVER  = 'translate(3px,-93px)';       // tip on the image's centre
+  const PILL  = 'translate(0,0)';
 
   const reset = ()=>{
     Object.assign(backend.style,{opacity:'1',transform:'none'});
-    Object.assign(overview.style,{opacity:'1',transform:'none'});
-    Object.assign(focus.style,{opacity:'0',transform:'scale(.985)'});
-    Object.assign(cursor.style,{opacity:'0',transform:'none'});
+    shot.classList.remove('hot');
+    Object.assign(cursor.style,{opacity:'0',transform:ENTER});
     Object.assign(clickRing.style,{opacity:'0',transform:'scale(.4)'});
     Object.assign(editor.style,{opacity:'0',transform:'translateY(16px) scale(.985)'});
     prompt.textContent = '';
@@ -4028,8 +4199,7 @@ function setupCommerceEditor(slideEl, sd, tl){
 
   const settle = ()=>{
     backend.style.opacity = '0';
-    overview.style.opacity = '0';
-    Object.assign(focus.style,{opacity:'1',transform:'none'});
+    shot.classList.add('hot');
     cursor.style.opacity = '0';
     clickRing.style.opacity = '0';
     Object.assign(editor.style,{opacity:'1',transform:'none'});
@@ -4044,32 +4214,47 @@ function setupCommerceEditor(slideEl, sd, tl){
 
   if (REDUCED){ settle(); return; }
 
-  // Start on the full product backend, then focus its Media card. The second
-  // frame is the supplied hover state, so "Edit with AI" is already visible
-  // before the pointer commits to it.
-  const FOCUS = 1.10;
-  tl.to(overview,[{opacity:1,transform:'scale(1)'},
-                  {opacity:0,transform:'scale(1.02)'}],
-    {at:FOCUS,dur:.42,ease:EASE.inOut,fill:'forwards'});
-  tl.to(focus,[{opacity:0,transform:'scale(.985)'},
-               {opacity:1,transform:'scale(1)'}],
-    {at:FOCUS+.08,dur:.48,ease:EASE.out});
+  // The card stays on the product backend: no zoom, no cut. The pointer does
+  // the explaining, so the page it is working in never leaves the screen.
+  //
+  // The travel is split at the slot's edge so the hover can be timed rather
+  // than guessed. Under an ease the tip's position is not proportional to
+  // elapsed time, so the crossing segment runs linear: the tip covers
+  // 310 -> 167px, crosses into the slot at 289px, and that is 14.7% of 380ms.
+  const MOVE = .45;
   tl.to(cursor,[
-    {opacity:0,transform:'translate(0,0) scale(1)',offset:0},
-    {opacity:1,transform:'translate(0,0) scale(1)',offset:.12},
-    {opacity:1,transform:'translate(-650px,315px) scale(1)',offset:.72},
-    {opacity:1,transform:'translate(-650px,315px) scale(.86)',offset:.86},
-    {opacity:1,transform:'translate(-650px,315px) scale(1)',offset:1}
-  ],{at:FOCUS+.30,dur:1.18,ease:EASE.out,fill:'forwards'});
+    {opacity:0,transform:ENTER,offset:0},
+    {opacity:1,transform:ENTER,offset:.12},
+    {opacity:1,transform:EDGE,offset:1}
+  ],{at:MOVE,dur:.85,ease:EASE.out,fill:'forwards'});
+
+  const CROSS = MOVE + .85;
+  tl.to(cursor,[{transform:EDGE},{transform:OVER}],
+    {at:CROSS,dur:.38,ease:'linear',fill:'forwards'});
+  tl.cls(shot,'hot',CROSS + .056);
+
+  // A beat on the image before reaching for the action: the hover is what
+  // produced that button, and without the pause the two read as one move to a
+  // button that was always there.
+  const REACH = CROSS + .54;
+  tl.to(cursor,[{transform:OVER},{transform:PILL}],
+    {at:REACH,dur:.34,ease:EASE.inOut,fill:'forwards'});
+
+  const CLICK = REACH + .44;
+  tl.to(cursor,[
+    {transform:PILL+' scale(1)'},
+    {transform:PILL+' scale(.86)'},
+    {transform:PILL+' scale(1)'}
+  ],{at:CLICK,dur:.22,ease:EASE.out,fill:'forwards'});
   tl.to(clickRing,[
     {opacity:0,transform:'scale(.4)'},
     {opacity:.65,transform:'scale(.65)'},
     {opacity:0,transform:'scale(1.45)'}
-  ],{at:FOCUS+1.13,dur:.38,ease:EASE.out,fill:'forwards'});
+  ],{at:CLICK+.02,dur:.38,ease:EASE.out,fill:'forwards'});
 
   // The modal arrives as one object, matching the demo rather than assembling
   // its production controls as separate decorative elements.
-  const EDITOR = FOCUS + 1.58;
+  const EDITOR = CLICK + .42;
   tl.to(backend,[{opacity:1,transform:'scale(1)'},
                  {opacity:0,transform:'scale(.985)'}],
     {at:EDITOR,dur:.30,ease:EASE.out,fill:'forwards'});
@@ -5074,7 +5259,7 @@ function fieldsFor(s, i){
       <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">Figma frame 234:1237, using the Webflow testimonial card's exact two-panel geometry and entrance choreography. The logo name looks up assets/logos (currently zephyr.svg).</p>`;
     case 'commerceEditor': return dur+`
       <label class="f"><span>Headline</span><textarea data-f="heading">${esc(s.heading||'')}</textarea></label>
-      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">The real AI catalog-admin flow: product backend → Media focus → Edit with AI → preset prompt → dot-grid processing → genuine result. Prompt: “${esc(CE_PROMPT)}” Source and result assets: ${ECOMMERCE.catalogSource&&ECOMMERCE.editorAfter?'ready':'missing catalog-source/editor-after'}.</p>`;
+      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">The real AI catalog-admin flow, rebuilt as live DOM: product backend → pointer crosses the catalogue image → Edit with AI → preset prompt → dot-grid processing → genuine result. Prompt: “${esc(CE_PROMPT)}” Source and result assets: ${ECOMMERCE.catalogSource&&ECOMMERCE.editorAfter?'ready':'missing catalog-source/editor-after'}.</p>`;
     case 'commerceLogos': return dur+`
       <label class="f"><span>Small title (optional)</span><input type="text" data-f="title" value="${esc(s.title||'')}"></label>
       <label class="f"><span>Logo names (comma-separated)</span><textarea data-f="logos">${esc(s.logos||'')}</textarea></label>

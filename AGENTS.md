@@ -45,23 +45,42 @@ own source + build + output and is fully independent of the main deck:
  infrastructure, booth CTA. Cards 1, 4 and 7 hold the longest slots; the first
  two demonstrate processes rather than stating a fact.
 - Optional event imagery is auto-inlined from `assets/ecommerce/`; see its
-  README for exact filenames. Card 4's two backend frames, source and generated
-  output are required; a missing asset fails the build.
+  README for exact filenames. Card 4's source and generated output are
+  required; a missing asset fails the build.
 
 Ecommerce Card 4 is the real `ai-catalog-admin` flow, rebuilt offline inside a
-fixed 1252x640 stage at (334,400). It opens on the supplied product-backend
-overview, swaps to the supplied Media-card hover state, moves the pointer to
-“Edit with AI,” then hands over to the white editor UI. `CE_PROMPT` is the
-exact “Brand sage backdrop” preset and the final frame is its real generated
-UUID recorded in `EVENT.md`; prompt and result must change together.
+fixed 1252x640 stage at (334,400). It opens on the product backend, moves the
+pointer across the catalogue image so “Edit with AI” surfaces under it, clicks,
+then hands over to the white editor UI. `CE_PROMPT` is the exact “Brand sage
+backdrop” preset and the final frame is its real generated UUID recorded in
+`EVENT.md`; prompt and result must change together.
 
-Three things about the implementation are load bearing:
+Four things about the implementation are load bearing:
 
-- **The backend frames are evidence, not generic chrome.**
-  `catalog-admin.png` and `catalog-media-hover.png` are the user's captures of
-  the real demo. The first establishes product context; the second is the
-  close-up where the AI action becomes available. Replacing them independently
-  breaks the focus handoff because their crop and scale are timed as a pair.
+- **The backend is live DOM, not the captures.**
+  `catalog-admin.png` and `catalog-media-hover.png` stay in `assets/ecommerce/`
+  as the reference for layout, copy and colour, but they are no longer inlined:
+  a 1024px capture on a 1252px stage is resampled into the stage and again by
+  the TV, and this UI's smallest type is 13px, where that softness reads as a
+  broken render rather than as a screenshot. Rebuilt, it is also the only way
+  the Media card can hold a real hover state instead of cutting to a second
+  screenshot of one. Geometry is the capture's at 1.22x, and the page keeps its
+  real height: Product details and Organisation run off the stage's bottom edge
+  exactly as they do in a browser, because squeezing the page to fit would make
+  the one honest thing on the card — its proportions — the first thing to go.
+- **The card does not zoom, and the checker enforces it.** An earlier cut
+  focused into the Media card to make the action legible. Rebuilt at 1.22x it
+  already is, and holding the page still means the pointer, not a camera move,
+  carries the story. `check_editor.py` asserts the image slot's rect never
+  moves while the backend is up.
+- **Hover is timed off a linear segment.** The travel is split at the slot's
+  edge: under an ease the tip's position is not proportional to elapsed time,
+  so the crossing runs `linear` and the pill's cue is arithmetic — the tip
+  covers 310→167px, enters at 289px, 14.7% of 380ms. Same rule as the dropin
+  card's zone: the state changes on the frame the pointer actually crosses in,
+  not on a guessed offset. The pointer then pauses on the image before reaching
+  for the button, or the hover and the click collapse into one move to a button
+  that looks like it was always there.
 - **The dot field covers a real generative swap.** The 1536x2048 source and
   880x1168 result share a 3:4 crop, but generation naturally changes small
   highlights and edges on the bottle. `.ce-veil` reproduces the tool's pending grid;
@@ -74,7 +93,9 @@ Three things about the implementation are load bearing:
   `tools/check_editor.py` checks normal motion twice and that reduced state.
 - **The backend pointer uses `UPLOADER.cursor` as a data URI.** Card 1 already
   inlines the same SVG; another inline copy collides on the mask id and renders
-  invisible even though its box and opacity are correct.
+  invisible even though its box and opacity are correct. It rests on the pill's
+  trailing edge, not its middle: the arrow is 44x61 drawn down-right of the
+  tip, so parking it on the label hides the two words the beat exists to show.
 - `encode_logos()` scans `assets/logos/*.svg`; new customer marks require no
   build-script registration. Ecommerce Card 3 now follows frame 234:1237 and
   reuses the inherited Webflow testimonial spread exactly: the 938×465 lime

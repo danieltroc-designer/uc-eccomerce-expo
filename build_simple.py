@@ -166,9 +166,10 @@ def encode_demo() -> str:
 def encode_ecommerce() -> str:
     """Inline Ecommerce Expo photography and card-specific vector art.
 
-    Card 4 requires the real catalog-admin source, two supplied backend frames
-    and a genuine AI Enhancer output; it never manufactures a fake result in
-    CSS. Cards 2 and 6 use required Figma exports: card 2's
+    Card 4 requires the real catalog-admin source and a genuine AI Enhancer
+    output; it never manufactures a fake result in CSS. Its backend is rebuilt
+    as DOM, so the two reference captures in assets/ecommerce/ are documentation
+    and are deliberately not inlined. Cards 2 and 6 use required Figma exports: card 2's
     accent colours are baked into its five icons, while card 6's product image,
     expanded rail, 66.281px collapsed connector and 339x61 final lockup are its
     actual frame assets.
@@ -179,8 +180,6 @@ def encode_ecommerce() -> str:
         "product": "product",
         "card1Product": "card1-product",
         "catalogSource": "catalog-source",
-        "catalogAdmin": "catalog-admin",
-        "catalogMediaHover": "catalog-media-hover",
         "editorAfter": "editor-after",
         "infrastructureProduct": "infrastructure-product",
     }
@@ -215,8 +214,6 @@ def encode_ecommerce() -> str:
         )
     for key, filename in (
         ("catalogSource", "catalog-source.jpg"),
-        ("catalogAdmin", "catalog-admin.png"),
-        ("catalogMediaHover", "catalog-media-hover.png"),
         ("editorAfter", "editor-after.jpg"),
     ):
         if key not in out:

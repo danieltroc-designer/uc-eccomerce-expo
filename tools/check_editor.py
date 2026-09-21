@@ -2,8 +2,12 @@
 """Card 4: verify backend -> Edit with AI -> genuine catalog result.
 
 The slide records the production ai-catalog-admin interaction offline. This
-check protects the sequence, supplied backend frames, exact preset prompt,
-source/result provenance, replay reset and reduced-motion payoff.
+check protects the sequence, the exact preset prompt, source/result
+provenance, replay reset and reduced-motion payoff.
+
+Two properties here are easy to lose in a refactor and are asserted directly:
+the backend is live DOM rather than a screenshot of one, and the card never
+zooms — the page it works in holds still while only the pointer moves.
 """
 
 import pathlib
@@ -38,23 +42,30 @@ def read(pg):
       const q = s => root && root.querySelector(s);
       const opacity = e => e ? parseFloat(getComputedStyle(e).opacity) : null;
       const natural = e => e ? [e.naturalWidth, e.naturalHeight] : null;
+      const rect = e => { if (!e) return null; const r = e.getBoundingClientRect();
+                          return [r.left, r.top, r.width, r.height]; };
       const stage = q('.ce-stage');
       return {
         stage: stage ? [stage.offsetLeft, stage.offsetTop,
                         stage.offsetWidth, stage.offsetHeight] : null,
         backend: opacity(q('.ce-backend')),
-        overview: opacity(q('.ce-admin-overview')),
-        focus: opacity(q('.ce-admin-focus')),
         cursor: opacity(q('.ce-admin-cursor')),
         ring: opacity(q('.ce-click-ring')),
+        hot: !!q('.ce-shot')?.classList.contains('hot'),
+        edit: opacity(q('.ce-edit')),
+        shot: rect(q('.ce-shot')),
+        tip: rect(q('.ce-admin-cursor'))?.slice(0, 2) || null,
+        // .ce-page, not .ce-backend: the pointer itself is an inlined SVG img
+        backendImages: [...(q('.ce-page')?.querySelectorAll('img') || [])]
+                         .map(i => [i.naturalWidth, i.naturalHeight]),
+        crumb: q('.ce-crumb-now')?.textContent || '',
+        action: q('.ce-edit')?.textContent.trim() || '',
         editor: opacity(q('.ce-editor')),
         prompt: q('.ce-prompt span')?.textContent || '',
         after: opacity(q('.ce-after')),
         veil: opacity(q('.ce-veil')),
         shimmer: opacity(q('.ce-shimmer')),
         done: q('.ce-done') ? getComputedStyle(q('.ce-done')).backgroundColor : '',
-        overviewNatural: natural(q('.ce-admin-overview')),
-        focusNatural: natural(q('.ce-admin-focus')),
         sourceNatural: natural(q('.ce-before')),
         afterNatural: natural(q('.ce-after')),
       };
@@ -88,32 +99,49 @@ def main():
             check("editor stage matches composition",
                   early["stage"] == [334, 400, 1252, 640], str(early["stage"]))
             check("product backend opens before editor",
-                  early["backend"] > .98 and early["overview"] > .98
-                  and early["editor"] < .02,
+                  early["backend"] > .98 and early["editor"] < .02,
                   f"backend {early['backend']:.2f}, editor {early['editor']:.2f}")
             check("prompt resets empty", early["prompt"] == "", repr(early["prompt"]))
-            check("supplied backend frames are native",
-                  early["overviewNatural"] == [1024, 899]
-                  and early["focusNatural"] == [1024, 791],
-                  f"{early['overviewNatural']}, {early['focusNatural']}")
+            # live DOM, not a capture: the only bitmaps in the backend are the
+            # production source photo, in the Media slot and the preview card
+            check("backend is rebuilt UI, not a screenshot",
+                  early["backendImages"] == [[1536, 2048], [1536, 2048]]
+                  and early["crumb"] == "Resurfacing Body Lotion"
+                  and early["action"] == "Edit with AI",
+                  f"{early['backendImages']}, {early['crumb']!r}")
+            check("Edit with AI waits for the pointer",
+                  not early["hot"] and early["edit"] < .02,
+                  f"hot {early['hot']}, pill {early['edit']:.2f}")
             check("catalog source is the production original",
                   early["sourceNatural"] == [1536, 2048],
                   str(early["sourceNatural"]))
 
+            # 125ms, not 250: the click ripple is only readable for ~230ms, and
+            # a cadence longer than the shortest beat turns this into a coin toss
             samples = []
-            for _ in range(36):
-                pg.wait_for_timeout(250)
+            for _ in range(72):
+                pg.wait_for_timeout(125)
                 samples.append(read(pg))
 
-            focused = next((s for s in samples
-                            if s["backend"] > .98 and s["focus"] > .95
-                            and s["overview"] < .05), None)
-            check("Media card focus replaces overview",
-                  focused is not None, "observed" if focused else "not observed")
-            pointer = next((s for s in samples
-                            if s["focus"] > .95 and s["cursor"] > .8), None)
-            check("pointer commits to Edit with AI",
-                  pointer is not None, "observed" if pointer else "not observed")
+            # the pointer crosses the image, and the pill is a consequence of
+            # that crossing rather than something that was always on the page
+            inside = [s for s in samples
+                      if s["cursor"] > .8 and s["tip"] and s["shot"]
+                      and s["shot"][0] <= s["tip"][0] <= s["shot"][0] + s["shot"][2]
+                      and s["shot"][1] <= s["tip"][1] <= s["shot"][1] + s["shot"][3]]
+            check("pointer crosses the catalogue image",
+                  bool(inside), f"{len(inside)} sample(s) with the tip in the slot")
+            check("hover reveals Edit with AI under it",
+                  any(s["hot"] and s["edit"] > .95 for s in inside),
+                  "observed" if inside else "not observed")
+            check("pointer commits to the action",
+                  any(s["ring"] > .1 for s in samples), "click ring observed")
+
+            # the user-visible contract of this card: the backend does not zoom
+            held = [s["shot"] for s in samples if s["backend"] > .5 and s["shot"]]
+            drift = max((max(abs(r[i] - held[0][i]) for i in range(4))
+                         for r in held), default=0)
+            check("the backend never zooms", drift < .6, f"{drift:.2f}px drift")
 
             editor_state = next((s for s in samples
                                  if s["editor"] > .98 and s["backend"] < .02), None)
