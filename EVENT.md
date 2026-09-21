@@ -5,16 +5,21 @@ Working source of truth for this booth cut. Do not invent event facts.
 ## Confirmed
 
 - Event name: **Ecommerce Expo**
-- Seven-card loop, approximately 49 seconds:
+- Seven-card loop, approximately 53 seconds:
   1. Product image upload → optimization → live store payoff (10s)
   2. Five ecommerce benefits (6s)
   3. Zephyr proof point (6s)
-  4. AI Image Editor background replacement (6s)
+  4. AI Enhancer upload → prompt → background replacement (10s)
   5. Customer logo wall (5s)
   6. Upload → Optimize → Deliver infrastructure view (6s)
   7. Booth CTA / file-board outro (10s)
-- Card 4's final version must use genuine AI Image Editor input/output:
-  background replacement only, no altered product, mockup, or generated model.
+- Card 4 uses Card 1's exact tube photo as its uploader and editor source. The
+  production standalone AI Enhancer generated result UUID
+  `9c081b6e-6892-4bda-8233-9d21584a1c07` from source UUID
+  `7bfcb94a-3f88-41a1-90b3-cc56a3c42360` with: “Replace only the background
+  with a sleek, light modern studio backdrop. Keep the product, crop, and
+  shadow unchanged.” The committed 832×1248 output is
+  `assets/ecommerce/editor-after.jpg`.
 - Logo wall: L'Oréal, Crayola, Samsonite, GemPages, Shogun, Marko.
 - Card 1's first phase follows Figma frame `234:979`: the complete uploader
   interaction from the Webflow booth card runs in the left cell with one tube
@@ -28,19 +33,15 @@ Working source of truth for this booth cut. Do not invent event facts.
   more sales.” beside the Zephyr mark and “This way, we get the absolute most
   speed we can when loading our web pages across mobile devices.” attributed
   to Sam McKinney, Director of Agency Services at Zephyr.
+- Card 7 follows Figma frame `219:1638` and otherwise retains the Webflow
+  outro unchanged: “Load faster, sell more.” over “Come say hi 👋 and enter
+  to win LEGO Polaroid Camera Building Set.”
 
 ## Assets still needed
 
 - Ecommerce product image (optional replacement for the current flower)
-- Genuine AI Image Editor before/after pair — the current pair is an explicit
-  **layout/motion placeholder** and will be replaced with a better confirmed
-  editor example. It is cropped to the well's native 623x455 and registers at
-  offset (0,0), which makes it safe for testing the wipe, but that geometric
-  check is not evidence of production provenance.
 - ~~Customer SVG marks~~ — all six wall logos and Zephyr are in
 - Ecommerce Expo QR artwork after its destination is confirmed
-- Final giveaway wording for card 7; `and enter to win something!` is a visible
-  Figma placeholder, not confirmed event copy
 
 See `assets/ecommerce/README.md` for exact filenames.
 
@@ -48,7 +49,6 @@ See `assets/ecommerce/README.md` for exact filenames.
 
 - Event dates, venue, and booth number
 - QR destination (likely ecommerce landing page, not yet confirmed)
-- Raffle / swag line
 - Replace the visible inherited QR before the event; its current destination
   remains `https://l.ead.me/bgyXox` and is not confirmed for Ecommerce Expo
 - Whether “2x faster page loads” and Zephyr attribution require legal/source

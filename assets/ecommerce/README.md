@@ -12,46 +12,21 @@ Drop final event artwork here using these exact filenames, then run
   required and inlined for offline playback.
 - `card1-browser-{os,left,right,back}.svg` — exact browser controls for Card 1's
   storefront payoff.
-- `editor-before` — the AI Image Editor input: the product on its original
-  background.
-- `editor-after` — the editor's own output for that exact file.
+- `editor-after.jpg` — Card 4's real AI Enhancer result for
+  `card1-product.jpg`. It was generated in the production standalone tool from
+  Uploadcare UUID `7bfcb94a-3f88-41a1-90b3-cc56a3c42360`; result UUID
+  `9c081b6e-6892-4bda-8233-9d21584a1c07`.
 
-Both are currently in as **layout/motion placeholders**, exported from Figma
-frame 213:1313 and cropped to 623x455 — the well's native size, so the card
-never resamples them. They still need to be replaced by a better, confirmed AI
-Image Editor example before the event. Crop from the plate export at (9,9):
-1px border plus 8px padding. **Re-export the pair together.** The card wipes
-between them, which only reads as a background change because the product
-registers at offset (0,0); `tools/check_editor.py` fails verification if it
-stops doing so.
+Card 4 deliberately has no separate `editor-before` asset: its source is the
+same inlined `card1Product` value used by Card 1, so the slide cannot quietly
+drift to a different product shot. The exact production prompt is stored as
+`CE_PROMPT` in `src/simple.template.html` and documented in `EVENT.md`.
 
-Either may be `.png`, `.jpg` or `.jpeg`; the build picks whichever exists.
-
-Card 4 displays an asset-needed state until *both* exist. Presence only makes
-the motion available; it does not mean placeholders are approved for the
-event. Do not synthesize the final pair or fake the replacement with CSS — the
-after ultimately has to be confirmed editor output.
-
-### Which Uploadcare feature produced these
-
-The current pair depicts an **AI Image Editor** flow: the near rock the bottle
-stands on is kept and only the sea and far background resolve to studio white.
-It is a placeholder example, not yet the final provenance-approved claim.
-
-Do not relabel it as background removal. `remove_bg` is a different feature
-with a different result — it cuts the subject out and puts a **solid colour**
-behind it, so the rock would be gone too. It is also REST-only, asynchronous,
-and not in the dashboard UI. If that is ever the effect you want instead, the
-round trip is scripted:
-
-    export UPLOADCARE_PUBLIC_KEY=... UPLOADCARE_SECRET_KEY=...
-    python tools/remove_bg.py assets/ecommerce/editor-before.jpg --bg ffffff --shadow
-
-`--bg` makes the add-on composite the studio colour itself, so what comes back
-is already a finished shot and no transparent PNG is ever a deliverable.
-`--shadow` adds the contact shadow. Both are fixed at REST call time and cannot
-be added later with a URL operation, so re-run the script to change them. It
-needs a paid plan. See https://uploadcare.com/docs/remove-bg/.
+The result is 832×1248 (2:3), matching the source aspect ratio. The source and
+result appear in the same 300×450 editor slot; the tool's dense dot-grid
+pending state covers the generative swap. Do not replace the result with a CSS
+background treatment or a synthetic mockup: regenerate it through the real
+tool and update its UUID and prompt provenance together.
 
 ## Benefit icons
 

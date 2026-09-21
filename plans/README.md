@@ -4,7 +4,7 @@
 |---|---|---|---|
 | 001 | [Replay card 1 optimization on every loop](001-replay-card-one-optimization.md) | HIGH | OBSOLETE |
 | 002 | [Move progress animation onto the compositor](002-composite-progress-motion.md) | HIGH | OBSOLETE |
-| 003 | [Make card 4 a real before/after reveal](003-build-real-editor-reveal.md) | HIGH | TODO |
+| 003 | [Make card 4 a real before/after reveal](003-build-real-editor-reveal.md) | HIGH | OBSOLETE |
 | 004 | [Pace card 1 for a booth, and fix its two element handovers](004-pace-card-one-for-a-booth.md) | HIGH | DONE |
 
 ## Status notes
@@ -19,19 +19,15 @@
   *second* visit), and the surviving progress animations run on
   `stroke-dashoffset` and `clip-path` rather than on `width`. Do not execute
   either plan; they would not apply.
-- **003 stays open and is asset-blocked.** It should be executed only once a
-  genuine AI Image Editor before/after pair is available; until then the card's
-  explicit asset-needed state is the honest behaviour. See `EVENT.md`.
+- **003 is obsolete.** Its old one-well wipe was superseded by Card 4's
+  production-derived upload → prompt → AI Enhancer flow. The genuine result,
+  source UUID and exact prompt are now recorded in `EVENT.md`, and
+  `tools/check_editor.py` verifies that flow twice plus reduced motion.
 - **004 is done** (card 1 retimed to its 10s slot, trust marks held for the
   whole card, widget→panel and placeholder→photo handovers de-crossfaded).
 
-## Recommended execution order
-
-1. **003** — when the confirmed editor assets land.
-
 ## Dependencies
 
-- 003 depends on genuine `assets/ecommerce/editor-before.jpg` and
-  `assets/ecommerce/editor-after.jpg` for final visual verification.
+- 003 has no remaining dependency; do not execute it against the rebuilt card.
 - 004 is independent and already applied; any future retiming of card 1 should
   start from its "Target" section, which records why each number is what it is.

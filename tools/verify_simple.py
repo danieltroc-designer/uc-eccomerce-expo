@@ -22,7 +22,8 @@ SHOTS = {
     0: [700, 1600, 2600, 3600, 4900, 6100, 7400, 8600],
     1: [250, 700, 1400, 3000],         # benefit row lands
     2: [250, 700, 1400, 2200],         # headline, then Zephyr mark
-    3: [300, 1100, 1700, 2100, 3200],  # before → light pass → cleaned shot
+    3: [500, 1500, 2800, 4000, 5200, 6400, 7200, 7800, 9000],
+                                            # upload → editor → prompt → shimmer → result
     4: [250, 650, 1100],               # six-logo sweep
     5: [700, 1800, 2900, 3800],        # upload → optimize → deliver → logo
     6: [400, 1400, 3000],              # booth CTA

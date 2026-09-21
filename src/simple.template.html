@@ -1632,54 +1632,78 @@
   .em-logo-fallback{font-family:var(--cmono);font-size:14px;letter-spacing:.18em;
     text-transform:uppercase;color:#fff}
 
-  /* Card 4 — laid out to Figma frame 213:1313. One well, not two panes: the
-     card's claim is that a single photo changes, and a before beside an after
-     turns a transformation into a comparison — the eye starts hunting for
-     differences instead of watching one happen.
+  /* Card 4 — the real AI Enhancer flow. The title stays on the shared anchor;
+     the 1252x640 stage under it first holds the same uploader Card 1 uses, then
+     turns over to the editor UI observed in the production standalone tool.
+     The source is Card 1's exact photo and the result is the real output UUID
+     recorded in EVENT.md. Nothing in this card manufactures an AI result. */
+  .ce-wrap{position:absolute;inset:0}
+  .ce-stage{position:absolute;left:334px;top:400px;width:1252px;height:640px}
 
-     The pair in assets/ecommerce/ is genuine AI Image Editor output, cropped
-     out of the frame's own export at (9,9) so the chrome below is CSS rather
-     than baked pixels. The two frames register exactly: the bottle and the
-     rock do not move, only the background behind them. That registration is
-     what allows a wipe here at all — re-export both together or the swap
-     turns into a jump cut.
+  /* Upload phase: the same 670x532 black cell, 400px uploader and 120x150
+     spring-dragged file as Card 1 — one interaction vocabulary across cards. */
+  .ce-upload-phase{position:absolute;inset:0;display:flex;align-items:center;
+    justify-content:center}
+  .ce-uploadbox{position:relative;width:670px;height:532px;border-radius:27px;
+    overflow:hidden;background:#000;box-shadow:0 0 0 1px rgba(255,255,255,.05);
+    display:flex;align-items:center;justify-content:center}
+  .ce-drag{position:absolute;left:40px;top:-5px;width:120px;height:150px;
+    z-index:3;opacity:0}
+  .ce-drag .ef-drag-card{position:absolute;inset:0}
 
-     Imagery stays explicitly pending until both files exist. Never synthesize
-     the before or imply that a CSS treatment is real editor output. */
-  .ee-wrap{position:absolute;inset:0}
-  /* 641x473 on the frame's centre (960.5,721.5). Border-box, so the 1px rule
-     and the 8px pad eat inward and leave the well at exactly 623x455 — the
-     pixel size of the exports, so neither frame is ever resampled. */
-  .ee-panel{position:absolute;left:640px;top:485px;width:641px;height:473px;
-    box-sizing:border-box;padding:8px;border:1px solid #181818;border-radius:16px;
-    background:#0c0c0c}
-  .ee-well{position:relative;width:100%;height:100%;border-radius:8px;
-    overflow:hidden;background:#fff}
-  .ee-well img{position:absolute;inset:0;width:100%;height:100%;
+  /* Editor phase, rebuilt from the supplied screenshot and the live production
+     tool. The white shell is deliberately one layer: it arrives as a complete
+     workspace rather than its controls assembling like a dashboard. */
+  .ce-editor{position:absolute;inset:0;border-radius:16px;overflow:hidden;
+    background:#fff;color:#151515;box-shadow:0 18px 50px rgba(0,0,0,.28);
+    opacity:0;transform:translateY(16px) scale(.985)}
+  .ce-canvas{position:absolute;left:130px;top:18px;width:992px;height:456px;
+    border-radius:10px;overflow:hidden;
+    background-color:#fff;
+    background-image:radial-gradient(circle,#d2d3d5 1.15px,transparent 1.25px);
+    background-size:6px 6px}
+  .ce-photo{position:absolute;left:346px;top:3px;width:300px;height:450px;
+    overflow:hidden;background:#ececeb}
+  .ce-photo img{position:absolute;inset:0;width:100%;height:100%;
     object-fit:cover;display:block}
-  .ee-after{opacity:0}
-  /* The sweep is the mechanism, not decoration: the after frame is clipped to
-     the light's trailing edge, so the new background arrives *behind* the pass
-     rather than dissolving in everywhere at once. A plain crossfade reads as
-     two photos trading places; this reads as one photo being worked on. Band
-     and clip share a duration, delay and easing on purpose — the band's bright
-     edge sits ~80px ahead of the clip, so light lands just before the change
-     it causes. Retime one and the other has to follow or the light trails the
-     result it is supposed to produce. */
-  .ee-scan{position:absolute;top:0;bottom:0;width:190px;z-index:2;opacity:0;
-    pointer-events:none;mix-blend-mode:screen;
-    background:linear-gradient(90deg,rgba(95,216,115,0) 0%,rgba(95,216,115,.16) 42%,
-      rgba(216,255,110,.55) 76%,rgba(255,255,255,.92) 92%,rgba(255,255,255,0) 100%)}
-  .slide.active .ee-scan{animation:eeScan 1.45s var(--ease-in-out) 1.15s both}
-  .slide.active .ee-after{animation:eeSwap 1.45s var(--ease-in-out) 1.15s both}
-  @keyframes eeScan{0%{left:-190px;opacity:0}8%{opacity:1}
-    88%{opacity:1}100%{left:623px;opacity:0}}
-  @keyframes eeSwap{0%{opacity:1;clip-path:inset(0 100% 0 0)}
-    100%{opacity:1;clip-path:inset(0 0 0 0)}}
-  .ee-pending{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-    background:repeating-linear-gradient(135deg,#101012 0,#101012 18px,#131316 18px,#131316 36px);
-    color:#77787d;text-align:center;font-family:var(--cmono);font-size:13px;line-height:1.6;
-    letter-spacing:.04em;text-transform:uppercase}
+  .ce-after{opacity:0}
+
+  /* The production tool covers the image with a dense dot field while work is
+     pending. The veil hides the unavoidable generative micro-differences in
+     the tube while the new frame arrives; the brighter moving band makes the
+     dots read as computation rather than as a texture crossfade. */
+  .ce-veil{position:absolute;inset:0;z-index:2;opacity:0;pointer-events:none;
+    background-color:rgba(245,245,243,.72);
+    background-image:radial-gradient(circle,rgba(49,49,47,.72) 1.15px,transparent 1.3px);
+    background-size:5px 5px}
+  .ce-shimmer{position:absolute;top:0;bottom:0;left:-180px;width:180px;z-index:3;
+    opacity:0;pointer-events:none;mix-blend-mode:screen;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.35) 28%,
+      rgba(255,255,255,.94) 58%,rgba(216,255,110,.48) 72%,transparent)}
+
+  .ce-composer{position:absolute;left:246px;top:466px;width:760px;height:128px;
+    padding:18px 16px 14px;border-radius:18px;background:#fff;
+    box-shadow:0 12px 30px rgba(0,0,0,.18),0 0 0 1px rgba(0,0,0,.07);
+    z-index:4}
+  .ce-prompt{height:52px;font-size:16px;font-weight:450;line-height:20px;
+    color:#555;white-space:normal;overflow:hidden}
+  .ce-prompt-cursor{display:inline-block;width:1px;height:16px;margin-left:2px;
+    vertical-align:-3px;background:#777;opacity:0}
+  .ce-prompt-cursor.on{opacity:1;animation:hbBlink .8s steps(1) infinite}
+  .ce-presets{position:absolute;left:16px;bottom:13px;display:flex;gap:7px}
+  .ce-chip{padding:7px 10px;border-radius:8px;background:#f1f1f2;color:#3e3e40;
+    font-size:12px;font-weight:520;line-height:1}
+  .ce-ratio{position:absolute;right:55px;bottom:14px;padding:6px 9px;border-radius:8px;
+    background:#f1f1f2;color:#3e3e40;font-size:12px;font-weight:520;line-height:1}
+  .ce-ratio::before{content:'';display:inline-block;width:12px;height:7px;
+    margin-right:6px;border:1px solid #666;border-radius:2px;vertical-align:-1px}
+  .ce-generate{position:absolute;right:14px;bottom:13px;width:30px;height:30px;
+    border-radius:9px;background:#2f5ae8;color:#fff;display:flex;align-items:center;
+    justify-content:center;font-size:18px;font-weight:600;line-height:1;opacity:.35}
+  .ce-action{position:absolute;bottom:10px;padding:8px 13px;border-radius:8px;
+    background:#f1f1f2;color:#343436;font-size:13px;font-weight:600;line-height:1}
+  .ce-cancel{left:12px}
+  .ce-done{right:12px;background:#9bb0ef;color:#fff}
 
   /* Card 5 — the booth wall, laid out to storyboard frame 207:1131.
      Two rows of three, and the marks are *not* on a grid: the frame places
@@ -1784,11 +1808,7 @@
     .slide.active .sc-chip{animation:none!important}
     .pd-dots[data-state="working"] i,.ef-dots[data-state="working"] i{animation:none!important}
     .eb-card,.el-logo{transition:none!important;opacity:1!important;transform:none!important}
-    .ee-scan,.ee-after{animation:none!important}
-    /* card 4's payoff is the cleaned shot, so settle on it rather than on the
-       photo the card opens with; the light pass has nothing left to explain */
-    .ee-scan{opacity:0!important}
-    .ee-after{opacity:1!important;clip-path:none!important}
+    .ce-prompt-cursor{animation:none!important}
   }
 </style>
 </head>
@@ -2088,12 +2108,12 @@ function Timeline({reduced=false}={}){
 }
 
 /* ---------------- default deck ---------------- */
-/* ---- Ecommerce Expo — 49-second, seven-card booth loop ----------------
+/* ---- Ecommerce Expo — 53-second, seven-card booth loop ----------------
    Product image in, storefront out; benefits and proof; one focused AI Editor
    demonstration; customer trust; then the system view and booth CTA.
-   Durations are 10/6/6/6/5/6/10 seconds. Card 1 carries the longest slot on
-   purpose: it is the only card that demonstrates a process rather than stating
-   a fact, and every beat in it has to be legible from across a stand. */
+   Durations are 10/6/6/10/5/6/10 seconds. Cards 1 and 4 carry longer slots
+   because they demonstrate processes rather than stating a fact, and every
+   beat has to be legible from across a stand. */
 const DEFAULT_DECK = {
   settings: { duration: 6, fade: 480, watermark: true },
   slides: [
@@ -2109,7 +2129,7 @@ const DEFAULT_DECK = {
       attribution:'Sam McKinney, Director of Agency Services at Zephyr',
       by:'Zephyr' },
 
-    { type:'commerceEditor', duration:6,
+    { type:'commerceEditor', duration:10,
       heading:'Turn any photo\ninto a catalog-ready product shot.' },
 
     { type:'commerceLogos', duration:5,
@@ -2123,7 +2143,7 @@ const DEFAULT_DECK = {
 
     { type:'commerceOutro', duration:10, layout:'outro',
       title:'Load faster,\nsell more.',
-      sub:'Come say hi \ud83d\udc4b\nand enter to win something!',
+      sub:'Come say hi \ud83d\udc4b\nand enter to win LEGO Polaroid Camera Building Set',
       qr:true, qrConfirmed:false, qrLabel:'QR URL to confirm', booth:'' }
   ]
 };
@@ -2322,6 +2342,12 @@ const ECOM_BENEFITS = [
   { benefit:'Nothing to\nmaintain',   feature:'Upload to delivery,\nhandled',   icon:'benefit-maintain',   ac:'#FF9825' },
   { benefit:'Any\nstore',             feature:'Works with\nany platform',       icon:'benefit-store',      ac:'#5978FF' },
 ];
+
+/* The exact prompt used to generate Card 4's committed result in the
+   production standalone AI Enhancer. Keep screen copy and EVENT.md together:
+   changing this text without regenerating editor-after.jpg makes the demo
+   claim an operation that did not produce the frame it reveals. */
+const CE_PROMPT = 'Replace only the background with a sleek, light modern studio backdrop. Keep the product, crop, and shadow unchanged.';
 
 /* Ecommerce Expo card 5's wall: x, y, w, h per slot in reading order, straight
    off storyboard frame 207:1131. Each box is the mark's own export size, so a
@@ -2559,17 +2585,75 @@ const R = {
       </div>
     </div>`;
   },
-  /* ---- Ecommerce Expo card 4: real editor output only ---- */
+  /* ---- Ecommerce Expo card 4: upload -> prompt -> real AI result ---- */
   commerceEditor(s){
-    const ready = !!(ECOMMERCE.editorBefore && ECOMMERCE.editorAfter);
-    const well = ready
-      ? `<img src="${esc(ECOMMERCE.editorBefore)}" alt="">
-         <img class="ee-after" src="${esc(ECOMMERCE.editorAfter)}" alt="">
-         <i class="ee-scan"></i>`
-      : `<div class="ee-pending">Genuine AI Image Editor<br>before / after assets needed</div>`;
-    return `<div class="ee-wrap">
+    const image = ECOMMERCE.card1Product;
+    const result = ECOMMERCE.editorAfter;
+    const sources = UPLOAD_SOURCES.map(([ic,label])=>`
+      <div class="ef-source"><i>${UI[ic]}</i><span>${esc(label)}</span></div>`).join('');
+    return `<div class="ce-wrap">
       <div class="shd" style="--shd-y:203px"><div class="shd-t reveal">${multiline(s.heading||'')}</div></div>
-      <div class="ee-panel reveal d2"><div class="ee-well">${well}</div></div>
+      <div class="ce-stage">
+        <div class="ce-upload-phase">
+          <div class="ce-uploadbox">
+            <div class="ef-widget">
+              <div class="ef-drop">
+                <div class="ef-dropic">${UI.upload}</div>
+                <div class="ef-droptxt">Drop files here</div>
+              </div>
+              <div class="ef-sources">${sources}</div>
+              <div class="ef-cancel">Cancel</div>
+            </div>
+            <div class="ce-drag">
+              <div class="ef-drag-card">
+                <img src="${image}" alt="">
+                <span class="ef-tag ef-kind">JPG</span>
+                <span class="ef-tag ef-size">6.5MB</span>
+              </div>
+              <i class="ef-cursor">${UI.cursor}</i>
+            </div>
+            <div class="ef-panel-slot">
+              <div class="ef-panel">
+                <div class="ef-uhead">
+                  <div class="ef-utitle">Uploading</div>
+                  <div class="ef-uclose">${UI.close}</div>
+                </div>
+                <div class="ef-ulist">
+                  <div class="ef-ufile" data-state="uploading">
+                    <div class="ef-ufleft">
+                      <div class="ef-uthumb"><img src="${image}" alt=""><i class="ef-ucheck">${UI.check}</i></div>
+                      <div class="ef-uname">product.jpg</div>
+                    </div>
+                    <div class="ef-uaction">${DI_RING}<i class="ef-ubin">${UI.trash}</i></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ce-editor">
+          <div class="ce-canvas">
+            <div class="ce-photo">
+              <img class="ce-before" src="${image}" alt="">
+              <img class="ce-after" src="${result}" alt="">
+              <i class="ce-veil"></i>
+              <i class="ce-shimmer"></i>
+            </div>
+          </div>
+          <div class="ce-composer">
+            <div class="ce-prompt"><span></span><i class="ce-prompt-cursor"></i></div>
+            <div class="ce-presets">
+              ${['Enhance','Golden hour','White studio','Remove people','Watercolor','Black & white']
+                .map(x=>`<span class="ce-chip">${x}</span>`).join('')}
+            </div>
+            <span class="ce-ratio">3:2</span>
+            <span class="ce-generate">↑</span>
+          </div>
+          <span class="ce-action ce-cancel">Cancel</span>
+          <span class="ce-action ce-done">Done</span>
+        </div>
+      </div>
     </div>`;
   },
   /* ---- Ecommerce Expo card 5: the six booth-wall customers ---- */
@@ -3934,6 +4018,169 @@ function setupCommerceFlow(slideEl, sd, tl){
   tl.at(SITE+.80,settleSite);
 }
 
+/* ---------------- Expo card 4: upload -> prompt -> AI result -----------------
+   This is a recording of a real tool flow, rebuilt offline: the source is Card
+   1's exact product photo; the prompt is the exact text used in production;
+   and editor-after.jpg is that request's real output. The dot-grid veil is not
+   pretending to generate anything — it reproduces the standalone tool's
+   pending state and masks the generative micro-differences while the result
+   frame arrives underneath it. */
+function setupCommerceEditor(slideEl, sd, tl){
+  const q = slideEl.querySelector.bind(slideEl);
+  const uploadPhase = q('.ce-upload-phase');
+  const box = q('.ce-uploadbox');
+  const widget = q('.ef-widget');
+  const drop = q('.ef-drop');
+  const dropText = q('.ef-droptxt');
+  const drag = q('.ce-drag');
+  const dragCard = q('.ef-drag-card');
+  const cursor = q('.ef-cursor');
+  const panel = q('.ef-panel');
+  const file = q('.ef-ufile');
+  const arc = q('.ef-uaction .di-ring .arc');
+  const editor = q('.ce-editor');
+  const prompt = q('.ce-prompt span');
+  const promptCursor = q('.ce-prompt-cursor');
+  const generate = q('.ce-generate');
+  const done = q('.ce-done');
+  const after = q('.ce-after');
+  const veil = q('.ce-veil');
+  const shimmer = q('.ce-shimmer');
+  if (!uploadPhase || !box || !widget || !drop || !drag || !panel || !arc ||
+      !editor || !prompt || !after || !veil || !shimmer) return;
+
+  const reset = ()=>{
+    Object.assign(uploadPhase.style,{opacity:'1',transform:'none'});
+    drop.classList.remove('hot');
+    dropText.textContent = 'Drop files here';
+    Object.assign(drag.style,{opacity:'0',transform:'none'});
+    Object.assign(dragCard.style,{opacity:'1',transform:'scale(1)'});
+    cursor.style.opacity = '1';
+    Object.assign(widget.style,{opacity:'1',transform:'none',filter:'none'});
+    Object.assign(panel.style,{opacity:'0',transform:'scale(.96)'});
+    file.dataset.state = 'uploading';
+    arc.style.strokeDashoffset = DI_RING_LEN;
+    Object.assign(editor.style,{opacity:'0',transform:'translateY(16px) scale(.985)'});
+    prompt.textContent = '';
+    promptCursor.classList.remove('on');
+    Object.assign(generate.style,{opacity:'.35',transform:'none'});
+    Object.assign(done.style,{background:'#9bb0ef'});
+    after.style.opacity = '0';
+    Object.assign(veil.style,{opacity:'0'});
+    Object.assign(shimmer.style,{opacity:'0',transform:'translateX(0)'});
+  };
+  reset();
+
+  const settle = ()=>{
+    Object.assign(uploadPhase.style,{opacity:'0',transform:'scale(.97)'});
+    Object.assign(widget.style,{opacity:'0',transform:'scale(.94)',filter:'blur(2px)'});
+    Object.assign(panel.style,{opacity:'1',transform:'none'});
+    file.dataset.state = 'done';
+    arc.style.strokeDashoffset = 0;
+    Object.assign(editor.style,{opacity:'1',transform:'none'});
+    prompt.textContent = CE_PROMPT;
+    promptCursor.classList.remove('on');
+    Object.assign(generate.style,{opacity:'.35',transform:'none'});
+    done.style.background = '#2f5ae8';
+    after.style.opacity = '1';
+    veil.style.opacity = '0';
+    Object.assign(shimmer.style,{opacity:'0',transform:'translateX(660px)'});
+  };
+
+  if (REDUCED){ settle(); return; }
+
+  // Same spring, geometry and hit-test as Card 1's uploader. Keeping these
+  // literal rather than making a second "similar" drag is what makes the
+  // product feel like it travelled from one slide into the next.
+  const FROM = {x:0,y:0}, OVER = {x:235,y:81};
+  const FLY = {at:.30,response:.68,bounce:.12};
+  tl.to(drag,[{opacity:0},{opacity:1}],{at:.20,dur:.20});
+  let landed = 1.2;
+  tl.spring(drag,FROM,OVER,{...FLY,onArrive:t=>landed=t});
+
+  const tip = {x:drag.offsetLeft+cursor.offsetLeft,y:drag.offsetTop+cursor.offsetTop};
+  const zx = widget.offsetLeft+drop.offsetLeft, zy = widget.offsetTop+drop.offsetTop;
+  const cross = springCrossing(FROM,OVER,FLY,o=>{
+    const x=tip.x+(o.x||0), y=tip.y+(o.y||0);
+    return x>=zx && x<=zx+drop.offsetWidth && y>=zy && y<=zy+drop.offsetHeight;
+  });
+  tl.cls(drop,'hot',cross!=null ? FLY.at+cross : Math.max(0,landed-.25));
+
+  const DROP = landed + .12;
+  tl.to(dragCard,[{opacity:1,transform:'scale(1)'},{opacity:0,transform:'scale(.28)'}],
+    {at:DROP,dur:.46,ease:EASE.inOut,fill:'forwards'});
+  tl.to(cursor,[{opacity:1},{opacity:0}],{at:DROP+.05,dur:.22,fill:'forwards'});
+  tl.at(DROP+.20,()=>{ dropText.textContent='1 file added'; });
+  tl.cls(drop,'hot',DROP+.34,false);
+
+  const SWAP = DROP + .64;
+  tl.to(widget,[{opacity:1,transform:'scale(1)',filter:'blur(0)'},
+                {opacity:0,transform:'scale(.94)',filter:'blur(2px)'}],
+    {at:SWAP,dur:.22,fill:'forwards'});
+  tl.to(panel,[{opacity:0,transform:'scale(.96)'},{opacity:1,transform:'scale(1)'}],
+    {at:SWAP+.12,dur:.30,ease:EASE.out});
+
+  const UPLOAD = SWAP + .42;
+  tl.to(arc,[{strokeDashoffset:DI_RING_LEN},{strokeDashoffset:0}],
+    {at:UPLOAD,dur:.95,ease:'linear'});
+  tl.at(UPLOAD+.98,()=>{ file.dataset.state='done'; });
+
+  // The uploaded state holds before the workspace arrives. The editor comes
+  // in as one object; individual controls do not fly around a production UI.
+  const EDITOR = UPLOAD + 1.38;
+  tl.to(uploadPhase,[{opacity:1,transform:'scale(1)'},
+                      {opacity:0,transform:'scale(.97)'}],
+    {at:EDITOR,dur:.32,ease:EASE.out,fill:'forwards'});
+  tl.to(editor,[{opacity:0,transform:'translateY(16px) scale(.985)'},
+                {opacity:1,transform:'translateY(0) scale(1)'}],
+    {at:EDITOR+.12,dur:.48,ease:EASE.out});
+
+  // tl.timeout keeps recursive typing owned by this slide's Timeline, so it
+  // stops instantly when the deck advances and restarts empty on the next loop.
+  const TYPE = EDITOR + .58;
+  tl.at(TYPE,()=>{
+    promptCursor.classList.add('on');
+    let i=0;
+    const tick = ()=>{
+      prompt.textContent = CE_PROMPT.slice(0,++i);
+      if(i < CE_PROMPT.length) tl.timeout(18,tick);
+    };
+    tick();
+  });
+
+  const GENERATE = TYPE + CE_PROMPT.length*.018 + .28;
+  tl.at(GENERATE,()=>promptCursor.classList.remove('on'));
+  tl.to(generate,[
+    {opacity:.35,transform:'scale(1)',background:'#2f5ae8'},
+    {opacity:1,transform:'scale(.88)',background:'#2f5ae8'},
+    {opacity:1,transform:'scale(1)',background:'#2f5ae8'}
+  ],{at:GENERATE,dur:.24,ease:EASE.out});
+
+  // Dense dots first, then the real result underneath them, then the veil
+  // clears. The crossfade is intentionally hidden at peak coverage: the AI
+  // output preserves the crop but naturally changes small product highlights.
+  tl.to(veil,[
+    {opacity:0,offset:0},
+    {opacity:.92,offset:.16},
+    {opacity:.92,offset:.72},
+    {opacity:0,offset:1}
+  ],{at:GENERATE+.16,dur:1.75,ease:EASE.inOut});
+  tl.to(shimmer,[
+    {opacity:0,transform:'translateX(0)'},
+    {opacity:1,transform:'translateX(120px)'},
+    {opacity:.9,transform:'translateX(510px)'},
+    {opacity:0,transform:'translateX(660px)'}
+  ],{at:GENERATE+.16,dur:1.75,ease:EASE.inOut});
+  tl.to(after,[{opacity:0},{opacity:1}],
+    {at:GENERATE+.72,dur:.62,ease:EASE.inOut});
+  tl.to(done,[{background:'#9bb0ef'},{background:'#2f5ae8'}],
+    {at:GENERATE+1.45,dur:.24,ease:EASE.out});
+
+  // Pin the final frame so killing WAAPI during the outgoing slide crossfade
+  // cannot blink back to the source image.
+  tl.at(GENERATE+1.95,settle);
+}
+
 function setupDropin(slideEl, sd, tl){
   const drop   = slideEl.querySelector('.di-drop');
   const txt    = slideEl.querySelector('.di-droptxt');
@@ -4778,6 +5025,7 @@ function enter(i){
   if (sd.type==='pipeline') setupPipeline(cur, sd, tl);
   if (sd.type==='dropin') setupDropin(cur, sd, tl);
   if (sd.type==='commerceFlow') setupCommerceFlow(cur, sd, tl);
+  if (sd.type==='commerceEditor') setupCommerceEditor(cur, sd, tl);
   if (sd.type==='commerceInfrastructure') setupCommerceInfrastructure(cur, sd, tl);
   tl.play();
 
@@ -4809,7 +5057,7 @@ let expanded = -1;
 
 const TYPE_LABEL = {statement:'Statement', number:'Number', chart:'Chart', stats:'Stats', logo:'Logo', logoAnim:'Logo FX', board:'File board', reveal:'Reveal', mockup:'Mockup', code:'Code / terminal', upload:'Upload demo', chaos:'Chaos graph', install:'Install app', dropin:'Drop-in form', features:'Feature row', quote2:'Customer quote', logos:'Logo wall', scale:'Scale / pipeline', pipeline:'How-it-works demo',
   commerceFlow:'Expo · Product flow', commerceBenefits:'Expo · Benefits',
-  commerceMetric:'Expo · Proof point', commerceEditor:'Expo · AI Editor',
+  commerceMetric:'Expo · Proof point', commerceEditor:'Expo · AI Enhancer',
   commerceLogos:'Expo · Logo wall', commerceInfrastructure:'Expo · Infrastructure',
   commerceOutro:'Expo · Booth CTA'};
 const VARIANT_LABEL = {
@@ -4884,7 +5132,7 @@ function fieldsFor(s, i){
       <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">Figma frame 234:1237, using the Webflow testimonial card's exact two-panel geometry and entrance choreography. The logo name looks up assets/logos (currently zephyr.svg).</p>`;
     case 'commerceEditor': return dur+`
       <label class="f"><span>Headline</span><textarea data-f="heading">${esc(s.heading||'')}</textarea></label>
-      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">Laid out to Figma frame 213:1313 — one 641&times;473 well, the background swapped in place behind a light pass. Asset status: ${ECOMMERCE.editorBefore&&ECOMMERCE.editorAfter?'ready':'waiting for assets/ecommerce/editor-before and editor-after'}. The pair must be the same crop or the wipe becomes a jump cut, and this card never simulates editor output with CSS.</p>`;
+      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">The real AI Enhancer flow: Card 1's product runs through the same uploader, the production prompt types into the editor UI, the tool's dot-grid shimmer covers processing, and the committed output replaces the source. Prompt: “${esc(CE_PROMPT)}” Result asset: ${ECOMMERCE.editorAfter?'ready':'missing assets/ecommerce/editor-after.jpg'}.</p>`;
     case 'commerceLogos': return dur+`
       <label class="f"><span>Small title (optional)</span><input type="text" data-f="title" value="${esc(s.title||'')}"></label>
       <label class="f"><span>Logo names (comma-separated)</span><textarea data-f="logos">${esc(s.logos||'')}</textarea></label>
@@ -4900,7 +5148,7 @@ function fieldsFor(s, i){
       <label class="f"><span>Booth number (blank until confirmed)</span><input type="text" data-f="booth" value="${esc(s.booth||'')}"></label>
       <label class="chk"><input type="checkbox" data-f="qr" ${s.qr!==false?'checked':''}> Show placeholder QR</label>
       <label class="chk"><input type="checkbox" data-f="qrConfirmed" ${s.qrConfirmed?'checked':''}> QR destination confirmed</label>
-      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">Frame 219:1638 reuses the complete Webflow board/outro composition: globe, four corner files and telemetry, sparkle glyph, wave and QR. The QR and “something” giveaway line are visible mockup placeholders until their event details are confirmed.</p>`;
+      <p style="font-size:12px;color:#7a7a82;margin-top:10px;line-height:1.5">Frame 219:1638 reuses the complete Webflow board/outro composition: globe, four corner files and telemetry, sparkle glyph, wave and QR. Only its headline differs from Webflow; the LEGO Polaroid giveaway line is retained from that slide. The QR remains a visible placeholder until its Expo destination is confirmed.</p>`;
     case 'statement': return dur+`
       <label class="f"><span>Kicker (optional small label)</span><input type="text" data-f="kicker" value="${esc(s.kicker||'')}"></label>
       <label class="f"><span>Heading</span><textarea data-f="heading">${esc(headText(s))}</textarea></label>
@@ -5140,10 +5388,10 @@ const NEW = {
   commerceFlow:{type:'commerceFlow',duration:10,heading:'Every product image, optimized and fast. Automatically.'},
   commerceBenefits:{type:'commerceBenefits',duration:6},
   commerceMetric:{type:'commerceMetric',duration:6,value:'2x faster page loads.',line:'Faster pages, more sales.',quote:'This way, we get the absolute most speed we can when loading our web pages across mobile devices.',attribution:'Sam McKinney, Director of Agency Services at Zephyr',by:'Zephyr'},
-  commerceEditor:{type:'commerceEditor',duration:6,heading:'Turn any photo\ninto a catalog-ready product shot.'},
+  commerceEditor:{type:'commerceEditor',duration:10,heading:'Turn any photo\ninto a catalog-ready product shot.'},
   commerceLogos:{type:'commerceLogos',duration:5,title:'Trusted by',logos:'L\u2019Or\u00e9al, Crayola, Samsonite, GemPages, Shogun, Marko'},
   commerceInfrastructure:{type:'commerceInfrastructure',duration:6,heading:'The infrastructure\nbehind every product image.',sub:'One integration. Upload, optimize, and deliver every image, and every other file.',steps:'Upload, Optimize, Deliver'},
-  commerceOutro:{type:'commerceOutro',duration:10,layout:'outro',title:'Load faster,\nsell more.',sub:'Come say hi \ud83d\udc4b\nand enter to win something!',qr:true,qrConfirmed:false,qrLabel:'QR URL to confirm',booth:''},
+  commerceOutro:{type:'commerceOutro',duration:10,layout:'outro',title:'Load faster,\nsell more.',sub:'Come say hi \ud83d\udc4b\nand enter to win LEGO Polaroid Camera Building Set',qr:true,qrConfirmed:false,qrLabel:'QR URL to confirm',booth:''},
   statement:{type:'statement',duration:8,kicker:'',heading:'Your headline goes here.',line2mono:false},
   number:{type:'number',duration:8,kicker:'',prefix:'',value:100,decimals:0,suffix:'+',label:'describe the number'},
   chart:{type:'chart',duration:11,big:'10X',label:'what grew',startLabel:'1%',endLabel:'10%',points:'1,2,2.5,4,6,7,9,10'},

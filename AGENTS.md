@@ -40,33 +40,38 @@ own source + build + output and is fully independent of the main deck:
   `pipeline`). Card 7 is a `board` slide with `layout:'outro'`.
 - Build: `python build_simple.py` → `dist/uploadcare-simple.html`.
 - Same rule applies: never hand-edit `dist/uploadcare-simple.html`.
-- Current default sequence is 10/6/6/6/5/6/10 seconds (49 seconds total):
- product flow, benefits, Zephyr proof point, AI Editor, customer logos,
- infrastructure, booth CTA. Card 1 holds the longest slot with card 7 because
- it is the only card that demonstrates a process rather than stating a fact.
+- Current default sequence is 10/6/6/10/5/6/10 seconds (53 seconds total):
+ product flow, benefits, Zephyr proof point, AI Enhancer, customer logos,
+ infrastructure, booth CTA. Cards 1, 4 and 7 hold the longest slots; the first
+ two demonstrate processes rather than stating a fact.
 - Optional event imagery is auto-inlined from `assets/ecommerce/`; see its
-  README for exact filenames. Card 4 renders an explicit asset-needed state
-  unless *both* editor frames exist, so there is no way to half-ship it.
+  README for exact filenames. Card 4's generated output is required, so a
+  missing `assets/ecommerce/editor-after.jpg` fails the build.
 
-Ecommerce card 4 is the AI Image Editor swap, laid out to frame 213:1313: a
-641x473 plate at (640,485) whose 1px rule and 8px pad are border-box, leaving
-the well at exactly 623x455 — the pixel size of the exports, so neither frame
-is ever resampled. The current pair is explicitly a layout/motion placeholder;
-replace it with a confirmed editor example before the event. Two things about
-the implementation are load bearing:
+Ecommerce Card 4 is the real standalone AI Enhancer flow, rebuilt offline
+inside a fixed 1252x640 stage at (334,400). It first reuses Card 1's complete
+uploader vocabulary — same 670x532 black cell, same 400px widget, same
+spring-dragged 120x150 `card1Product` — then hands over to the white editor UI.
+`CE_PROMPT` is the exact production prompt and the final frame is the real
+generated UUID recorded in `EVENT.md`; neither may be changed independently
+because together they are the provenance of the claim.
 
-- **It is a wipe, not a crossfade, and that is a claim about the assets.** The
-  after frame is clipped to the sweep's trailing edge, so the new background
-  arrives *behind* the light rather than dissolving in everywhere at once. That
-  only reads as "the background changed" because the two exports register on
-  the product: `tools/check_editor.py` cross-correlates the silhouettes and
-  fails unless the best offset is (0,0). Re-export the pair together or the
-  swap becomes a jump cut. The band and the clip share a duration, delay and
-  easing so the light lands just before the change it causes; retime one and
-  the other has to follow.
-- **Measure geometry after `.reveal` settles.** The plate wears `reveal d2`,
-  which animates `transform`, so a panel sampled mid-entrance reads ~16px low
-  and the frame's y looks wrong when only the animation is unfinished.
+Three things about the implementation are load bearing:
+
+- **There is no separate before asset.** The drag card, compact row and editor
+  source all use `ECOMMERCE.card1Product`, the same inlined data URI as Card 1.
+  This prevents Card 4 quietly drifting to a different product shot.
+- **The dot field covers a real generative swap.** The source and 832x1248
+  result share a 2:3 crop, but generation naturally changes small highlights
+  and edges on the tube. `.ce-veil` reproduces the tool's dense pending grid;
+  the result crossfades only while that veil is near peak opacity, and
+  `.ce-shimmer` gives the field a travelling bright edge. Showing the dissolve
+  without the veil turns it into a visible product morph. The veil is the
+  tool's state indication, not a claim that CSS produced the result.
+- **Prompt typing is Timeline-owned.** Its recursive 18ms ticks go through
+  `tl.timeout()`, so leaving the card stops them and re-entry resets to an empty
+  prompt synchronously. Reduced motion opens directly on the genuine result.
+  `tools/check_editor.py` checks normal motion twice and that reduced state.
 - `encode_logos()` scans `assets/logos/*.svg`; new customer marks require no
   build-script registration. Ecommerce Card 3 now follows frame 234:1237 and
   reuses the inherited Webflow testimonial spread exactly: the 938×465 lime
@@ -428,9 +433,10 @@ deliberate:
   greys between roughly 20% and 100% of `#454545`. The mark keeps its `#090909`
   pad, which knocks the wireframe's crossing lines out from behind it.
 - **The sign-off is two lines and carries the booth QR.** `Come say hi 👋` runs
-  on over the current Figma placeholder `and enter to win something!`, both at
-  the frame's 1.065 leading. Neither the giveaway nor destination is confirmed
-  Expo copy yet. The QR under it is pinned at `857,711`, not stacked, for the
+  on over `and enter to win LEGO Polaroid Camera Building Set`, preserving the
+  Webflow outro exactly while the Expo headline changes to `Load faster, sell
+  more.` Both lines use the frame's 1.065 leading. The QR destination is still
+  unconfirmed. The QR under it is pinned at `857,711`, not stacked, for the
   same reason the rest of the column is.
   - **The destination lives in the artwork, not in a constant.** `make_qr()`
     reads `assets/qr/booth-qr.png` — design's black-on-white export — recovers

@@ -166,10 +166,9 @@ def encode_demo() -> str:
 def encode_ecommerce() -> str:
     """Inline Ecommerce Expo photography and card-specific vector art.
 
-    Photography is deliberately optional during layout work. Card 4 must use
-    genuine AI Image Editor output, so the template renders an explicit
-    asset-needed state until both files exist instead of manufacturing a fake
-    before/after in CSS. Cards 2 and 6 use required Figma exports: card 2's
+    Card 4 reuses Card 1's product source and requires a genuine AI Enhancer
+    output; it never manufactures a fake result in CSS. Cards 2 and 6 use
+    required Figma exports: card 2's
     accent colours are baked into its five icons, while card 6's product image,
     expanded rail, 66.281px collapsed connector and 339x61 final lockup are its
     actual frame assets.
@@ -179,7 +178,6 @@ def encode_ecommerce() -> str:
     stems = {
         "product": "product",
         "card1Product": "card1-product",
-        "editorBefore": "editor-before",
         "editorAfter": "editor-after",
         "infrastructureProduct": "infrastructure-product",
     }
@@ -211,6 +209,11 @@ def encode_ecommerce() -> str:
         raise SystemExit(
             f"ERROR: required Ecommerce Expo Card 1 image missing: "
             f"{ECOMMERCE / 'card1-product.jpg'}"
+        )
+    if "editorAfter" not in out:
+        raise SystemExit(
+            f"ERROR: required Ecommerce Expo AI Enhancer output missing: "
+            f"{ECOMMERCE / 'editor-after.jpg'}"
         )
     if "infrastructureProduct" not in out:
         raise SystemExit(

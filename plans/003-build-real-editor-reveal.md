@@ -1,12 +1,18 @@
 # 003 — Make card 4 a real before/after reveal
 
-- **Status**: TODO
+- **Status**: OBSOLETE — superseded by the upload → prompt → AI Enhancer flow
 - **Commit**: e122bf0
 - **Severity**: HIGH
 - **Category**: Purpose
 - **Estimated scope**: 2 source/test files plus regenerated `dist/uploadcare-simple.html`; about 80 lines
 
 ## Problem
+
+> This plan targeted the previous two-pane placeholder and then a one-well
+> wipe. Card 4 has since been rebuilt around the production standalone AI
+> Enhancer: it reuses Card 1's source, types the exact production prompt,
+> reproduces the tool's pending shimmer, and settles on the genuine generated
+> result recorded in `EVENT.md`. Do not execute the old geometry below.
 
 Card 4 currently creates two side-by-side panes:
 
