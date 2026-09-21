@@ -9,17 +9,18 @@ Working source of truth for this booth cut. Do not invent event facts.
   1. Product image upload → optimization → live store payoff (10s)
   2. Five ecommerce benefits (6s)
   3. Zephyr proof point (6s)
-  4. AI Enhancer upload → prompt → background replacement (10s)
+  4. Marketplace backend → Edit with AI → catalog variant (10s)
   5. Customer logo wall (5s)
   6. Upload → Optimize → Deliver infrastructure view (6s)
   7. Booth CTA / file-board outro (10s)
-- Card 4 uses Card 1's exact tube photo as its uploader and editor source. The
-  production standalone AI Enhancer generated result UUID
-  `9c081b6e-6892-4bda-8233-9d21584a1c07` from source UUID
-  `7bfcb94a-3f88-41a1-90b3-cc56a3c42360` with: “Replace only the background
-  with a sleek, light modern studio backdrop. Keep the product, crop, and
-  shadow unchanged.” The committed 832×1248 output is
-  `assets/ecommerce/editor-after.jpg`.
+- Card 4 records the production `ai-catalog-admin` demo: the Ashfold product
+  backend opens on its Media card, focuses the “Edit with AI” action, and hands
+  over to the editor. Its real source UUID is
+  `01362b9d-462f-4db4-8c8a-acd0b4c2a06a`; the “Brand sage backdrop” preset
+  generated result UUID `3d5bbd80-9f76-46d0-b7ff-263dbb1ec4fe` with:
+  “Replace the background with a flat sage green studio backdrop, keep the
+  bottle and its natural shadow”. The committed 1536×2048 source and 880×1168
+  result are `assets/ecommerce/catalog-source.jpg` and `editor-after.jpg`.
 - Logo wall: L'Oréal, Crayola, Samsonite, GemPages, Shogun, Marko.
 - Card 1's first phase follows Figma frame `234:979`: the complete uploader
   interaction from the Webflow booth card runs in the left cell with one tube

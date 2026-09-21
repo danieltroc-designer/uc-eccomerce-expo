@@ -166,9 +166,9 @@ def encode_demo() -> str:
 def encode_ecommerce() -> str:
     """Inline Ecommerce Expo photography and card-specific vector art.
 
-    Card 4 reuses Card 1's product source and requires a genuine AI Enhancer
-    output; it never manufactures a fake result in CSS. Cards 2 and 6 use
-    required Figma exports: card 2's
+    Card 4 requires the real catalog-admin source, two supplied backend frames
+    and a genuine AI Enhancer output; it never manufactures a fake result in
+    CSS. Cards 2 and 6 use required Figma exports: card 2's
     accent colours are baked into its five icons, while card 6's product image,
     expanded rail, 66.281px collapsed connector and 339x61 final lockup are its
     actual frame assets.
@@ -178,6 +178,9 @@ def encode_ecommerce() -> str:
     stems = {
         "product": "product",
         "card1Product": "card1-product",
+        "catalogSource": "catalog-source",
+        "catalogAdmin": "catalog-admin",
+        "catalogMediaHover": "catalog-media-hover",
         "editorAfter": "editor-after",
         "infrastructureProduct": "infrastructure-product",
     }
@@ -210,11 +213,17 @@ def encode_ecommerce() -> str:
             f"ERROR: required Ecommerce Expo Card 1 image missing: "
             f"{ECOMMERCE / 'card1-product.jpg'}"
         )
-    if "editorAfter" not in out:
-        raise SystemExit(
-            f"ERROR: required Ecommerce Expo AI Enhancer output missing: "
-            f"{ECOMMERCE / 'editor-after.jpg'}"
-        )
+    for key, filename in (
+        ("catalogSource", "catalog-source.jpg"),
+        ("catalogAdmin", "catalog-admin.png"),
+        ("catalogMediaHover", "catalog-media-hover.png"),
+        ("editorAfter", "editor-after.jpg"),
+    ):
+        if key not in out:
+            raise SystemExit(
+                f"ERROR: required Ecommerce Expo Card 4 asset missing: "
+                f"{ECOMMERCE / filename}"
+            )
     if "infrastructureProduct" not in out:
         raise SystemExit(
             f"ERROR: required Ecommerce Expo product image missing: "

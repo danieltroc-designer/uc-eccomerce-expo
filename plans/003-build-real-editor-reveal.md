@@ -1,6 +1,6 @@
 # 003 — Make card 4 a real before/after reveal
 
-- **Status**: OBSOLETE — superseded by the upload → prompt → AI Enhancer flow
+- **Status**: OBSOLETE — superseded by the catalog backend → AI editor flow
 - **Commit**: e122bf0
 - **Severity**: HIGH
 - **Category**: Purpose
@@ -9,10 +9,10 @@
 ## Problem
 
 > This plan targeted the previous two-pane placeholder and then a one-well
-> wipe. Card 4 has since been rebuilt around the production standalone AI
-> Enhancer: it reuses Card 1's source, types the exact production prompt,
-> reproduces the tool's pending shimmer, and settles on the genuine generated
-> result recorded in `EVENT.md`. Do not execute the old geometry below.
+> wipe. Card 4 has since been rebuilt around the production AI catalog-admin:
+> it establishes the product backend, opens “Edit with AI,” types the exact
+> preset prompt, reproduces the pending shimmer, and settles on the genuine
+> generated result recorded in `EVENT.md`. Do not execute the old geometry.
 
 Card 4 currently creates two side-by-side panes:
 

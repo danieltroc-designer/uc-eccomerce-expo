@@ -20,8 +20,8 @@
   `stroke-dashoffset` and `clip-path` rather than on `width`. Do not execute
   either plan; they would not apply.
 - **003 is obsolete.** Its old one-well wipe was superseded by Card 4's
-  production-derived upload → prompt → AI Enhancer flow. The genuine result,
-  source UUID and exact prompt are now recorded in `EVENT.md`, and
+  production-derived catalog backend → Edit with AI → variant flow. The
+  genuine result, source UUID and exact preset are recorded in `EVENT.md`, and
   `tools/check_editor.py` verifies that flow twice plus reduced motion.
 - **004 is done** (card 1 retimed to its 10s slot, trust marks held for the
   whole card, widget→panel and placeholder→photo handovers de-crossfaded).

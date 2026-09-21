@@ -12,21 +12,22 @@ Drop final event artwork here using these exact filenames, then run
   required and inlined for offline playback.
 - `card1-browser-{os,left,right,back}.svg` — exact browser controls for Card 1's
   storefront payoff.
-- `editor-after.jpg` — Card 4's real AI Enhancer result for
-  `card1-product.jpg`. It was generated in the production standalone tool from
-  Uploadcare UUID `7bfcb94a-3f88-41a1-90b3-cc56a3c42360`; result UUID
-  `9c081b6e-6892-4bda-8233-9d21584a1c07`.
+- `catalog-admin.png` — supplied full product-backend view for Card 4.
+- `catalog-media-hover.png` — supplied Media-card focus with “Edit with AI”.
+- `catalog-source.jpg` — the production Ashfold source image, UUID
+  `01362b9d-462f-4db4-8c8a-acd0b4c2a06a`.
+- `editor-after.jpg` — the real “Brand sage backdrop” result, UUID
+  `3d5bbd80-9f76-46d0-b7ff-263dbb1ec4fe`.
 
-Card 4 deliberately has no separate `editor-before` asset: its source is the
-same inlined `card1Product` value used by Card 1, so the slide cannot quietly
-drift to a different product shot. The exact production prompt is stored as
-`CE_PROMPT` in `src/simple.template.html` and documented in `EVENT.md`.
+The backend frames establish where AI editing lives in the marketplace flow;
+the source and result are the real images loaded by that demo. The exact preset
+prompt is stored as `CE_PROMPT` in `src/simple.template.html` and documented in
+`EVENT.md`.
 
-The result is 832×1248 (2:3), matching the source aspect ratio. The source and
-result appear in the same 300×450 editor slot; the tool's dense dot-grid
-pending state covers the generative swap. Do not replace the result with a CSS
-background treatment or a synthetic mockup: regenerate it through the real
-tool and update its UUID and prompt provenance together.
+The 1536×2048 source and 880×1168 result both use the same 3:4 editor crop. The
+tool's dense dot-grid pending state covers the generative swap. Do not replace
+the result with a CSS treatment or synthetic mockup: regenerate it through the
+real tool and update its UUID and prompt provenance together.
 
 ## Benefit icons
 

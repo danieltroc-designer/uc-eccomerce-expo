@@ -45,33 +45,36 @@ own source + build + output and is fully independent of the main deck:
  infrastructure, booth CTA. Cards 1, 4 and 7 hold the longest slots; the first
  two demonstrate processes rather than stating a fact.
 - Optional event imagery is auto-inlined from `assets/ecommerce/`; see its
-  README for exact filenames. Card 4's generated output is required, so a
-  missing `assets/ecommerce/editor-after.jpg` fails the build.
+  README for exact filenames. Card 4's two backend frames, source and generated
+  output are required; a missing asset fails the build.
 
-Ecommerce Card 4 is the real standalone AI Enhancer flow, rebuilt offline
-inside a fixed 1252x640 stage at (334,400). It first reuses Card 1's complete
-uploader vocabulary — same 670x532 black cell, same 400px widget, same
-spring-dragged 120x150 `card1Product` — then hands over to the white editor UI.
-`CE_PROMPT` is the exact production prompt and the final frame is the real
-generated UUID recorded in `EVENT.md`; neither may be changed independently
-because together they are the provenance of the claim.
+Ecommerce Card 4 is the real `ai-catalog-admin` flow, rebuilt offline inside a
+fixed 1252x640 stage at (334,400). It opens on the supplied product-backend
+overview, swaps to the supplied Media-card hover state, moves the pointer to
+“Edit with AI,” then hands over to the white editor UI. `CE_PROMPT` is the
+exact “Brand sage backdrop” preset and the final frame is its real generated
+UUID recorded in `EVENT.md`; prompt and result must change together.
 
 Three things about the implementation are load bearing:
 
-- **There is no separate before asset.** The drag card, compact row and editor
-  source all use `ECOMMERCE.card1Product`, the same inlined data URI as Card 1.
-  This prevents Card 4 quietly drifting to a different product shot.
-- **The dot field covers a real generative swap.** The source and 832x1248
-  result share a 2:3 crop, but generation naturally changes small highlights
-  and edges on the tube. `.ce-veil` reproduces the tool's dense pending grid;
+- **The backend frames are evidence, not generic chrome.**
+  `catalog-admin.png` and `catalog-media-hover.png` are the user's captures of
+  the real demo. The first establishes product context; the second is the
+  close-up where the AI action becomes available. Replacing them independently
+  breaks the focus handoff because their crop and scale are timed as a pair.
+- **The dot field covers a real generative swap.** The 1536x2048 source and
+  880x1168 result share a 3:4 crop, but generation naturally changes small
+  highlights and edges on the bottle. `.ce-veil` reproduces the tool's pending grid;
   the result crossfades only while that veil is near peak opacity, and
   `.ce-shimmer` gives the field a travelling bright edge. Showing the dissolve
-  without the veil turns it into a visible product morph. The veil is the
-  tool's state indication, not a claim that CSS produced the result.
+  without the veil turns it into a visible product morph.
 - **Prompt typing is Timeline-owned.** Its recursive 18ms ticks go through
   `tl.timeout()`, so leaving the card stops them and re-entry resets to an empty
   prompt synchronously. Reduced motion opens directly on the genuine result.
   `tools/check_editor.py` checks normal motion twice and that reduced state.
+- **The backend pointer uses `UPLOADER.cursor` as a data URI.** Card 1 already
+  inlines the same SVG; another inline copy collides on the mask id and renders
+  invisible even though its box and opacity are correct.
 - `encode_logos()` scans `assets/logos/*.svg`; new customer marks require no
   build-script registration. Ecommerce Card 3 now follows frame 234:1237 and
   reuses the inherited Webflow testimonial spread exactly: the 938×465 lime

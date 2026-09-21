@@ -1,14 +1,9 @@
 #!/usr/bin/env python3
-"""Card 4: verify upload -> prompt -> shimmer -> genuine AI result.
+"""Card 4: verify backend -> Edit with AI -> genuine catalog result.
 
-The card is a recording of a real AI Enhancer interaction, rebuilt offline.
-This check protects the parts that make that claim honest:
-
-* the uploader, editor source and Card 1 all use one identical inlined photo;
-* the committed result is the real generated 2:3 asset, not CSS treatment;
-* phase timing exposes upload progress, prompt typing and the dot-grid pending
-  state before settling on the generated result;
-* a second visit resets synchronously, and reduced motion opens on the payoff.
+The slide records the production ai-catalog-admin interaction offline. This
+check protects the sequence, supplied backend frames, exact preset prompt,
+source/result provenance, replay reset and reduced-motion payoff.
 """
 
 import pathlib
@@ -26,8 +21,8 @@ CHROME = next(
      if p.is_file()), None)
 
 CARD = 3
-PROMPT = ("Replace only the background with a sleek, light modern studio "
-          "backdrop. Keep the product, crop, and shadow unchanged.")
+PROMPT = ("Replace the background with a flat sage green studio backdrop, "
+          "keep the bottle and its natural shadow")
 fails = []
 
 
@@ -42,27 +37,26 @@ def read(pg):
       const root = document.querySelector('.slide.active .ce-wrap');
       const q = s => root && root.querySelector(s);
       const opacity = e => e ? parseFloat(getComputedStyle(e).opacity) : null;
+      const natural = e => e ? [e.naturalWidth, e.naturalHeight] : null;
       const stage = q('.ce-stage');
-      const editor = q('.ce-editor');
-      const arc = q('.ef-uaction .di-ring .arc');
-      const sourceImages = [q('.ce-drag img'), q('.ef-uthumb img'), q('.ce-before')];
-      const after = q('.ce-after');
       return {
         stage: stage ? [stage.offsetLeft, stage.offsetTop,
                         stage.offsetWidth, stage.offsetHeight] : null,
-        uploader: opacity(q('.ce-upload-phase')),
-        editor: opacity(editor),
-        widget: opacity(q('.ef-widget')),
-        panel: opacity(q('.ef-panel')),
-        dash: arc ? parseFloat(getComputedStyle(arc).strokeDashoffset) : null,
+        backend: opacity(q('.ce-backend')),
+        overview: opacity(q('.ce-admin-overview')),
+        focus: opacity(q('.ce-admin-focus')),
+        cursor: opacity(q('.ce-admin-cursor')),
+        ring: opacity(q('.ce-click-ring')),
+        editor: opacity(q('.ce-editor')),
         prompt: q('.ce-prompt span')?.textContent || '',
-        after: opacity(after),
+        after: opacity(q('.ce-after')),
         veil: opacity(q('.ce-veil')),
         shimmer: opacity(q('.ce-shimmer')),
         done: q('.ce-done') ? getComputedStyle(q('.ce-done')).backgroundColor : '',
-        sourcesReady: sourceImages.every(i => i && i.src),
-        sourceCount: new Set(sourceImages.map(i => i && i.src)).size,
-        afterNatural: after ? [after.naturalWidth, after.naturalHeight] : null,
+        overviewNatural: natural(q('.ce-admin-overview')),
+        focusNatural: natural(q('.ce-admin-focus')),
+        sourceNatural: natural(q('.ce-before')),
+        afterNatural: natural(q('.ce-after')),
       };
     }""")
 
@@ -77,9 +71,7 @@ def main():
     with sync_playwright() as p:
         browser = p.chromium.launch(
             executable_path=str(CHROME) if CHROME else None,
-            headless=True,
-            args=["--no-sandbox", "--disable-gpu"],
-        )
+            headless=True, args=["--no-sandbox", "--disable-gpu"])
         pg = browser.new_page(
             viewport={"width": 1920, "height": 1080},
             reduced_motion="no-preference")
@@ -91,48 +83,50 @@ def main():
         for visit in (1, 2):
             print(f"visit {visit}")
             enter(pg)
-            pg.wait_for_timeout(300)
+            pg.wait_for_timeout(250)
             early = read(pg)
             check("editor stage matches composition",
                   early["stage"] == [334, 400, 1252, 640], str(early["stage"]))
-            check("uploader opens before editor",
-                  early["uploader"] > .98 and early["editor"] < .02,
-                  f"uploader {early['uploader']:.2f}, editor {early['editor']:.2f}")
-            check("one source photo feeds drag, row, and editor",
-                  early["sourcesReady"] and early["sourceCount"] == 1,
-                  f"{early['sourceCount']} source(s)")
-            check("upload ring resets empty", early["dash"] > 57,
-                  f"dash {early['dash']:.1f}")
+            check("product backend opens before editor",
+                  early["backend"] > .98 and early["overview"] > .98
+                  and early["editor"] < .02,
+                  f"backend {early['backend']:.2f}, editor {early['editor']:.2f}")
             check("prompt resets empty", early["prompt"] == "", repr(early["prompt"]))
+            check("supplied backend frames are native",
+                  early["overviewNatural"] == [1024, 899]
+                  and early["focusNatural"] == [1024, 791],
+                  f"{early['overviewNatural']}, {early['focusNatural']}")
+            check("catalog source is the production original",
+                  early["sourceNatural"] == [1536, 2048],
+                  str(early["sourceNatural"]))
 
-            # Sample the score rather than betting on one wall-clock instant:
-            # headless scheduling can move a short state by a frame or two.
-            # What matters is that every phase is observable in order.
             samples = []
             for _ in range(36):
                 pg.wait_for_timeout(250)
                 samples.append(read(pg))
 
-            uploading = next((s for s in samples
-                              if s["panel"] > .98 and 5 < s["dash"] < 55), None)
-            check("compact upload visibly progresses",
-                  uploading is not None,
-                  (f"dash {uploading['dash']:.1f}" if uploading
-                   else "no in-progress ring sample"))
+            focused = next((s for s in samples
+                            if s["backend"] > .98 and s["focus"] > .95
+                            and s["overview"] < .05), None)
+            check("Media card focus replaces overview",
+                  focused is not None, "observed" if focused else "not observed")
+            pointer = next((s for s in samples
+                            if s["focus"] > .95 and s["cursor"] > .8), None)
+            check("pointer commits to Edit with AI",
+                  pointer is not None, "observed" if pointer else "not observed")
 
+            editor_state = next((s for s in samples
+                                 if s["editor"] > .98 and s["backend"] < .02), None)
+            check("editor modal replaces backend",
+                  editor_state is not None,
+                  "observed" if editor_state else "not observed")
             typing = next((s for s in samples
                            if 10 < len(s["prompt"]) < len(PROMPT)
                            and PROMPT.startswith(s["prompt"])), None)
-            editor_state = next((s for s in samples
-                                 if s["editor"] > .98 and s["uploader"] < .02), None)
-            check("editor replaces uploader",
-                  editor_state is not None,
-                  "observed" if editor_state else "not observed")
-            check("production prompt types in place",
+            check("exact preset prompt types in place",
                   typing is not None,
                   (f"{len(typing['prompt'])}/{len(PROMPT)} chars"
                    if typing else "no partial prompt sample"))
-
             pending = next((s for s in samples
                             if s["veil"] > .25 and s["shimmer"] > .1), None)
             check("dot-grid shimmer covers generation",
@@ -145,18 +139,17 @@ def main():
                   final["after"] > .98 and final["veil"] < .02
                   and final["shimmer"] < .02,
                   f"after {final['after']:.2f}, veil {final['veil']:.2f}")
-            check("exact production prompt is shown",
+            check("production prompt is shown",
                   final["prompt"] == PROMPT, f"{len(final['prompt'])} chars")
-            check("genuine result keeps source aspect",
-                  final["afterNatural"] == [832, 1248],
+            check("genuine result asset is loaded",
+                  final["afterNatural"] == [880, 1168],
                   str(final["afterNatural"]))
-            check("Done resolves active",
-                  final["done"] == "rgb(47, 90, 232)", final["done"])
+            check("Add to media resolves active",
+                  final["done"] == "rgb(24, 24, 24)", final["done"])
 
         check("no page errors", not errors, "; ".join(errors[:3]))
         browser.close()
 
-        # Reduced motion skips demonstration movement but must retain its payoff.
         red = p.chromium.launch(
             executable_path=str(CHROME) if CHROME else None,
             headless=True, args=["--no-sandbox", "--disable-gpu"])
@@ -168,7 +161,7 @@ def main():
         pg.wait_for_timeout(100)
         state = read(pg)
         check("reduced motion opens on final result",
-              state["editor"] > .98 and state["uploader"] < .02
+              state["editor"] > .98 and state["backend"] < .02
               and state["after"] > .98 and state["prompt"] == PROMPT,
               f"editor {state['editor']}, after {state['after']}")
         red.close()
@@ -177,7 +170,7 @@ def main():
     if fails:
         print(f"{len(fails)} check(s) failed")
         return 1
-    print("card 4 replays the genuine AI Enhancer flow cleanly")
+    print("card 4 replays the catalog-admin AI flow cleanly")
     return 0
 
 
