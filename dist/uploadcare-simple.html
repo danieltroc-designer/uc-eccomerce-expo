@@ -1809,6 +1809,15 @@
      3:4 bottle cuts the pump off), and the CTA carries the backend's price. */
   .ce-wrap>.shd{z-index:3}
   .ce-site{top:360px}
+  /* The product slot takes the result's own 3:4 ratio (470/624 = .7532 against
+     the asset's .7534), so the generated frame is shown whole rather than
+     cropped. Card 1's 561x590 slot is tuned to its landscape tube shot: at that
+     width the bottle needs 618px of height and there are ~615px between "Back
+     to list" and the fold, so a full-width crop cannot contain it — the pump
+     goes at the top and the base at the bottom, which is what it was doing.
+     Narrower and taller is the only fit that shows all of it above the fold;
+     below the bottle there is only backdrop, and that is what the stage clips. */
+  .ce-site .ef-site-photo{top:50px;width:470px;height:624px}
   .ce-site .ef-site-photo img{top:0;height:100%}
   .ce-site .ef-site-cta{display:flex;align-items:baseline;gap:14px}
   .ce-site-price{font-weight:500;opacity:.72}
