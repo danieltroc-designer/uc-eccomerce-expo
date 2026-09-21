@@ -948,7 +948,9 @@
   .pd-url .id{color:#fff}
   .pd-url .op{color:#ffd864}
   .pd-url .arg{color:#a7a7a7}
-  .pd-url .tf{overflow:hidden;height:0;opacity:0}
+  /* each op holds its line from the start and is clipped, not grown: the rows
+     below never move, and nothing here animates layout */
+  .pd-url .tf{opacity:0;clip-path:inset(0 0 100% 0)}
   .pd-url .st{opacity:0}
   .pd-url .cl{opacity:0}
 
@@ -1089,15 +1091,15 @@
   .slide.active .ft-card{opacity:1;transform:none}
 
   /* Once the icons land the row just sits there, which is the one place in the
-     deck that read as a static slide rather than a paused one. A pulse now
-     travels left to right on a loop: each panel washes to 10% of its own icon's
-     accent and back. The colour is the card's, not a house colour, so the sweep
-     reads as five distinct capabilities lighting up in turn instead of one
-     effect painted across the row.
+     deck that read as a static slide rather than a paused one. A single pulse
+     now travels left to right: each panel washes to 10% of its own icon's
+     accent and back, once. The colour is the card's, not a house colour, so the
+     sweep reads as five distinct capabilities lighting up in turn instead of
+     one effect painted across the row.
 
      It rides an overlay's opacity rather than the card's own background-color.
-     Opacity composites; background-color repaints, and this runs forever on a
-     panel nobody ever touches. The overlay carries a full-strength inset ring
+     Opacity composites; background-color repaints. The overlay carries a
+     full-strength inset ring
      over a 40%-alpha fill, so at the peak the edge sits at 25% of the accent
      while the fill stays at the 10% wash — the border is what actually carries
      the pulse across a room, the fill alone is too quiet at this distance.
@@ -1115,9 +1117,15 @@
      across the row; at this spacing each panel gets its own moment and the
      sweep is legible as five events. Each pulse also runs longer than the gap
      (1.5s against 300ms), so neighbours still overlap and the row never breaks
-     into five separate blinks. */
+     into five separate blinks.
+
+     It runs once, not on a loop. The wave exists to group the five panels and
+     say the row is one thing; having made that point it is over, and a card
+     that keeps washing under copy someone is reading has stopped explaining
+     and started decorating. The row is settled and quiet for the rest of the
+     slide — a paused card, which is what it should be. */
   .slide.active .ft-card::before{
-    animation:ftPulse 3.8s ease-in-out calc(1.9s + var(--i)*.30s) infinite;
+    animation:ftPulse 3.8s ease-in-out calc(1.9s + var(--i)*.30s) 1;
   }
   /* the card's own content has to outrank the wash, or the tint lands on top of
      the label and the icon instead of behind them */
@@ -1604,8 +1612,7 @@
      row; `ECOM_BENEFITS[].ac` duplicates the colour baked into each SVG
      because CSS cannot read one out of inlined markup, so the two have to be
      kept in step. The wash rides a ::before overlay's opacity rather than the
-     card's background-color — opacity composites where colour repaints, and
-     this loops forever on a panel nobody touches. */
+     card's background-color — opacity composites where colour repaints. */
   .eb-card::before{
     content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
     background:color-mix(in srgb, var(--ac) 40%, transparent);
@@ -1617,9 +1624,11 @@
      breaks into five separate blinks. The start is later than the last panel's
      entrance (~.86s here, against ~1.7s there) so the wave opens on a built
      row, and scoping to .slide.active restarts it from the top on every loop
-     instead of inheriting whatever phase the deck happened to render at. */
+     instead of inheriting whatever phase the deck happened to render at.
+     One pass, for the reason the Webflow row gives: the wave groups the five
+     panels, and once it has the card should hold still and be read. */
   .slide.active .eb-card::before{
-    animation:ftPulse 3.8s ease-in-out calc(1.2s + var(--i)*.30s) infinite;
+    animation:ftPulse 3.8s ease-in-out calc(1.2s + var(--i)*.30s) 1;
   }
   /* the panel's own content has to outrank the wash, or the tint lands on top
      of the copy and the icon instead of behind them */
@@ -1742,9 +1751,12 @@
   .ce-admin-cursor{position:absolute;left:165px;top:352px;width:44px;height:61px;
     z-index:5;opacity:0;will-change:transform}
   .ce-admin-cursor img{width:100%;height:100%;display:block}
+  /* Centred on the tip. It opens near its full size and clears in 220ms: a
+     ripple that starts at a tenth of its size and keeps growing after the
+     press has ended reads as an effect rather than as feedback. */
   .ce-click-ring{position:absolute;left:139px;top:326px;width:52px;height:52px;
-    border:2px solid #8064d8;border-radius:50%;opacity:0;transform:scale(.4);
-    z-index:4;pointer-events:none}
+    border:1.5px solid rgba(128,100,216,.85);border-radius:50%;opacity:0;
+    transform:scale(.9);z-index:4;pointer-events:none}
 
   /* Editor phase, rebuilt from the supplied screenshot and the live production
      tool. The white shell is deliberately one layer: it arrives as a complete
@@ -1852,7 +1864,11 @@
   .ei-wrap .shd{--shd-y:180px}
   .ei-rail{position:absolute;left:466px;top:701px;width:989px;height:49px;
     display:flex;align-items:center}
-  .ei-step{flex:none;box-sizing:border-box;display:flex;align-items:center;justify-content:center;
+  /* above the connectors: the expanded node/line/node still spans the original
+     gap while it fades, and the step sliding inward over it has to cover it
+     rather than have a stroke drawn across its face */
+  .ei-step{position:relative;z-index:1;
+    flex:none;box-sizing:border-box;display:flex;align-items:center;justify-content:center;
     padding:16px 32px;border:1px solid rgba(255,255,255,.09);border-radius:12px;
     background:#090909;color:#9a9a9a;font-family:var(--cmono);font-size:11.502px;
     line-height:normal;font-weight:400;text-transform:uppercase;white-space:nowrap;
@@ -1918,7 +1934,7 @@
     .hb-mark path{animation:none!important;opacity:.62}
     .hb-wave,.hb-wave i{animation:none!important}
     /* the capability wash is decoration on a settled row; nothing is lost by
-       pinning it off, whereas a looping colour pulse is exactly the sort of
+       pinning it off, and a colour pulse under copy is exactly the sort of
        thing reduced motion is asking to be spared */
     .ft-card::before,.eb-card::before{animation:none!important;opacity:0}
     .pl-shine .pl-pill::after{animation:none!important;opacity:0!important}
@@ -2094,6 +2110,35 @@ function springCrossing(from, to, opts, hits){
     if (hits(o)) return i/120;                            // springKeyframes steps at 1/120
   }
   return null;
+}
+
+/* The same question for an authored path: when does a pointer following
+   `points` (each {at,x,y}, `at` a fraction of `dur` seconds) first satisfy
+   `hits`? Only valid for effects running easing:'linear', which is why the
+   card that uses this puts its velocity profile in the waypoints instead of a
+   timing function — an eased effect would make `at` a fraction of progress
+   rather than of time, and the answer here would be wrong by the easing.
+   Walking it at 4ms is exact enough for a cue that has to land on a frame. */
+function pathCrossing(points, dur, hits){
+  for (let t = 0; t <= dur*1000; t += 4){
+    const f = t/(dur*1000);
+    let i = 1;
+    while (i < points.length-1 && points[i].at < f) i++;
+    const a = points[i-1], b = points[i];
+    const k = (f - a.at)/((b.at - a.at) || 1);
+    if (hits(a.x + (b.x-a.x)*k, a.y + (b.y-a.y)*k)) return t/1000;
+  }
+  return dur;
+}
+
+/* An element's box in some positioned ancestor's coordinates, as a hit test.
+   offsetLeft/offsetTop, never a rect: #stage is CSS-scaled, so rects are in
+   screen px and would put the box somewhere else on a laptop. */
+function inside(el, root){
+  let x = 0, y = 0, n = el;
+  while (n && n !== root){ x += n.offsetLeft; y += n.offsetTop; n = n.offsetParent; }
+  const w = el.offsetWidth, h = el.offsetHeight;
+  return (px,py)=> px >= x && px <= x+w && py >= y && py <= y+h;
 }
 
 /* spring a translated element from {x,y} to {x,y} via WAAPI (easing:'linear',
@@ -4219,6 +4264,7 @@ function setupCommerceEditor(slideEl, sd, tl){
   const q = slideEl.querySelector.bind(slideEl);
   const backend = q('.ce-backend');
   const shot = q('.ce-shot');
+  const pill = q('.ce-edit');
   const cursor = q('.ce-admin-cursor');
   const clickRing = q('.ce-click-ring');
   const editor = q('.ce-editor');
@@ -4232,25 +4278,49 @@ function setupCommerceEditor(slideEl, sd, tl){
   const site = q('.ce-site');
   const sitePhoto = q('.ce-site .ef-site-photo');
   const siteInfo = q('.ce-site .ef-site-info');
-  if (!backend || !shot || !cursor || !clickRing || !editor ||
+  if (!backend || !shot || !pill || !cursor || !clickRing || !editor ||
       !prompt || !after || !veil || !shimmer || !site) return;
 
   const SITE_SHUT = 'inset(0 0 93% 0 round 16px)';
   const SITE_OPEN = 'inset(0 0 0 0 round 16px)';
 
-  // Pointer path in tip coordinates, as offsets from its resting place on the
-  // Edit with AI pill: it enters over the empty page margin, crosses the
-  // catalogue image, then drops onto the action that the crossing revealed.
-  const ENTER = 'translate(845px,168px)';
-  const EDGE  = 'translate(145px,-103px)';    // tip just right of the image slot
-  const OVER  = 'translate(3px,-93px)';       // tip on the image's centre
-  const PILL  = 'translate(0,0)';
+  /* The pointer path, in tip coordinates inside the backend. A hand does not
+     travel in straight lines between stops: it throws the pointer out on a
+     shallow arc, peaks early and decelerates for most of the trip, lands a few
+     pixels past the target and pulls back. This is that, authored — a sagging
+     arc from the empty page margin to the catalogue image, with the velocity
+     front-loaded (peak at ~25% of the time) and a 6px overshoot corrected at
+     the end. The waypoints carry the shape, so the effect runs `linear` and
+     every offset below is a real fraction of elapsed time. */
+  const REST = {x:165, y:352};                  // the pointer's seat on the pill
+  const tr = p=>`translate(${(p.x-REST.x).toFixed(1)}px,${(p.y-REST.y).toFixed(1)}px)`;
+  const APPROACH = [
+    {at:0,   x:1010, y:520},
+    {at:.09, x:922,  y:506},
+    {at:.19, x:791,  y:482},
+    {at:.30, x:645,  y:447},
+    {at:.42, x:510,  y:406},
+    {at:.55, x:395,  y:362},
+    {at:.69, x:289,  y:316},
+    {at:.82, x:216,  y:282},
+    {at:.93, x:166,  y:253},                    // overshoot, 6px past
+    {at:1,   x:168,  y:259}                     // and the correction back
+  ];
+  // The reach for the button it just revealed: short, so quicker and with a
+  // smaller 4px overshoot than the long throw.
+  const REACH_PATH = [
+    {at:0,   x:168, y:259},
+    {at:.55, x:166, y:338},
+    {at:.78, x:164, y:356},
+    {at:1,   x:165, y:352}
+  ];
 
   const reset = ()=>{
     Object.assign(backend.style,{opacity:'1',transform:'none'});
     shot.classList.remove('hot');
-    Object.assign(cursor.style,{opacity:'0',transform:ENTER});
-    Object.assign(clickRing.style,{opacity:'0',transform:'scale(.4)'});
+    Object.assign(cursor.style,{opacity:'0',transform:tr(APPROACH[0])});
+    Object.assign(clickRing.style,{opacity:'0',transform:'scale(.9)'});
+    pill.style.transform = '';
     Object.assign(editor.style,{opacity:'0',transform:'translateY(16px) scale(.985)'});
     prompt.textContent = '';
     promptCursor.classList.remove('on');
@@ -4297,40 +4367,42 @@ function setupCommerceEditor(slideEl, sd, tl){
   // The card stays on the product backend: no zoom, no cut. The pointer does
   // the explaining, so the page it is working in never leaves the screen.
   //
-  // The travel is split at the slot's edge so the hover can be timed rather
-  // than guessed. Under an ease the tip's position is not proportional to
-  // elapsed time, so the crossing segment runs linear: the tip covers
-  // 310 -> 167px, crosses into the slot at 289px, and that is 14.7% of 380ms.
-  const MOVE = .45;
-  tl.to(cursor,[
-    {opacity:0,transform:ENTER,offset:0},
-    {opacity:1,transform:ENTER,offset:.12},
-    {opacity:1,transform:EDGE,offset:1}
-  ],{at:MOVE,dur:.85,ease:EASE.out,fill:'forwards'});
-
-  const CROSS = MOVE + .85;
-  tl.to(cursor,[{transform:EDGE},{transform:OVER}],
-    {at:CROSS,dur:.38,ease:'linear',fill:'forwards'});
-  tl.cls(shot,'hot',CROSS + .056);
+  // The throw is one continuous move, not segments joined at the slot's edge.
+  // The hover is still timed off the real crossing rather than an offset
+  // guessed back from the end — same contract springCrossing() gives the drop
+  // cards — but here the path is authored, so the crossing is found by walking
+  // it: the effect runs linear, so a waypoint's offset is its time.
+  const MOVE = .45, THROW = 1.05;
+  // opacity goes on every waypoint, not just the two that change it: a
+  // property missing from the last keyframe gets an implicit one synthesised
+  // from the underlying value, and here that is opacity:0 — the pointer faded
+  // back out across the whole travel while its position stayed correct.
+  const throwKf = APPROACH.map((p,i)=>({transform:tr(p),offset:p.at,opacity:i?1:0}));
+  tl.to(cursor,throwKf,{at:MOVE,dur:THROW,ease:'linear',fill:'forwards'});
+  tl.cls(shot,'hot',MOVE + pathCrossing(APPROACH,THROW,inside(shot,backend)));
 
   // A beat on the image before reaching for the action: the hover is what
   // produced that button, and without the pause the two read as one move to a
   // button that was always there.
-  const REACH = CROSS + .54;
-  tl.to(cursor,[{transform:OVER},{transform:PILL}],
-    {at:REACH,dur:.34,ease:EASE.inOut,fill:'forwards'});
+  const REACH = MOVE + THROW + .42;
+  tl.to(cursor,REACH_PATH.map(p=>({transform:tr(p),offset:p.at})),
+    {at:REACH,dur:.34,ease:'linear',fill:'forwards'});
 
-  const CLICK = REACH + .44;
-  tl.to(cursor,[
-    {transform:PILL+' scale(1)'},
-    {transform:PILL+' scale(.86)'},
-    {transform:PILL+' scale(1)'}
-  ],{at:CLICK,dur:.22,ease:EASE.out,fill:'forwards'});
+  /* The pointer holds still through the click, because that is what a pointer
+     does — the button is what responds to being pressed. A cursor that shrinks
+     14% is animating the hand, not the interface. The short gap before the
+     press is the hesitation between arriving somewhere and committing to it. */
+  const CLICK = REACH + .34 + .12;
+  tl.to(pill,[
+    {transform:'scale(1)',offset:0},
+    {transform:'scale(.97)',offset:.35},
+    {transform:'scale(.97)',offset:.55},
+    {transform:'scale(1)',offset:1}
+  ],{at:CLICK,dur:.18,ease:EASE.out,fill:'forwards'});
   tl.to(clickRing,[
-    {opacity:0,transform:'scale(.4)'},
-    {opacity:.65,transform:'scale(.65)'},
-    {opacity:0,transform:'scale(1.45)'}
-  ],{at:CLICK+.02,dur:.38,ease:EASE.out,fill:'forwards'});
+    {opacity:.5,transform:'scale(.9)'},
+    {opacity:0,transform:'scale(1.25)'}
+  ],{at:CLICK+.02,dur:.22,ease:EASE.out,fill:'forwards'});
 
   // The modal arrives as one object, matching the demo rather than assembling
   // its production controls as separate decorative elements.
@@ -4357,11 +4429,13 @@ function setupCommerceEditor(slideEl, sd, tl){
 
   const GENERATE = TYPE + CE_PROMPT.length*.018 + .28;
   tl.at(GENERATE,()=>promptCursor.classList.remove('on'));
+  // A send button, pressed. .97 for 150ms is what a real one does; the weight
+  // of the action is carried by the two seconds of processing that follow it.
   tl.to(generate,[
-    {opacity:.35,transform:'scale(1)',background:'#171717'},
-    {opacity:1,transform:'scale(.88)',background:'#171717'},
-    {opacity:1,transform:'scale(1)',background:'#171717'}
-  ],{at:GENERATE,dur:.24,ease:EASE.out});
+    {opacity:.35,transform:'scale(1)',offset:0},
+    {opacity:1,transform:'scale(.97)',offset:.4},
+    {opacity:1,transform:'scale(1)',offset:1}
+  ],{at:GENERATE,dur:.15,ease:EASE.out});
 
   // Dense dots first, then the real result underneath them, then the veil
   // clears. The crossfade is intentionally hidden at peak coverage: the AI
@@ -4552,6 +4626,29 @@ function setupCommerceInfrastructure(slideEl, sd, tl){
   const COMPACT_W = steps.reduce((n,s)=>n+s.offsetWidth,0) + 2*66.281;
   const COMPACT_X = (1920-COMPACT_W)/2;
 
+  /* Where each piece has to be once the rail is compact, as a translation.
+     The contraction used to animate the rail's own left and width — a layout
+     pass on every frame of a 750ms move, for a result that is pure
+     displacement. The rail's box now never changes: the outer steps slide
+     inward to exactly where that layout put them and each compact connector
+     slides to the middle of the gap they leave, so frame 219:1578 is hit on
+     the pixel with nothing off the compositor. Layout coordinates, for the
+     reason the travel above uses them. */
+  const compactDx = (()=>{
+    let run = COMPACT_X - rail.offsetLeft;
+    return steps.map(s=>{
+      const d = run - s.offsetLeft;
+      run += s.offsetWidth + 66.281;
+      return d;
+    });
+  })();
+  const linkDx = collapsed.map((c,i)=>{
+    const box = c.parentElement;
+    const mid = (steps[i].offsetLeft + compactDx[i] + steps[i].offsetWidth
+               + steps[i+1].offsetLeft + compactDx[i+1]) / 2;
+    return mid - (box.offsetLeft + box.offsetWidth/2);
+  });
+
   // Reset synchronously: on a second loop the DOM still holds the previous
   // visit's logo and collapsed rail until this score is built.
   file.style.opacity = '0';
@@ -4559,12 +4656,11 @@ function setupCommerceInfrastructure(slideEl, sd, tl){
   photo.style.transform = 'none';
   size.textContent = '680KB';
   size.dataset.working = 'false';
-  rail.style.left = '466px';
-  rail.style.width = '989px';
   rail.style.opacity = '1';
   rail.dataset.phase = 'travel';
-  expanded.forEach(e=>e.style.opacity='1');
-  collapsed.forEach(e=>e.style.opacity='0');
+  steps.forEach(s=>s.style.transform='none');
+  expanded.forEach(e=>Object.assign(e.style,{opacity:'1',clipPath:'inset(0 0 0 0)'}));
+  collapsed.forEach(e=>Object.assign(e.style,{opacity:'0',transform:''}));
   lockup.style.opacity = '0';
   lockup.style.transform = 'scale(.94)';
   steps.forEach(s=>s.dataset.state='idle');
@@ -4630,9 +4726,24 @@ function setupCommerceInfrastructure(slideEl, sd, tl){
   // neutral strokes warm to yellow. The exact collapsed 66.281px connector
   // replaces the expanded node/line/node construction during the contraction.
   tl.at(COLLAPSE, ()=>{ rail.dataset.phase='collapse'; });
-  tl.to(rail, [{left:'466px',width:'989px'},
-               {left:`${COMPACT_X}px`,width:`${COMPACT_W}px`}],
+  steps.forEach((s,i)=>tl.to(s,
+        [{transform:'translateX(0px)'},{transform:`translateX(${compactDx[i].toFixed(2)}px)`}],
+        {at:COLLAPSE, dur:COMPACT-COLLAPSE, ease:EASE.inOut, fill:'forwards'}));
+  collapsed.forEach((c,i)=>tl.to(c,
+        [{transform:'translate(-50%,-50%) translateX(0px)'},
+         {transform:`translate(-50%,-50%) translateX(${linkDx[i].toFixed(2)}px)`}],
+        {at:COLLAPSE, dur:COMPACT-COLLAPSE, ease:EASE.inOut, fill:'forwards'}));
+  /* The expanded node/line/node still spans the gap the steps are closing, so
+     it has to end where they now are. Clipping it by exactly the neighbouring
+     step's displacement is what the old width animation did for free: the line
+     shortens instead of hanging off the outside of a step that has slid past
+     it. Its far end is clipped too, for the connector whose right step moves. */
+  expanded.forEach((e,i)=>{
+    const l = Math.max(0, compactDx[i]).toFixed(2);
+    const r = Math.max(0, -compactDx[i+1]).toFixed(2);
+    tl.to(e,[{clipPath:'inset(0 0 0 0)'},{clipPath:`inset(0 ${r}px 0 ${l}px)`}],
         {at:COLLAPSE, dur:COMPACT-COLLAPSE, ease:EASE.inOut, fill:'forwards'});
+  });
   expanded.forEach(e=>tl.to(e,[{opacity:1},{opacity:0}],
         {at:COLLAPSE+.18,dur:.42,fill:'forwards'}));
   collapsed.forEach(e=>tl.to(e,[{opacity:0},{opacity:1}],
@@ -4865,7 +4976,7 @@ function setupPipeline(slideEl, sd, tl){
     Object.assign(page1.style, {opacity:'1', transform:'none', filter:'none'});
     statics.forEach(p=>p.style.opacity = '0');
     close.style.opacity = '0';
-    tfs.forEach(d=>Object.assign(d.style, {opacity:'0', height:'0px', overflow:''}));
+    tfs.forEach(d=>Object.assign(d.style, {opacity:'0', clipPath:'inset(0 0 100% 0)'}));
     lines.forEach(p=>p.style.opacity = '0');
     dots.forEach(d=>d.dataset.state = 'standby');
     donut.forEach(c=>c.classList.remove('lit'));
@@ -4887,7 +4998,7 @@ function setupPipeline(slideEl, sd, tl){
     statics.forEach(p=>p.style.opacity = '1');
     page1.style.opacity = '0';
     close.style.opacity = '1';
-    tfs.forEach(d=>Object.assign(d.style, {opacity:'1', height:'auto', overflow:'visible'}));
+    tfs.forEach(d=>Object.assign(d.style, {opacity:'1', clipPath:'inset(0 0 0 0)'}));
     lines.forEach(p=>p.style.opacity = '1');
     donut.forEach(c=>c.classList.add('lit'));
     return;
@@ -4953,28 +5064,20 @@ function setupPipeline(slideEl, sd, tl){
           {at, dur:.6, fill:'forwards'});
     tl.to(shots[i+1], [{opacity:0, filter:'blur(20px)', transform:'scale(1.05)'},
                        {opacity:1, filter:'blur(0px)',  transform:'scale(1)'}], {at, dur:.6});
-    // height:auto is not animatable, so the row's height has to go in as a
-    // number — and it has to be a *layout* number, not a measurement of what is
-    // on screen. #stage is CSS-scaled to fit the viewport, so
-    // getBoundingClientRect() inside it reports post-transform pixels; feeding
-    // those back in as a length makes the row short by exactly the scale
-    // factor. At 1:1 the two agree, which is how this survived every check —
-    // but a 1440-wide laptop runs the stage at .75 and it sheared 5px off the
-    // bottom of every transform line. line-height is a layout value and each
-    // row is nowrap, so it is always exactly one line tall.
-    tl.at(at, ()=>{
-      const row = tfs[i].firstElementChild;
-      const h = parseFloat(getComputedStyle(row).lineHeight) || row.offsetHeight;
-      const a = tfs[i].animate([{opacity:0, height:'0px'},{opacity:1, height:h+'px'}],
-              {duration:400, easing:EASE.out, fill:'both'});
-      // the clip exists only so the row can grow into view; holding it after
-      // that trims the descenders, which sit a little below the line box
-      a.finished.then(()=>{
-        Object.assign(tfs[i].style, {height:'auto', overflow:'visible', opacity:'1'});
-        a.cancel();
-      }, ()=>{});
-      tl.anim(a);
-    });
+    /* Each op wipes down into a row that was already there. The rows used to
+       animate height 0 -> one line, which is a layout animation three times a
+       card, and it needed the row's height as a number — a *layout* number,
+       because #stage is CSS-scaled and a rect fed back in as a length is short
+       by the scale factor (that one shipped, and sheared the descenders off
+       every line on a 1440-wide laptop). Clipping needs no measurement and no
+       layout: the row reserves its line from the start, so nothing below it
+       moves, and inset(0 0 100% 0) -> inset(0) reveals it top-down exactly as
+       growing did. The closing bracket sits at its final place throughout,
+       invisible until it fades in, so the block no longer walks down the
+       column as it fills. */
+    tl.to(tfs[i], [{opacity:0, clipPath:'inset(0 0 100% 0)'},
+                   {opacity:1, clipPath:'inset(0 0 0 0)'}],
+          {at, dur:.4, ease:EASE.out, fill:'forwards'});
   });
   // the tag closes once the last op is in, which is what tells you the URL is
   // finished rather than still being written

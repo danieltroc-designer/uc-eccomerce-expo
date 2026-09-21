@@ -56,7 +56,7 @@ the storefront. `CE_PROMPT` is the exact “Brand sage backdrop” preset and th
 result is its real generated UUID recorded in `EVENT.md`; prompt and result
 must change together.
 
-Five things about the implementation are load bearing:
+These things about the implementation are load bearing:
 
 - **The backend is live DOM, not the captures.**
   `catalog-admin.png` and `catalog-media-hover.png` stay in `assets/ecommerce/`
@@ -74,14 +74,33 @@ Five things about the implementation are load bearing:
   already is, and holding the page still means the pointer, not a camera move,
   carries the story. `check_editor.py` asserts the image slot's rect never
   moves while the backend is up.
-- **Hover is timed off a linear segment.** The travel is split at the slot's
-  edge: under an ease the tip's position is not proportional to elapsed time,
-  so the crossing runs `linear` and the pill's cue is arithmetic — the tip
-  covers 310→167px, enters at 289px, 14.7% of 380ms. Same rule as the dropin
-  card's zone: the state changes on the frame the pointer actually crosses in,
-  not on a guessed offset. The pointer then pauses on the image before reaching
-  for the button, or the hover and the click collapse into one move to a button
-  that looks like it was always there.
+- **The pointer moves like a hand, and the hover is timed off where it
+  actually is.** The travel was three straight segments under three different
+  easings, and the joints between them were visible: a hand does not change
+  direction and velocity at a corner. It is now one continuous throw along an
+  authored arc (`APPROACH`, tip coordinates inside the backend) that sags
+  ~40px off the straight line, peaks at ~25% of the time, decelerates for the
+  rest, lands 6px past the target and pulls back — a ballistic move and its
+  corrective sub-movement. Because the shape lives in the waypoints, the
+  effect runs `linear`, which is also what makes a waypoint's `offset` a real
+  fraction of elapsed time; `pathCrossing()` then walks the path to find when
+  the tip enters the slot and the pill is cued on that frame. Same rule as the
+  dropin card's zone, and the same trap: an eased effect would make those
+  offsets fractions of *progress* and the cue would be wrong by the easing.
+  The pointer then pauses on the image before the shorter reach for the
+  button, or the hover and the click collapse into one move to a button that
+  looks like it was always there.
+- **The pointer holds still through the click; the button is what presses.**
+  It used to shrink to `scale(.86)`, which animates the hand rather than the
+  interface — real cursors do not change size, and 14% is far outside the
+  .95–.98 a press reads in. `.ce-edit` now dips to `.97` for 180ms and the
+  ripple opens near full size and clears in 220ms, so the feedback is on the
+  thing that was pressed and is over when the press is.
+  Every waypoint in the throw carries `opacity`, including the ones that do
+  not change it: a property missing from the last keyframe gets an implicit
+  one synthesised from the underlying value, which here is `opacity:0`, and
+  the pointer faded back out across the whole travel while its position stayed
+  perfectly correct.
 - **The dot field covers a real generative swap.** The 1536x2048 source and
   880x1168 result share a 3:4 crop, but generation naturally changes small
   highlights and edges on the bottle. `.ce-veil` reproduces the tool's pending grid;
@@ -139,9 +158,10 @@ Five things about the implementation are load bearing:
   each SVG, because CSS cannot read a colour out of inlined markup), the wash
   on a `::before` overlay's opacity rather than `background-color`, 300ms
   between panels against a 1.5s pulse so the row reads as one travelling wave,
-  scoped to `.slide.active`, and pinned off under reduced motion. Only the
-  start delay differs: 1.2s, because this row's entrance ends at ~.86s where
-  the Webflow one waits on icons that land at ~1.7s.
+  one pass rather than a loop, scoped to `.slide.active`, and pinned off under
+  reduced motion. Only the start delay differs: 1.2s, because this row's
+  entrance ends at ~.86s where the Webflow one waits on icons that land at
+  ~1.7s. The wave is done by ~3.9s of the 6s card.
 - Ecommerce Card 6 comes from frame 218:1470. Its 989px rail is pinned at
   (466,701) and uses Figma's real 8.14062px endpoint and 308.719px line SVGs.
   The 120x150 file opens at (602,529), moves to the exact optical centres of
@@ -156,6 +176,18 @@ Five things about the implementation are load bearing:
   asserts every beat and the rail geometry. Target distances are calculated
   from `offsetLeft`/`offsetWidth`, never screen-space rects, so the file still
   lands correctly when the 1920px stage is scaled on a laptop.
+  **The contraction is displacement, not layout.** It used to animate the
+  rail's own `left` and `width`, which relayouts the row on every frame of a
+  750ms move to produce a result that is pure translation. The rail's box is
+  now fixed at 989px: the outer steps translate inward to exactly where that
+  layout put them and each compact connector translates to the middle of the
+  gap they leave, so the checker asserts the frame the steps *draw* rather
+  than the rail's offsets — and also that the rail's box never moves. Two
+  consequences are load bearing. `.ei-step` carries a `z-index`, because the
+  expanded node/line/node still spans the original gap while it fades and the
+  step sliding across it has to cover it; and the expanded connector is
+  clipped by its neighbouring step's displacement, or its line hangs off the
+  outside of a step that has slid past it.
 - `build_simple.py` reuses every encoder from `build.py` and adds six tokens
   of its own: `__QR_SVG__` (the booth QR, vectorised out of
   `assets/qr/booth-qr.png` — see card 7 below), `__LOGOS_JSON__` (the marks
@@ -225,6 +257,16 @@ bearing and were each a bug first:
   the picture, is unchanged. `check_pipeline.py` asserts this — if the URL block
   ever grows another row (a fourth transform, say) the margin has to pay for it
   again, and the four-row `.pd-body` has to grow too.
+- **Each op is clipped into view, not grown.** The rows used to animate
+  `height` from 0 to one line, which is three deliberate layout animations per
+  card and needed the line height as a number — and it had to be a *layout*
+  number, which is the bug described under "never feed `getBoundingClientRect()`
+  back in as a length". Every row now holds its line from the start and reveals
+  with `clip-path: inset(0 0 100% 0)` → `inset(0)`: no measurement, no reflow,
+  and the same top-down wipe. The one visible difference is that the closing
+  bracket sits at its final place throughout instead of being pushed down as
+  the block fills, which is invisible because it is transparent until it fades
+  in.
 
 The three compliance marks along the bottom come from the storyboard's own logo
 sheet (node 189:493) and keep its relative sizing: `PD_BADGES` draws each at
@@ -337,8 +379,12 @@ row and it sits centred in the stage.
 
 Once the icons land the row used to just sit there, which was the one card in
 the deck that read as a static slide rather than a paused one. A pulse now
-loops across it left to right: each panel washes to 10% of **its own icon's**
-accent and back, 300ms apart. That gap was 180ms first and read as a single
+travels across it left to right **once**: each panel washes to 10% of **its own
+icon's** accent and back, 300ms apart. It is deliberately not a loop — the wave
+exists to group the five panels and say the row is one thing, and a wash that
+keeps running under copy someone is reading has stopped explaining and started
+decorating. It is over by ~4.6s of a 6s card, which leaves the row settled and
+quiet to be read. That gap was 180ms first and read as a single
 wash sliding across the row rather than five panels taking turns; each pulse
 still runs far longer than the gap (1.5s against 300ms) so neighbours overlap
 and the row never breaks into five separate blinks. Per-card colour
@@ -347,7 +393,7 @@ up in turn instead of one effect painted over the row, so `FEATURES[].ac`
 duplicates the accent baked into each SVG and the two have to be kept in step —
 CSS cannot read a colour out of inlined markup. The wash rides a `::before`
 overlay's opacity rather than the card's `background-color`: opacity composites
-where colour repaints, and this runs forever on a panel nobody touches. The
+where colour repaints. The
 overlay pairs a full-strength inset ring with a 40%-alpha fill so the peak sits
 at a 25% edge over a 10% wash — at booth distance the ring is what actually
 carries the pulse across the room; the fill alone is too quiet. It is scoped to
@@ -574,9 +620,9 @@ score (the two typewriters); it's still owned by the timeline, so it dies with
 it. `spring()` reports its settle time through `onArrive` synchronously, which
 is how the cursor demos anchor the tap that follows the travel. `tl.anim(a)`
 adopts an animation the card had to start itself — usually because a keyframe
-can only be measured at the moment it runs, like the pipeline card's
-`height:auto` rows — and `tl.onKill(fn)` registers teardown for anything with a
-lifetime of its own, such as that card's `requestAnimationFrame` canvas.
+can only be measured at the moment it runs — and `tl.onKill(fn)` registers
+teardown for anything with a lifetime of its own, such as the pipeline card's
+`requestAnimationFrame` canvas.
 
 Three things to keep in mind when adding a card:
 

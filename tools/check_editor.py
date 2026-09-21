@@ -143,8 +143,11 @@ def main():
             check("pointer commits to the action",
                   any(s["ring"] > .1 for s in samples), "click ring observed")
 
-            # the user-visible contract of this card: the backend does not zoom
-            held = [s["shot"] for s in samples if s["backend"] > .5 and s["shot"]]
+        # the user-visible contract of this card: the backend does not zoom.
+        # Only while it is actually up — the .985 it recedes to as the editor
+        # takes over is the handover, and sampling mid-crossfade would read
+        # that as a camera move.
+            held = [s["shot"] for s in samples if s["backend"] > .99 and s["shot"]]
             drift = max((max(abs(r[i] - held[0][i]) for i in range(4))
                          for r in held), default=0)
             check("the backend never zooms", drift < .6, f"{drift:.2f}px drift")

@@ -47,7 +47,13 @@ def state(pg):
         size:q('.ei-size').textContent,
         steps:[...document.querySelectorAll('.slide.active .ei-step')].map(e=>e.dataset.state),
         centres:[...document.querySelectorAll('.slide.active .ei-step')].map(
-          e=>rail.offsetLeft+e.offsetLeft+e.offsetWidth/2),
+          e=>rail.offsetLeft+e.offsetLeft+e.offsetWidth/2+matrix(e).e),
+        // the rail contracts by translating its steps, so its own box never
+        // moves: measure the frame the steps actually draw
+        extent:(()=>{const s=[...document.querySelectorAll('.slide.active .ei-step')];
+          const a=s[0], z=s[s.length-1];
+          const l=rail.offsetLeft+a.offsetLeft+matrix(a).e;
+          return [l, rail.offsetLeft+z.offsetLeft+z.offsetWidth+matrix(z).e-l]})(),
         lockup:(()=>{const e=q('.ei-lockup');return [
           e.offsetLeft,e.offsetTop,e.offsetWidth,e.offsetHeight,
           getComputedStyle(e).opacity,matrix(e).a]})()
@@ -130,12 +136,19 @@ def main():
         check("file disappears after delivery",
               compact["fileOpacity"] == "0", compact["fileOpacity"])
         check("rail collapses to frame 219:1578",
-              compact["rail"][0] in (722, 723) and compact["rail"][2] == 475
+              abs(compact["extent"][0] - 722.5) < 1.5
+              and abs(compact["extent"][1] - 475) < 1.5
               and compact["railPhase"] == "collapse",
-              f"{compact['rail']}, {compact['railPhase']}")
+              f"{[round(v, 1) for v in compact['extent']]}, {compact['railPhase']}")
+        check("the contraction never reflows the rail",
+              compact["rail"] == [466, 701, 989, 49], str(compact["rail"]))
+        # the border is sampled while its .75s transition is still resolving,
+        # so compare warmth rather than an exact triplet
+        border = [int(v) for v in compact["stepBorder"]
+                  .removeprefix("rgb(").removesuffix(")").split(",")]
         check("compact path resolves to yellow",
               compact["railFill"] == "rgb(255, 207, 62)"
-              and compact["stepBorder"] == "rgb(255, 231, 160)",
+              and all(abs(g - w) <= 4 for g, w in zip(border, (255, 231, 160))),
               f"{compact['railFill']}, {compact['stepBorder']}")
 
         pg.wait_for_timeout(550)
