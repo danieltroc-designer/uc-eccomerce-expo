@@ -74,22 +74,28 @@ These things about the implementation are load bearing:
   already is, and holding the page still means the pointer, not a camera move,
   carries the story. `check_editor.py` asserts the image slot's rect never
   moves while the backend is up.
-- **The pointer moves like a hand, and the hover is timed off where it
-  actually is.** The travel was three straight segments under three different
-  easings, and the joints between them were visible: a hand does not change
-  direction and velocity at a corner. It is now one continuous throw along an
-  authored arc (`APPROACH`, tip coordinates inside the backend) that sags
-  ~40px off the straight line, peaks at ~25% of the time, decelerates for the
-  rest, lands 6px past the target and pulls back — a ballistic move and its
-  corrective sub-movement. Because the shape lives in the waypoints, the
-  effect runs `linear`, which is also what makes a waypoint's `offset` a real
-  fraction of elapsed time; `pathCrossing()` then walks the path to find when
-  the tip enters the slot and the pill is cued on that frame. Same rule as the
-  dropin card's zone, and the same trap: an eased effect would make those
-  offsets fractions of *progress* and the cue would be wrong by the easing.
-  The pointer then pauses on the image before the shorter reach for the
-  button, or the hover and the click collapse into one move to a button that
-  looks like it was always there.
+- **The pointer moves like a hand, in one move, straight to Edit with AI.**
+ The travel was three straight segments under three different easings, and
+ the joints between them were visible: a hand does not change direction and
+ velocity at a corner. It is now one continuous throw along an authored arc
+ (`APPROACH`, tip coordinates inside the backend) that peaks at ~25% of the
+ time, decelerates for the rest, lands 5px past the target and pulls back — a
+ ballistic move and its corrective sub-movement. Because the shape lives in
+ the waypoints, the effect runs `linear`, which is also what makes a
+ waypoint's `offset` a real fraction of elapsed time; `pathCrossing()` then
+ walks the path to find when the tip enters the slot and the pill is cued on
+ that frame. Same rule as the dropin card's zone, and the same trap: an eased
+ effect would make those offsets fractions of *progress* and the cue would be
+ wrong by the easing.
+ An earlier cut stopped the pointer on the image, waited, and then made a
+ second short reach down to the button it had revealed. The arc is now bowed
+ so the tip enters the slot with ~30% of the trip left instead: the pill is
+ up (measured: hover at ~1.65s, pill opaque by 1.85s) while the pointer is
+ still travelling towards it, and lands on it at ~2.0s. That reads as going
+ somewhere on purpose, where the dwell read as two unrelated movements. The
+ timing the dwell and reach used to occupy is given back to the two beats
+ around them — the backend now holds alone for .75s and the throw takes
+ 1.25s — so the click still falls at 2.38s and no beat after it moved.
 - **The pointer holds still through the click; the button is what presses.**
   It used to shrink to `scale(.86)`, which animates the hand rather than the
   interface — real cursors do not change size, and 14% is far outside the
@@ -179,14 +185,27 @@ These things about the implementation are load bearing:
   (shared `.shd-s` remains 32px elsewhere). The slide runs 8s without retiming
   any beat: the lockup still arrives at ~5.04s and simply holds two seconds
   longer than it did in the 6s cut.
-  **The contraction is displacement, not layout.** It used to animate the
-  rail's own `left` and `width`, which relayouts the row on every frame of a
-  750ms move to produce a result that is pure translation. The rail's box is
-  now fixed at 989px: the outer steps translate inward to exactly where that
-  layout put them and each compact connector translates to the middle of the
-  gap they leave, so the checker asserts the frame the steps *draw* rather
-  than the rail's offsets — and also that the rail's box never moves. Two
-  consequences are load bearing. `.ei-step` carries a `z-index`, because the
+ **The contraction is displacement, not layout.** It used to animate the
+ rail's own `left` and `width`, which relayouts the row on every frame of a
+ 750ms move to produce a result that is pure translation. The rail's box is
+ now fixed at 989px: the outer steps translate inward to exactly where that
+ layout put them and each compact connector translates to the middle of the
+ gap they leave, so the checker asserts the frame the steps *draw* rather
+ than the rail's offsets — and also that the rail's box never moves.
+ **And it springs, because the chips have mass.** An ease-in-out arrives at
+ the frame perfectly and reads as a diagram redrawing itself; objects being
+ pulled together carry past their stop and settle back. `RAIL_SPRING`
+ (response .45, bounce .30) peaks at 300ms, overshoots ~3.5% — 9px on the
+ outer chips' 256px, briefly closing their 66px gap to 57 — and is done in
+ 640ms, so the move is quicker than the ease it replaced and the time goes
+ into the settle. `COMPACT` and `LOGO` are derived from the spring's own
+ reported duration, so retuning the feel cannot leave the lockup handing over
+ onto a rail that is still moving. One trajectory is sampled for the longest
+ displacement and normalised, and every chip, compact connector and fading
+ line's clip is scaled off that same curve — a linear spring is linear in its
+ target, so this is exact, and it is what keeps the connectors centred
+ between the chips on every frame including through the overshoot. Two
+ further consequences are load bearing. `.ei-step` carries a `z-index`, because the
   expanded node/line/node still spans the original gap while it fades and the
   step sliding across it has to cover it; and the expanded connector is
   clipped by its neighbouring step's displacement, or its line hangs off the
@@ -520,7 +539,13 @@ deliberate:
 - **The glyph sparkles per pixel in brand yellow.** `setupBoard()` gives each
   of the mark's 47 squares its own period, phase, opacity floor/ceiling and one
   of five Uploadcare-yellow shades, so it shimmers without ever reading as a
-  pulse. Reduced motion retains a still yellow glyph. The mark keeps its
+  pulse. **All five shades are `#FFCF3E` with slightly more or less light in
+  them, and the opacity floor is .3.** The first cut ran #f5bd22 to #fff0b0
+  over a .18 floor, which is a two-stop range: across a stand the pale end
+  reads as cream, the dark end as amber, and yellow that dark over `#090909`
+  goes brown before it goes dim — so the mark read as several colours rather
+  than one brand yellow catching the light. Reduced motion retains a still
+  yellow glyph. The mark keeps its
   `#090909` pad, which knocks the wireframe's crossing lines out from behind it.
 - **The sign-off is two lines and carries the booth QR.** `Come say hi 👋` runs
   on over `and enter to win LEGO Polaroid Camera Building Set`, preserving the

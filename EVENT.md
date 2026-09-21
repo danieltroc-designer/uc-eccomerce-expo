@@ -45,7 +45,8 @@ Working source of truth for this booth cut. Do not invent event facts.
 - Card 7 follows Figma frame `219:1638` and otherwise retains the Webflow
   outro unchanged: “Load faster, sell more.” over “Come say hi 👋 and enter
   to win LEGO Polaroid Camera Building Set.” Its central pixel glyph shimmers
-  across Uploadcare yellow shades.
+  across five near-identical Uploadcare yellows, so it stays brand yellow
+  while it moves rather than drifting between cream and amber.
 
 ## Assets still needed
 
