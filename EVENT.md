@@ -5,13 +5,13 @@ Working source of truth for this booth cut. Do not invent event facts.
 ## Confirmed
 
 - Event name: **Ecommerce Expo**
-- Seven-card loop, approximately 55 seconds:
+- Seven-card loop, approximately 62 seconds:
   1. Product image upload → optimization → live store payoff (10s)
-  2. Five ecommerce benefits (6s)
+  2. Five ecommerce benefits, two one-second highlight passes (11s)
   3. Zephyr proof point (6s)
   4. Marketplace backend → Edit with AI → catalog variant → storefront (12s)
   5. Customer logo wall (5s)
-  6. Upload → Optimize → Deliver infrastructure view (6s)
+  6. Upload → Optimize → Deliver infrastructure view (8s)
   7. Booth CTA / file-board outro (10s)
 - Card 4 records the production `ai-catalog-admin` demo: the Ashfold product
   backend opens, the pointer crosses its catalogue image so “Edit with AI”
@@ -38,10 +38,14 @@ Working source of truth for this booth cut. Do not invent event facts.
 - Card 3 follows Figma frame `234:1237`: “2x faster page loads. Faster pages,
   more sales.” beside the Zephyr mark and “This way, we get the absolute most
   speed we can when loading our web pages across mobile devices.” attributed
-  to Sam McKinney, Director of Agency Services at Zephyr.
+  to Sam McKinney, Director of Agency Services at Zephyr. The two green-panel
+  claims are separate paragraphs with a 40px gap.
+- Card 6 preserves its existing choreography and uses its added two seconds
+  solely to hold the final Uploadcare lockup longer.
 - Card 7 follows Figma frame `219:1638` and otherwise retains the Webflow
   outro unchanged: “Load faster, sell more.” over “Come say hi 👋 and enter
-  to win LEGO Polaroid Camera Building Set.”
+  to win LEGO Polaroid Camera Building Set.” Its central pixel glyph shimmers
+  across Uploadcare yellow shades.
 
 ## Assets still needed
 

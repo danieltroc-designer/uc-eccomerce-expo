@@ -20,13 +20,15 @@ SHOTS = {
     # card 1 runs a 10s slot: drag, drop, handover, the 1.45s upload, the
     # optimization readout and its hold, then the storefront
     0: [700, 1600, 2600, 3600, 4900, 6100, 7400, 8600],
-    1: [250, 700, 1400, 3000],         # benefit row lands
+    # card 2: one second per panel, twice; sample each highlight
+    1: [1400, 2400, 3400, 4400, 5400, 6400, 7400, 8400, 9400, 10400],
     2: [250, 700, 1400, 2200],         # headline, then Zephyr mark
     3: [400, 1500, 1800, 2350, 2900, 4000, 5200, 5800, 7400, 8700, 9600, 11500],
                                  # backend → hover → click → editor → prompt → shimmer
                                  # → result → storefront
     4: [250, 650, 1100],               # six-logo sweep
-    5: [700, 1800, 2900, 3800],        # upload → optimize → deliver → logo
+    5: [700, 1800, 2900, 3800, 5400, 7400],
+                                            # upload → optimize → deliver → logo hold
     6: [400, 1400, 3000],              # booth CTA
 }
 

@@ -40,10 +40,10 @@ own source + build + output and is fully independent of the main deck:
   `pipeline`). Card 7 is a `board` slide with `layout:'outro'`.
 - Build: `python build_simple.py` → `dist/uploadcare-simple.html`.
 - Same rule applies: never hand-edit `dist/uploadcare-simple.html`.
-- Current default sequence is 10/6/6/12/5/6/10 seconds (55 seconds total):
+- Current default sequence is 10/11/6/12/5/8/10 seconds (62 seconds total):
  product flow, benefits, Zephyr proof point, AI Enhancer, customer logos,
- infrastructure, booth CTA. Cards 1, 4 and 7 hold the longest slots; the first
- two demonstrate processes rather than stating a fact.
+ infrastructure, booth CTA. Card 2 uses its 11s for two full five-card
+ highlight passes; Card 6 uses its added 2s only for the final logo hold.
 - Optional event imagery is auto-inlined from `assets/ecommerce/`; see its
   README for exact filenames. Card 4's source and generated output are
   required; a missing asset fails the build.
@@ -151,17 +151,16 @@ These things about the implementation are load bearing:
   exports under `assets/ecommerce/benefit-*.svg`; their accent colours are
   baked into the art, and `encode_ecommerce()` deliberately fails if one is
   missing rather than silently substituting an approximation. Once the row is
-  built it runs the **same pulse as the Webflow capability row** — it reuses
-  `ftPulse` outright, so retuning the wash is one edit rather than two that
-  drift. Everything the Webflow note below says about that pulse applies here:
-  per-panel colour from `ECOM_BENEFITS[].ac` (duplicating what is baked into
-  each SVG, because CSS cannot read a colour out of inlined markup), the wash
-  on a `::before` overlay's opacity rather than `background-color`, 300ms
-  between panels against a 1.5s pulse so the row reads as one travelling wave,
-  one pass rather than a loop, scoped to `.slide.active`, and pinned off under
-  reduced motion. Only the start delay differs: 1.2s, because this row's
-  entrance ends at ~.86s where the Webflow one waits on icons that land at
-  ~1.7s. The wave is done by ~3.9s of the 6s card.
+  built it runs two deliberate highlight passes. Each panel owns one full
+  second in reading order, so a pass takes five seconds and the 11s card has
+  room for two turns after its entrance. `ebFlash` is a five-second animation
+  whose visible event occupies its first 20%; `calc(.9s + var(--i)*1s)` places
+  those events back-to-back, and two iterations put the second turn exactly
+  five seconds later. Per-panel colour comes from `ECOM_BENEFITS[].ac`,
+  duplicating what is baked into each SVG because CSS cannot read a colour out
+  of inlined markup. The wash remains on a `::before` opacity layer rather
+  than repainting `background-color`, is scoped to `.slide.active`, and is
+  pinned off under reduced motion.
 - Ecommerce Card 6 comes from frame 218:1470. Its 989px rail is pinned at
   (466,701) and uses Figma's real 8.14062px endpoint and 308.719px line SVGs.
   The 120x150 file opens at (602,529), moves to the exact optical centres of
@@ -176,6 +175,10 @@ These things about the implementation are load bearing:
   asserts every beat and the rail geometry. Target distances are calculated
   from `offsetLeft`/`offsetWidth`, never screen-space rects, so the file still
   lands correctly when the 1920px stage is scaled on a laptop.
+  The subtitle has a card-specific 52px gap below the two-line headline
+  (shared `.shd-s` remains 32px elsewhere). The slide runs 8s without retiming
+  any beat: the lockup still arrives at ~5.04s and simply holds two seconds
+  longer than it did in the 6s cut.
   **The contraction is displacement, not layout.** It used to animate the
   rail's own `left` and `width`, which relayouts the row on every frame of a
   750ms move to produce a result that is pure translation. The rail's box is
@@ -405,7 +408,9 @@ Card 3 is the customer quote as a two-panel spread: the lime pull-quote at
 `justify-between`, which is what lands the attribution and the company blurb on
 a shared bottom edge even though the columns hold different content. The quote
 panel enters first and the customer panel ~220ms later, so the pair reads as a
-claim and then its source. Two details on this card are load-bearing:
+claim and then its source. The two claims on the lime panel are separate
+paragraphs with a 40px gap, not two lines separated by `<br>`. Two details on
+this card are load-bearing:
 
 - **Panels fade fast and move slow.** They sit inside the slide's own 520ms
   crossfade, so a long fade here compounds into a second one. On the lime block
@@ -512,12 +517,11 @@ deliberate:
   that says "files are moving" while the centre line does the talking. Sizes and
   positions are the frame's; `.hb-outro-mode` carries the whole small-scale
   treatment so the non-outro board layout keeps its original 18px.
-- **The glyph sparkles per pixel.** `setupBoard()` gives each of the mark's 47
-  squares its own period, phase and opacity floor/ceiling, so it shimmers
-  without ever reading as a pulse. This is not an invention: the frame's own
-  render is a still of exactly this, a field of squares sitting at different
-  greys between roughly 20% and 100% of `#454545`. The mark keeps its `#090909`
-  pad, which knocks the wireframe's crossing lines out from behind it.
+- **The glyph sparkles per pixel in brand yellow.** `setupBoard()` gives each
+  of the mark's 47 squares its own period, phase, opacity floor/ceiling and one
+  of five Uploadcare-yellow shades, so it shimmers without ever reading as a
+  pulse. Reduced motion retains a still yellow glyph. The mark keeps its
+  `#090909` pad, which knocks the wireframe's crossing lines out from behind it.
 - **The sign-off is two lines and carries the booth QR.** `Come say hi 👋` runs
   on over `and enter to win LEGO Polaroid Camera Building Set`, preserving the
   Webflow outro exactly while the Expo headline changes to `Load faster, sell

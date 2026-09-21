@@ -109,13 +109,22 @@ def main():
               f"{'ok' if off <= 2 else 'WRONG SIZE'}")
         bad += off > 2
 
-        # the glyph should be a spread of opacities, not one value
-        ops = pg.evaluate("()=>[...document.querySelectorAll('.slide.active .hb-mark path')]"
-                          ".map(p=>+getComputedStyle(p).opacity)")
+        # The glyph should be a spread of yellow pixels, not one grey value.
+        glyph = pg.evaluate(
+            "()=>[...document.querySelectorAll('.slide.active .hb-mark path')]"
+            ".map(p=>{const s=getComputedStyle(p);return "
+            "{opacity:+s.opacity,fill:s.fill}})")
+        ops = [p["opacity"] for p in glyph]
+        fills = {p["fill"] for p in glyph}
         spread = max(ops) - min(ops)
+        yellow = all(int(c) >= 180 and int(c) > int(b)
+                     for fill in fills
+                     for c, _, b in [fill.removeprefix("rgb(")
+                                     .removesuffix(")").split(",")])
         print(f"     glyph pixels: {len(ops)}  opacity {min(ops):.2f}..{max(ops):.2f} "
-              f"spread {spread:.2f}  {'ok' if spread > .3 else 'FLAT'}")
-        bad += spread <= .3
+              f"spread {spread:.2f}  yellows {len(fills)}  "
+              f"{'ok' if spread > .3 and yellow and len(fills) > 1 else 'WRONG'}")
+        bad += spread <= .3 or not yellow or len(fills) <= 1
         ctx.close()
     print("mismatches:", bad)
 

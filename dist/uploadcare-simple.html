@@ -673,6 +673,7 @@
     background:#090909;z-index:2;
   }
   .hb-mark svg{width:62px;height:62px;display:block;overflow:visible}
+  .hb-mark path{fill:var(--yc,#ffcf3e)}
   /* the sparkle: every pixel of the mark drifts on its own slow cycle. Range
      and period are randomised per square in setupBoard() — the storyboard's
      own render is a snapshot of exactly this, a field of squares sitting at
@@ -1193,6 +1194,8 @@
   .qt-quote{font-size:64px;font-weight:600;line-height:1.065;letter-spacing:-.96px;
     margin-right:.96px;
     text-box-trim:trim-both;text-box-edge:cap alphabetic;transition-delay:.26s}
+  .em-wrap .qt-quote{display:flex;flex-direction:column;gap:40px}
+  .em-wrap .qt-quote p{margin:0}
   .qt-by{font-size:24px;font-weight:400;line-height:1.4;transition-delay:.42s}
   .qt-head{display:flex;flex-direction:column;align-items:flex-start;gap:24px}
   .qt-logo{width:183px;transition-delay:.50s}
@@ -1619,16 +1622,18 @@
     box-shadow:inset 0 0 0 1px var(--ac);
     opacity:0;
   }
-  /* 300ms between panels, as on the Webflow row: each pulse runs far longer
-     than the gap (1.5s against 300ms), so neighbours overlap and the row never
-     breaks into five separate blinks. The start is later than the last panel's
-     entrance (~.86s here, against ~1.7s there) so the wave opens on a built
-     row, and scoping to .slide.active restarts it from the top on every loop
-     instead of inheriting whatever phase the deck happened to render at.
-     One pass, for the reason the Webflow row gives: the wave groups the five
-     panels, and once it has the card should hold still and be read. */
+  /* Card 2 is the exception to the Webflow row's overlapping wave. Each panel
+     owns a full one-second highlight slot, in reading order, and the five-card
+     pass repeats once. A five-second animation with a one-second event at its
+     head gives every card the same slot; the per-card one-second delay places
+     those events back-to-back, while two iterations put the second turn five
+     seconds later. Starting at .9s lets the row finish entering first. */
   .slide.active .eb-card::before{
-    animation:ftPulse 3.8s ease-in-out calc(1.2s + var(--i)*.30s) 1;
+    animation:ebFlash 5s linear calc(.9s + var(--i)*1s) 2;
+  }
+  @keyframes ebFlash{
+    0%,20%,100%{opacity:0}
+    2%,18%{opacity:.25}
   }
   /* the panel's own content has to outrank the wash, or the tint lands on top
      of the copy and the icon instead of behind them */
@@ -1862,6 +1867,7 @@
      a separate layer so translating it never disturbs that geometry. */
   .ei-wrap{position:absolute;inset:0;background:#090909}
   .ei-wrap .shd{--shd-y:180px}
+  .ei-wrap .shd-s{margin-top:52px}
   .ei-rail{position:absolute;left:466px;top:701px;width:989px;height:49px;
     display:flex;align-items:center}
   /* above the connectors: the expanded node/line/node still spans the original
@@ -2273,17 +2279,18 @@ function Timeline({reduced=false}={}){
 /* ---- Ecommerce Expo — 55-second, seven-card booth loop ----------------
    Product image in, storefront out; benefits and proof; one focused AI Editor
    demonstration; customer trust; then the system view and booth CTA.
-   Durations are 10/6/6/12/5/6/10 seconds. Cards 1 and 4 carry longer slots
+   Durations are 10/11/6/12/5/8/10 seconds. Cards 1 and 4 carry longer slots
    because they demonstrate processes rather than stating a fact, and every
-   beat has to be legible from across a stand. Card 4 is the longest because it
-   runs two payoffs: the generated result, then that result live on a page. */
+   beat has to be legible from across a stand. Card 2 gives each of five
+   benefits two full one-second highlights; Card 6 holds its final Uploadcare
+   lockup for two extra seconds. */
 const DEFAULT_DECK = {
   settings: { duration: 6, fade: 480, watermark: true },
   slides: [
     { type:'commerceFlow', duration:10,
       heading:'Every product image, optimized and fast. Automatically.' },
 
-    { type:'commerceBenefits', duration:6 },
+    { type:'commerceBenefits', duration:11 },
 
     { type:'commerceMetric', duration:6,
       value:'2x faster page loads.',
@@ -2299,7 +2306,7 @@ const DEFAULT_DECK = {
       title:'Trusted by',
       logos:'L\u2019Or\u00e9al, Crayola, Samsonite, GemPages, Shogun, Marko' },
 
-    { type:'commerceInfrastructure', duration:6,
+    { type:'commerceInfrastructure', duration:8,
       heading:'The infrastructure\nbehind every product image.',
       sub:'One integration. Upload, optimize, and deliver every image, and every other file.',
       steps:'Upload, Optimize, Deliver' },
@@ -2748,7 +2755,10 @@ const R = {
     const mark = LOGOS[logoKey(s.by||'')];
     return `<div class="em-wrap qt-wrap">
       <div class="qt-panel qt-say">
-        <p class="qt-in qt-quote">${esc(s.value||'')}<br>${esc(s.line||'')}</p>
+        <div class="qt-in qt-quote">
+          <p>${esc(s.value||'')}</p>
+          <p>${esc(s.line||'')}</p>
+        </div>
       </div>
       <div class="qt-panel qt-who">
         <div class="qt-head">
@@ -3838,16 +3848,18 @@ function setupBoard(slideEl, sd, tl){
   if (globe && sd.globe!==false && !REDUCED) globe.classList.add('spin');
 
   /* Sparkle the centre glyph: every pixel gets its own slow cycle, its own
-     phase and its own floor and ceiling, so the mark shimmers without any of
-     it reading as a pulse. Negative delays start each square mid-cycle, which
-     is what stops all 47 of them lifting together on the first beat. */
+     phase, yellow and floor/ceiling, so the mark shimmers in brand yellows
+     without any of it reading as one pulse. Negative delays start each square
+     mid-cycle, which stops all 47 lifting together on the first beat. */
   if (mark && !REDUCED){
     const rnd = (a,b)=>a + Math.random()*(b-a);
+    const yellows = ['#ffcf3e','#ffd85f','#ffe180','#f5bd22','#fff0b0'];
     mark.querySelectorAll('path').forEach(px=>{
       px.style.setProperty('--d',  rnd(4.5, 9.5).toFixed(2)+'s');
       px.style.setProperty('--t',  (-rnd(0, 9.5)).toFixed(2)+'s');
       px.style.setProperty('--o1', rnd(.18, .45).toFixed(2));
       px.style.setProperty('--o2', rnd(.75, 1).toFixed(2));
+      px.style.setProperty('--yc', yellows[Math.floor(rnd(0,yellows.length))]);
     });
     mark.classList.add('twinkle');
   }
@@ -5722,11 +5734,11 @@ gLogo.onchange = ()=>{ deck.settings.watermark=gLogo.checked; enter(idx); };
 /* add menu */
 const NEW = {
   commerceFlow:{type:'commerceFlow',duration:10,heading:'Every product image, optimized and fast. Automatically.'},
-  commerceBenefits:{type:'commerceBenefits',duration:6},
+  commerceBenefits:{type:'commerceBenefits',duration:11},
   commerceMetric:{type:'commerceMetric',duration:6,value:'2x faster page loads.',line:'Faster pages, more sales.',quote:'This way, we get the absolute most speed we can when loading our web pages across mobile devices.',attribution:'Sam McKinney, Director of Agency Services at Zephyr',by:'Zephyr'},
   commerceEditor:{type:'commerceEditor',duration:12,heading:'Turn any photo\ninto a catalog-ready product shot.'},
   commerceLogos:{type:'commerceLogos',duration:5,title:'Trusted by',logos:'L\u2019Or\u00e9al, Crayola, Samsonite, GemPages, Shogun, Marko'},
-  commerceInfrastructure:{type:'commerceInfrastructure',duration:6,heading:'The infrastructure\nbehind every product image.',sub:'One integration. Upload, optimize, and deliver every image, and every other file.',steps:'Upload, Optimize, Deliver'},
+  commerceInfrastructure:{type:'commerceInfrastructure',duration:8,heading:'The infrastructure\nbehind every product image.',sub:'One integration. Upload, optimize, and deliver every image, and every other file.',steps:'Upload, Optimize, Deliver'},
   commerceOutro:{type:'commerceOutro',duration:10,layout:'outro',title:'Load faster,\nsell more.',sub:'Come say hi \ud83d\udc4b\nand enter to win LEGO Polaroid Camera Building Set',qr:true,qrConfirmed:false,qrLabel:'QR URL to confirm',booth:''},
   statement:{type:'statement',duration:8,kicker:'',heading:'Your headline goes here.',line2mono:false},
   number:{type:'number',duration:8,kicker:'',prefix:'',value:100,decimals:0,suffix:'+',label:'describe the number'},
