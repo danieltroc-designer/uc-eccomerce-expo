@@ -97,7 +97,7 @@ def main():
             pg.wait_for_timeout(250)
             early = read(pg)
             check("editor stage matches composition",
-                  early["stage"] == [334, 400, 1252, 640], str(early["stage"]))
+                  early["stage"] == [334, 360, 1252, 640], str(early["stage"]))
             check("product backend opens before editor",
                   early["backend"] > .98 and early["editor"] < .02,
                   f"backend {early['backend']:.2f}, editor {early['editor']:.2f}")

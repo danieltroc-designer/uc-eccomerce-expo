@@ -87,7 +87,7 @@ def main():
             pg.wait_for_timeout(250)
             early = read(pg)
             check("process shell matches frame",
-                  early["shell"] == [334, 394, 1252, 554], str(early["shell"]))
+                  early["shell"] == [334, 354, 1252, 554], str(early["shell"]))
             check("one photo source feeds every view",
                   len(early["imageSources"]) == 1 and early["imageCount"] == 5,
                   f"{len(early['imageSources'])} source / {early['imageCount']} views")
@@ -107,7 +107,7 @@ def main():
                   late["resultOpacity"] > .98 and min(late["lineOpacity"]) > .98,
                   f"photo {late['resultOpacity']:.2f}, lines {late['lineOpacity']}")
             check("storefront browser matches frame",
-                  late["site"] == [334, 426, 1252, 814]
+                  late["site"] == [334, 386, 1252, 814]
                   and late["sitePhoto"] == [33, 62, 561, 590],
                   f"browser {late['site']}, photo {late['sitePhoto']}")
             check("storefront replaces process shell",

@@ -1420,7 +1420,7 @@
      whole phase so the storefront can replace it as one transition unit. */
   .ef-wrap{position:absolute;inset:0;background:#181818}
   .ef-wrap>.shd{z-index:3}
-  .ef-process{position:absolute;left:334px;top:394px;width:1252px;height:554px;
+  .ef-process{position:absolute;left:334px;top:354px;width:1252px;height:554px;
     border-radius:39px;background:#0c0c0c;border:1px solid rgba(255,255,255,.05);
     padding:11px;overflow:hidden}
   .ef-grid{position:relative;z-index:1;height:100%;display:grid;
@@ -1529,7 +1529,7 @@
      shell's 1252px width, so Card 1 can hand from system work to visible result
      without the composition changing scale. The 814px browser extends below
      the stage exactly as it does in the frame and is clipped by the TV. */
-  .ef-site{position:absolute;left:334px;top:426px;width:1252px;height:814px;
+  .ef-site{position:absolute;left:334px;top:386px;width:1252px;height:814px;
     border-radius:16px;background:#fff;overflow:hidden;opacity:0;pointer-events:none;
     box-shadow:0 100px 40px rgba(0,0,0,.07),0 41.778px 16.711px rgba(0,0,0,.05),
       0 22.336px 8.935px rgba(0,0,0,.04),0 12.522px 5.009px rgba(0,0,0,.04),
@@ -1650,7 +1650,7 @@
      details and Organisation run off the bottom edge exactly as they do in the
      demo rather than being squeezed to fit. */
   .ce-wrap{position:absolute;inset:0}
-  .ce-stage{position:absolute;left:334px;top:400px;width:1252px;height:640px}
+  .ce-stage{position:absolute;left:334px;top:360px;width:1252px;height:640px}
 
   .ce-backend{position:absolute;inset:0;border-radius:16px;overflow:hidden;
     background:#f5f5f5;box-shadow:0 18px 50px rgba(0,0,0,.28);
@@ -2528,6 +2528,11 @@ const PD_UUID = '13cf5c14-acb4-4cfe-9add-2d2b155d650c';
    enough the same width that even spacing is what the eye wants. */
 const PD_BADGES = [['soc2',52.0,52.0],['gdpr',52.9,52.9],['hipaa',53.7,46.1]];
 const PD_BADGE_Y = 1015, PD_BADGE_GAP = 99;
+/* Card 1 sits 40px higher than the frame so its art reads closer to the
+   headline; its trust marks move with it rather than staying pinned, or the
+   card's own bottom margin grows by exactly what the top lost. The storefront
+   still has to cover them — it opens at 386 and runs 814px, so it does. */
+const EF_BADGE_Y = PD_BADGE_Y - 40;
 /* *stars* mark the value half of each readout, which is set in white */
 const PD_ANALYSIS = [
   'image/jpeg \u00b7 290 KB',
@@ -2561,10 +2566,10 @@ const R = {
     const cx0 = 960 - (PD_BADGES.length-1)*PD_BADGE_GAP/2;
     const badges = PD_BADGES.map(([name,w,h],i)=>
       `<div class="ef-badge" style="left:${cx0+i*PD_BADGE_GAP-w/2}px;`
-      + `top:${PD_BADGE_Y-h/2}px;width:${w}px;height:${h}px">${COMPLIANCE[name]}</div>`).join('');
+      + `top:${EF_BADGE_Y-h/2}px;width:${w}px;height:${h}px">${COMPLIANCE[name]}</div>`).join('');
     const donut = PD_DONUT.replace(/pdGaps/g,'efGaps');
     return `<div class="ef-wrap">
-      <div class="shd"><div class="shd-t reveal">${esc(s.heading||'')}</div></div>
+      <div class="shd" style="--shd-y:120px"><div class="shd-t reveal">${esc(s.heading||'')}</div></div>
 
       <div class="ef-process">
         <div class="ef-grid">
@@ -2688,7 +2693,7 @@ const R = {
     const image = ECOMMERCE.catalogSource;
     const result = ECOMMERCE.editorAfter;
     return `<div class="ce-wrap">
-      <div class="shd" style="--shd-y:203px"><div class="shd-t reveal">${multiline(s.heading||'')}</div></div>
+      <div class="shd" style="--shd-y:120px"><div class="shd-t reveal">${multiline(s.heading||'')}</div></div>
       <div class="ce-stage">
         <div class="ce-backend">
           <div class="ce-bar">
