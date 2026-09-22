@@ -690,6 +690,52 @@ Three things to keep in mind when adding a card:
   `tools/trace_cursor.py` prints position and opacity per frame, which is how
   that one was caught; screenshots alone read as "the animation is just fast".
 
+### Exporting the loop as video
+
+`python tools/export_video.py` writes `dist/uploadcare-expo-4k.mp4` — one full
+63s loop at 3840x2160, 30fps. Four things about it are load bearing:
+
+- **It records a loop the deck advanced into by itself.** The first cut forced
+ `pause(); enter(0); resume()` to get card 1 from the top, which restarted
+ card 1's score over a run that had just been killed and left the storefront
+ payoff an empty grey page. The tool now jumps to the *last* card as pre-roll
+ and waits for the deck's own advance timer to reach card 1; every card inside
+ the recorded window is entered exactly as the TV enters it. The card order is
+ printed, and it should read `[6, 0, 1, 2, 3, 4, 5, 6, 0]`.
+- **The viewport is the full 3840x2160 and `deviceScaleFactor` stays 1.**
+ `Page.startScreencast` captures the visual viewport in *CSS* pixels and
+ ignores the device scale factor, so the obvious setup — a 1920x1080 viewport
+ at `dsf=2`, which screenshots correctly at 4K — delivers 1080p frames that
+ the encoder then upscales into a 4K container. That shipped once and reads
+ as noisy, haloed edges rather than as the wrong resolution (measured against
+ the lossless render: mean abs error 4.84 on the outro's QR, versus 0.06 for
+ the real thing). At a 4K viewport `fit()` scales `#stage` by 2, which is
+ what a real 4K panel does, and Chrome re-rasterises through the transform:
+ the frame is pixel-identical to the `dsf=2` screenshot (mean abs error
+ 0.000), so the warning about CSS-scaling the stage does not apply to the
+ stage's own `fit()` transform. `check_size()` in the exporter and a
+ dimension guard in the encoder both assert this now, because it is invisible
+ in every other check — the container, the metadata and the card geometry are
+ all correct either way.
+- **Frames are PNG.** At 4K the screencast still sustains ~67fps, well past
+ the 30fps output, so there is no reason to put a lossy JPEG generation in
+ front of the H.264 one.
+- **Screencast frames are irregular and are resampled on their own
+ timestamps.** Chrome only emits a frame when something changed, so a still
+ hold produces none; `tools/mp4writer.swift` picks, for each output frame at
+ n/fps, the newest source frame at or before it. Dropping that and treating
+ the frames as evenly spaced would make the video drift against the deck.
+- **The MP4 is written with AVFoundation, not ffmpeg.** Playwright's bundled
+ ffmpeg is a VP8/WebM-only build and there is no system ffmpeg here. The same
+ binary reads the result back (`--inspect out.mp4 dir t…` prints real
+ duration/size/fps and writes 1:1 stills), which is the only way to check the
+ encode without an H.264 decoder. `swiftc` here is older than the default SDK,
+ so the build falls back through the older SDKs beside it.
+
+The window is exactly one period: it opens on the outro still crossfading into
+card 1 and ends on the outro settled, so the file loops seamlessly. Starting
+it clean on card 1 instead means shifting the window past that 520ms fade.
+
 Verify with `python tools/verify_simple.py`, which screenshots all eight cards
 in both normal and reduced motion to `tools/_shots/` and fails loudly on
 console errors, and `python tools/verify_timeline.py`, which asserts a slide's
