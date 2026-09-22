@@ -40,7 +40,7 @@ own source + build + output and is fully independent of the main deck:
   `pipeline`). Card 7 is a `board` slide with `layout:'outro'`.
 - Build: `python build_simple.py` → `dist/uploadcare-simple.html`.
 - Same rule applies: never hand-edit `dist/uploadcare-simple.html`.
-- Current default sequence is 10/11/6/12/5/8/10 seconds (62 seconds total):
+- Current default sequence is 10/11/6/13/5/8/10 seconds (63 seconds total):
  product flow, benefits, Zephyr proof point, AI Enhancer, customer logos,
  infrastructure, booth CTA. Card 2 uses its 11s for two full five-card
  highlight passes; Card 6 uses its added 2s only for the final logo hold.
@@ -121,11 +121,11 @@ These things about the implementation are load bearing:
   product slot takes a centred cover crop (card 1's -27.02%/142.61% is tuned to
   its tube shot and would cut the pump off a 3:4 bottle), the copy is the
   Ashfold page's own, and the CTA carries the backend's €49.00.
-  **The slide runs 12s, not 10.** The extra two seconds are the ~1.05s the
-  finished result holds before the handover plus the storefront's own hold.
-  That first hold is the only time the generated frame is on screen with
-  nothing happening to it — do not reclaim it by starting the handover earlier,
-  and do not pay for the payoff by speeding up the beats before it.
+ **The slide runs 13s, not 12.** The finished result still holds untouched for
+ ~1.05s. A second data-URI pointer then enters from the composer, travels to
+ the now-active “Add to media” button, presses it, and only then hands over to
+ the storefront. The added second pays for that action; no earlier typing,
+ generation, result hold, or storefront beat was shortened.
 - **Prompt typing is Timeline-owned.** Its recursive 18ms ticks go through
   `tl.timeout()`, so leaving the card stops them and re-entry resets to an empty
   prompt synchronously. Reduced motion opens directly on the storefront, the
@@ -167,6 +167,9 @@ These things about the implementation are load bearing:
   of inlined markup. The wash remains on a `::before` opacity layer rather
   than repainting `background-color`, is scoped to `.slide.active`, and is
   pinned off under reduced motion.
+  The SOC 2, GDPR and HIPAA marks sit in this card's open bottom band at
+  `PD_BADGE_Y`, centred beneath the benefits. They moved here from Card 1
+  because they support the benefit claims rather than uploader mechanics.
 - Ecommerce Card 6 comes from frame 218:1470. Its 989px rail is pinned at
   (466,701) and uses Figma's real 8.14062px endpoint and 308.719px line SVGs.
   The 120x150 file opens at (602,529), moves to the exact optical centres of
@@ -222,8 +225,9 @@ These things about the implementation are load bearing:
   recoloured from CSS), `__MARKET_JSON__` (card 5's marketplace chrome in
   `assets/marketplace/` — just the download glyph; its app tile reuses the
   deck's own Uploadcare glyph, recoloured to brand yellow from CSS), and
-  `__COMPLIANCE_JSON__` (card 6's three trust marks in `assets/compliance/`,
-  inlined as markup so they inherit the card's opacity).
+  `__COMPLIANCE_JSON__` (the three trust marks in `assets/compliance/`, used
+  beneath Expo Card 2 and by the inherited pipeline card, inlined as markup so
+  they inherit the card's opacity).
 
 Card 6 is a port of the three-panel demo on the marketing site
 (upload | analyse | deliver), laid out to storyboard frame 184:5610. One thing
@@ -325,12 +329,8 @@ whole five-step story inside 3.2s and left the `-97%` claim readable for about
 quietly trimmed: the upload ring fills over **1.45s** (at .55s it read as the
 card skipping the upload), "1 file added" **holds ~.6s** before the widget
 hands over, and the finished readout **holds ~1.3s** before the storefront
-starts replacing it. The three compliance marks now come up with the card at
-~1s and never fade — the storefront's page covers their strip at y≈1015, so
-they are occluded rather than dimmed, which is why there is no badge exit
-tween any more. Do not reintroduce one: fading them while the browser is
-opening is visible as a dim, since the clip only reaches their row late in the
-reveal.
+starts replacing it. Card 1 no longer carries the three compliance marks;
+they now support Card 2's benefits.
 
 Two handovers on this card are deliberately *not* straight crossfades, for the
 reason the install card's label swap documents below — two elements of very

@@ -51,6 +51,10 @@ def read(pg):
         backend: opacity(q('.ce-backend')),
         cursor: opacity(q('.ce-admin-cursor')),
         ring: opacity(q('.ce-click-ring')),
+        editorCursor: opacity(q('.ce-editor-cursor')),
+        editorTip: rect(q('.ce-editor-cursor'))?.slice(0, 2) || null,
+        doneRing: opacity(q('.ce-done-ring')),
+        doneBox: rect(q('.ce-done')),
         hot: !!q('.ce-shot')?.classList.contains('hot'),
         edit: opacity(q('.ce-edit')),
         shot: rect(q('.ce-shot')),
@@ -186,6 +190,19 @@ def main():
                   str(done_editing["afterNatural"]))
             check("Add to media resolves active",
                   done_editing["done"] == "rgb(24, 24, 24)", done_editing["done"])
+            media_target = [s for s in samples
+                            if s["editorCursor"] > .8 and s["editorTip"]
+                            and s["doneBox"]
+                            and s["doneBox"][0] <= s["editorTip"][0]
+                                <= s["doneBox"][0] + s["doneBox"][2]
+                            and s["doneBox"][1] <= s["editorTip"][1]
+                                <= s["doneBox"][1] + s["doneBox"][3]]
+            check("editor pointer goes to Add to media",
+                  bool(media_target),
+                  f"{len(media_target)} sample(s) with the tip on the button")
+            check("editor pointer clicks Add to media",
+                  any(s["doneRing"] > .01 for s in samples),
+                  "click ring observed")
 
             # the payoff: the generated variant live on the storefront
             hold = [s for s in samples if s["editor"] < .02 and s["site"] > .98]

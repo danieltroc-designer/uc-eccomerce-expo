@@ -1533,9 +1533,6 @@
     font-size:13px;line-height:20px;text-transform:uppercase;color:#a7a7a7}
   .ef-analysis p{opacity:0}
   .ef-analysis b{font-weight:inherit;color:#fff}
-  .ef-badge{position:absolute;opacity:0}
-  .ef-badge svg{width:100%;height:100%;display:block}
-
   /* Storefront payoff — frame 234:1415. It deliberately keeps the process
      shell's 1252px width, so Card 1 can hand from system work to visible result
      without the composition changing scale. The 814px browser extends below
@@ -1633,6 +1630,13 @@
   /* the panel's own content has to outrank the wash, or the tint lands on top
      of the copy and the icon instead of behind them */
   .eb-copy,.eb-icon{position:relative;z-index:1}
+  /* The trust marks support the benefit claim, rather than the mechanics of
+     Card 1's uploader. They use Card 2's open bottom band beneath the row. */
+  .eb-badge{position:absolute;opacity:0;transform:translateY(10px);
+    transition:opacity var(--dur-2) ease,transform var(--dur-3) var(--ease-out);
+    transition-delay:calc(.62s + var(--i,0)*.09s)}
+  .eb-badge svg{width:100%;height:100%;display:block}
+  .slide.active .eb-badge{opacity:.5;transform:none}
 
   /* Card 3 — Zephyr testimonial, frame 234:1237. It intentionally reuses the
      Webflow quote card's geometry and choreography above: the lime claim leads,
@@ -1811,6 +1815,14 @@
     background:#f1f1f2;color:#343436;font-size:13px;font-weight:600;line-height:1}
   .ce-cancel{left:12px}
   .ce-done{right:12px;background:#8f8f8f;color:#fff}
+  /* A second pointer closes the editor interaction. Its tip rests inside the
+     active Add to media button; a data URI avoids duplicate SVG mask ids. */
+  .ce-editor-cursor{position:absolute;left:1174px;top:612px;width:44px;height:61px;
+    z-index:7;opacity:0;will-change:transform}
+  .ce-editor-cursor img{width:100%;height:100%;display:block}
+  .ce-done-ring{position:absolute;left:1148px;top:586px;width:52px;height:52px;
+    border:1.5px solid rgba(255,207,62,.88);border-radius:50%;opacity:0;
+    transform:scale(.9);z-index:6;pointer-events:none}
 
   /* The payoff: the variant that was just generated, live on the storefront.
      This is card 1's browser reused outright — every .ef-site* rule, including
@@ -1916,7 +1928,7 @@
     /* entrance choreography collapses to an instant jump to the settled state
        (opacity cross-fades that aid comprehension are kept where they exist) */
     .di-widget,.di-row,.di-drop,.di-check,.di-ring,.di-bin,.ft-card,.ft-tile svg,.sc-cell,
-    .qt-panel,.qt-in,.lw-title,.lw-logo,.lw-word,.pd-zone,.pd-ph,.pd-badge,
+    .qt-panel,.qt-in,.lw-title,.lw-logo,.lw-word,.pd-zone,.pd-ph,.pd-badge,.eb-badge,
     .reveal,.reveal.fx-stagger .w,.reveal.fx-clip .cl,.slide,.rv-photo,.rv-photo img,.rv-photo::after,
     .pl-row.pl-anim .pl-pill,.pl-row.pl-anim .pl-line,.pl-row.pl-anim .pl-line span,
     .mk-card,.mk-overlay,.cd-window.reveal,.cd-chrome i,
@@ -2271,10 +2283,10 @@ function Timeline({reduced=false}={}){
 }
 
 /* ---------------- default deck ---------------- */
-/* ---- Ecommerce Expo — 55-second, seven-card booth loop ----------------
+/* ---- Ecommerce Expo — 63-second, seven-card booth loop ----------------
    Product image in, storefront out; benefits and proof; one focused AI Editor
    demonstration; customer trust; then the system view and booth CTA.
-   Durations are 10/11/6/12/5/8/10 seconds. Cards 1 and 4 carry longer slots
+   Durations are 10/11/6/13/5/8/10 seconds. Cards 1 and 4 carry longer slots
    because they demonstrate processes rather than stating a fact, and every
    beat has to be legible from across a stand. Card 2 gives each of five
    benefits two full one-second highlights; Card 6 holds its final Uploadcare
@@ -2294,7 +2306,7 @@ const DEFAULT_DECK = {
       attribution:'Sam McKinney, Director of Agency Services at Zephyr',
       by:'Zephyr' },
 
-    { type:'commerceEditor', duration:12,
+    { type:'commerceEditor', duration:13,
       heading:'Turn any photo\ninto a catalog-ready product shot.' },
 
     { type:'commerceLogos', duration:5,
@@ -2603,11 +2615,6 @@ const PD_UUID = '13cf5c14-acb4-4cfe-9add-2d2b155d650c';
    enough the same width that even spacing is what the eye wants. */
 const PD_BADGES = [['soc2',52.0,52.0],['gdpr',52.9,52.9],['hipaa',53.7,46.1]];
 const PD_BADGE_Y = 1015, PD_BADGE_GAP = 99;
-/* Card 1 sits 40px higher than the frame so its art reads closer to the
-   headline; its trust marks move with it rather than staying pinned, or the
-   card's own bottom margin grows by exactly what the top lost. The storefront
-   still has to cover them — it opens at 386 and runs 814px, so it does. */
-const EF_BADGE_Y = PD_BADGE_Y - 40;
 /* *stars* mark the value half of each readout, which is set in white */
 const PD_ANALYSIS = [
   'image/jpeg \u00b7 290 KB',
@@ -2638,10 +2645,6 @@ const R = {
     const image = ECOMMERCE.card1Product;
     const sources = UPLOAD_SOURCES.map(([ic,label])=>`
       <div class="ef-source"><i>${UI[ic]}</i><span>${esc(label)}</span></div>`).join('');
-    const cx0 = 960 - (PD_BADGES.length-1)*PD_BADGE_GAP/2;
-    const badges = PD_BADGES.map(([name,w,h],i)=>
-      `<div class="ef-badge" style="left:${cx0+i*PD_BADGE_GAP-w/2}px;`
-      + `top:${EF_BADGE_Y-h/2}px;width:${w}px;height:${h}px">${COMPLIANCE[name]}</div>`).join('');
     const donut = PD_DONUT.replace(/pdGaps/g,'efGaps');
     return `<div class="ef-wrap">
       <div class="shd" style="--shd-y:120px"><div class="shd-t reveal">${esc(s.heading||'')}</div></div>
@@ -2705,7 +2708,6 @@ const R = {
           </div>
         </div>
       </div>
-      ${badges}
       <div class="ef-site" aria-hidden="true">
         <div class="ef-sitebar">
           <div class="ef-sitecontrols">
@@ -2743,7 +2745,11 @@ const R = {
         </div>
         <div class="eb-icon">${ECOMMERCE[f.icon]}</div>
       </div>`).join('');
-    return `<div class="eb-wrap"><div class="eb-row">${cards}</div></div>`;
+    const cx0 = 960 - (PD_BADGES.length-1)*PD_BADGE_GAP/2;
+    const badges = PD_BADGES.map(([name,w,h],i)=>
+      `<div class="eb-badge" style="--i:${i};left:${cx0+i*PD_BADGE_GAP-w/2}px;`
+      + `top:${PD_BADGE_Y-h/2}px;width:${w}px;height:${h}px">${COMPLIANCE[name]}</div>`).join('');
+    return `<div class="eb-wrap"><div class="eb-row">${cards}</div>${badges}</div>`;
   },
   /* ---- Ecommerce Expo card 3: Zephyr testimonial spread ---- */
   commerceMetric(s){
@@ -2868,6 +2874,8 @@ const R = {
           </div>
           <span class="ce-action ce-cancel">Cancel</span>
           <span class="ce-action ce-done">Add to media</span>
+          <i class="ce-editor-cursor"><img src="${UPLOADER.cursor}" alt=""></i>
+          <i class="ce-done-ring"></i>
         </div>
       </div>
 
@@ -4084,7 +4092,6 @@ function setupCommerceFlow(slideEl, sd, tl){
   const dots = qa('.ef-dots');
   const donut = qa('.ef-right .pd-donut .c');
   const lines = qa('.ef-analysis p');
-  const badges = qa('.ef-badge');
   if (!process || !site || !sitePhoto || !siteInfo || !left || !widget || !drop || !drag || !panel || !file || !arc) return;
 
   const reset = ()=>{
@@ -4114,7 +4121,6 @@ function setupCommerceFlow(slideEl, sd, tl){
     dots.forEach(d=>d.dataset.state = 'standby');
     donut.forEach(c=>c.classList.remove('lit'));
     lines.forEach(p=>p.style.opacity = '0');
-    badges.forEach(b=>Object.assign(b.style,{opacity:'0',transform:'translateY(10px)'}));
   };
   reset();
 
@@ -4131,7 +4137,6 @@ function setupCommerceFlow(slideEl, sd, tl){
     dots.forEach(d=>d.dataset.state = 'standby');
     donut.forEach(c=>c.classList.add('lit'));
     lines.forEach(p=>p.style.opacity = '1');
-    badges.forEach(b=>Object.assign(b.style,{opacity:'.5',transform:'none'}));
     process.dataset.state = 'ready-for-site';
   };
 
@@ -4144,9 +4149,6 @@ function setupCommerceFlow(slideEl, sd, tl){
     });
     Object.assign(sitePhoto.style,{opacity:'1',transform:'none'});
     Object.assign(siteInfo.style,{opacity:'1',transform:'none'});
-    // the marks stay up; the browser page covers their strip (y≈1015 sits
-    // inside the 334,426 1252x814 box), so they are occluded, never dimmed
-    badges.forEach(b=>Object.assign(b.style,{opacity:'.5',transform:'none'}));
     process.dataset.state = 'site-live';
   };
 
@@ -4159,16 +4161,6 @@ function setupCommerceFlow(slideEl, sd, tl){
   tl.to(drag,[{opacity:0},{opacity:1}],{at:.30,dur:.26});
   let landed = 1.55;
   tl.spring(drag,FROM,OVER,{...FLY,onArrive:t=>landed=t});
-
-  // The three trust marks come up with the card and never leave. They used to
-  // arrive with the analysis and be faded out again half a second later, which is
-  // not long enough to read three logos across a stand — and because the fade
-  // ran before the browser's clip had grown down to their strip, you watched
-  // them dim rather than being covered. They now hold at the frame's .5 for
-  // the whole card; the storefront page occludes them, which is honest.
-  badges.forEach((b,i)=>tl.to(b,
-    [{opacity:0,transform:'translateY(10px)'},{opacity:.5,transform:'translateY(0)'}],
-    {at:.55+i*.09,dur:.34,ease:EASE.out}));
 
   // Light the drop zone on the exact spring frame where the pointer enters.
   const tip = {x:drag.offsetLeft+cursor.offsetLeft,y:drag.offsetTop+cursor.offsetTop};
@@ -4285,6 +4277,8 @@ function setupCommerceEditor(slideEl, sd, tl){
   const promptCursor = q('.ce-prompt-cursor');
   const generate = q('.ce-generate');
   const done = q('.ce-done');
+  const editorCursor = q('.ce-editor-cursor');
+  const doneRing = q('.ce-done-ring');
   const after = q('.ce-after');
   const veil = q('.ce-veil');
   const shimmer = q('.ce-shimmer');
@@ -4292,7 +4286,8 @@ function setupCommerceEditor(slideEl, sd, tl){
   const sitePhoto = q('.ce-site .ef-site-photo');
   const siteInfo = q('.ce-site .ef-site-info');
   if (!backend || !shot || !pill || !cursor || !clickRing || !editor ||
-      !prompt || !after || !veil || !shimmer || !site) return;
+      !prompt || !done || !editorCursor || !doneRing || !after || !veil ||
+      !shimmer || !site) return;
 
   const SITE_SHUT = 'inset(0 0 93% 0 round 16px)';
   const SITE_OPEN = 'inset(0 0 0 0 round 16px)';
@@ -4334,7 +4329,11 @@ function setupCommerceEditor(slideEl, sd, tl){
     prompt.textContent = '';
     promptCursor.classList.remove('on');
     Object.assign(generate.style,{opacity:'.35',transform:'none'});
-    done.style.background = '#8f8f8f';
+    Object.assign(done.style,{background:'#8f8f8f',transform:'none'});
+    Object.assign(editorCursor.style,{
+      opacity:'0',transform:'translate(-160px,-92px)'
+    });
+    Object.assign(doneRing.style,{opacity:'0',transform:'scale(.9)'});
     after.style.opacity = '0';
     veil.style.opacity = '0';
     Object.assign(shimmer.style,{opacity:'0',transform:'translateX(0)'});
@@ -4354,7 +4353,9 @@ function setupCommerceEditor(slideEl, sd, tl){
     prompt.textContent = CE_PROMPT;
     promptCursor.classList.remove('on');
     Object.assign(generate.style,{opacity:'.35',transform:'none'});
-    done.style.background = '#181818';
+    Object.assign(done.style,{background:'#181818',transform:'none'});
+    editorCursor.style.opacity = '0';
+    doneRing.style.opacity = '0';
     after.style.opacity = '1';
     veil.style.opacity = '0';
     Object.assign(shimmer.style,{opacity:'0',transform:'translateX(660px)'});
@@ -4468,16 +4469,47 @@ function setupCommerceEditor(slideEl, sd, tl){
   // crossfade must not blink back to the source image.
   tl.at(GENERATE+1.95,settle);
 
+  /* Complete the visible interaction instead of jumping from a finished edit
+     to the storefront. The result keeps its original ~1.05s still hold first;
+     only then does a second pointer enter from the composer, travel to Add to
+     media and press it. This extra beat shifts the handover later rather than
+     taking time away from typing, generation, or the completed result.
+
+     The short path has a slight bow and a 4px correction at the end. As with
+     the backend pointer, every keyframe carries opacity so the underlying
+     opacity:0 cannot be synthesised into an accidental fade across the move. */
+  const MEDIA_MOVE = GENERATE + 2.60;
+  const MEDIA_PATH = [
+    {offset:0,   transform:'translate(-160px,-92px)',opacity:0},
+    {offset:.10, transform:'translate(-148px,-88px)',opacity:1},
+    {offset:.42, transform:'translate(-92px,-64px)',opacity:1},
+    {offset:.72, transform:'translate(-38px,-28px)',opacity:1},
+    {offset:.92, transform:'translate(4px,2px)',opacity:1},
+    {offset:1,   transform:'translate(0,0)',opacity:1}
+  ];
+  tl.to(editorCursor,MEDIA_PATH,
+    {at:MEDIA_MOVE,dur:.72,ease:'linear',fill:'forwards'});
+  const MEDIA_CLICK = MEDIA_MOVE + .85;
+  tl.to(done,[
+    {transform:'scale(1)',offset:0},
+    {transform:'scale(.97)',offset:.35},
+    {transform:'scale(.97)',offset:.55},
+    {transform:'scale(1)',offset:1}
+  ],{at:MEDIA_CLICK,dur:.18,ease:EASE.out,fill:'forwards'});
+  tl.to(doneRing,[
+    {opacity:.5,transform:'scale(.9)'},
+    {opacity:0,transform:'scale(1.25)'}
+  ],{at:MEDIA_CLICK+.02,dur:.22,ease:EASE.out,fill:'forwards'});
+
   /* The variant goes live. This is card 1's payoff played in this card's
      vocabulary — the working surface lifts and recedes while the storefront
      opens down from its 56px chrome — and it is the point of the whole card:
      the generated image is not a preview, it is already the product page.
 
-     The result holds finished and still for ~1.05s first. That hold is the
-     only time the generated frame is on screen without something else
-     happening to it, and it is what the slide's extra two seconds bought; do
-     not reclaim them by starting the handover earlier. */
-  const SITE = GENERATE + 3.0;
+     The result holds finished and still for ~1.05s before the pointer arrives.
+     That hold is what the slide's earlier extra two seconds bought; do not
+     reclaim it by starting the pointer or handover earlier. */
+  const SITE = MEDIA_CLICK + .35;
   tl.to(editor,
     [{opacity:1,transform:'translateY(0) scale(1)'},
      {opacity:0,transform:'translateY(-18px) scale(.985)'}],
@@ -5757,7 +5789,7 @@ const NEW = {
   commerceFlow:{type:'commerceFlow',duration:10,heading:'Every product image, optimized and fast. Automatically.'},
   commerceBenefits:{type:'commerceBenefits',duration:11},
   commerceMetric:{type:'commerceMetric',duration:6,value:'2x faster page loads.',line:'Faster pages, more sales.',quote:'This way, we get the absolute most speed we can when loading our web pages across mobile devices.',attribution:'Sam McKinney, Director of Agency Services at Zephyr',by:'Zephyr'},
-  commerceEditor:{type:'commerceEditor',duration:12,heading:'Turn any photo\ninto a catalog-ready product shot.'},
+  commerceEditor:{type:'commerceEditor',duration:13,heading:'Turn any photo\ninto a catalog-ready product shot.'},
   commerceLogos:{type:'commerceLogos',duration:5,title:'Trusted by',logos:'L\u2019Or\u00e9al, Crayola, Samsonite, GemPages, Shogun, Marko'},
   commerceInfrastructure:{type:'commerceInfrastructure',duration:8,heading:'The infrastructure\nbehind every product image.',sub:'One integration. Upload, optimize, and deliver every image, and every other file.',steps:'Upload, Optimize, Deliver'},
   commerceOutro:{type:'commerceOutro',duration:10,layout:'outro',title:'Load faster,\nsell more.',sub:'Come say hi \ud83d\udc4b\nand enter to win LEGO Polaroid Camera Building Set',qr:true,qrConfirmed:false,qrLabel:'QR URL to confirm',booth:''},

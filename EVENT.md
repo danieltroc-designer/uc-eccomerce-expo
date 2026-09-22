@@ -5,11 +5,11 @@ Working source of truth for this booth cut. Do not invent event facts.
 ## Confirmed
 
 - Event name: **Ecommerce Expo**
-- Seven-card loop, approximately 62 seconds:
+- Seven-card loop, approximately 63 seconds:
   1. Product image upload → optimization → live store payoff (10s)
   2. Five ecommerce benefits, two one-second highlight passes (11s)
   3. Zephyr proof point (6s)
-  4. Marketplace backend → Edit with AI → catalog variant → storefront (12s)
+  4. Marketplace backend → Edit with AI → catalog variant → Add to media → storefront (13s)
   5. Customer logo wall (5s)
   6. Upload → Optimize → Deliver infrastructure view (8s)
   7. Booth CTA / file-board outro (10s)
@@ -23,8 +23,9 @@ Working source of truth for this booth cut. Do not invent event facts.
   “Replace the background with a flat sage green studio backdrop, keep the
   bottle and its natural shadow”. The committed 1536×2048 source and 880×1168
   result are `assets/ecommerce/catalog-source.jpg` and `editor-after.jpg`. The
-  card ends with that result live on an Ashfold product page, reusing Card 1's
-  storefront frame; its copy and €49.00 price come from the demo's own backend
+  finished result holds, a second pointer clicks “Add to media,” and the card
+  ends with that result live on an Ashfold product page, reusing Card 1's
+  storefront frame. Its copy and €49.00 price come from the demo's own backend
   record, not from invented catalogue data.
 - Logo wall: L'Oréal, Crayola, Samsonite, GemPages, Shogun, Marko.
 - Card 1's first phase follows Figma frame `234:979`: the complete uploader
@@ -34,7 +35,8 @@ Working source of truth for this booth cut. Do not invent event facts.
   the completed process shell recedes into a 1252px browser where the same tube
   photo is already live on the Velour Essentials product page. It is paced for
   booth distance — the upload takes 1.45s and the optimization claim holds ~1.3s
-  before the storefront arrives — which is what the 10s slot buys.
+  before the storefront arrives — which is what the 10s slot buys. The SOC 2,
+  GDPR and HIPAA marks now sit beneath Card 2's benefit row rather than Card 1.
 - Card 3 follows Figma frame `234:1237`: “2x faster page loads. Faster pages,
   more sales.” beside the Zephyr mark and “This way, we get the absolute most
   speed we can when loading our web pages across mobile devices.” attributed

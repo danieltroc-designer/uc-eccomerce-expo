@@ -23,9 +23,9 @@ SHOTS = {
     # card 2: one second per panel, twice; sample each highlight
     1: [1400, 2400, 3400, 4400, 5400, 6400, 7400, 8400, 9400, 10400],
     2: [250, 700, 1400, 2200],         # headline, then Zephyr mark
-    3: [400, 1500, 1800, 2350, 2900, 4000, 5200, 5800, 7400, 8700, 9600, 11500],
+    3: [400, 1500, 1800, 2350, 2900, 4000, 5200, 5800, 7400, 8200, 8800, 9500, 10500, 12500],
                                  # backend → hover → click → editor → prompt → shimmer
-                                 # → result → storefront
+                                 # → result → Add to media pointer/click → storefront
     4: [250, 650, 1100],               # six-logo sweep
     5: [700, 1800, 2900, 3800, 5400, 7400],
                                             # upload → optimize → deliver → logo hold
