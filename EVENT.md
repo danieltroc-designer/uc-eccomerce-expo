@@ -23,7 +23,7 @@ Working source of truth for this booth cut. Do not invent event facts.
   “Replace the background with a flat sage green studio backdrop, keep the
   bottle and its natural shadow”. The committed 1536×2048 source and 880×1168
   result are `assets/ecommerce/catalog-source.jpg` and `editor-after.jpg`. The
-  finished result holds, a second pointer clicks “Add to media,” and the card
+  finished result holds, the same pointer clicks “Add to media,” and the card
   ends with that result live on an Ashfold product page, reusing Card 1's
   storefront frame. Its copy and €49.00 price come from the demo's own backend
   record, not from invented catalogue data.

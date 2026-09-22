@@ -122,21 +122,35 @@ These things about the implementation are load bearing:
   its tube shot and would cut the pump off a 3:4 bottle), the copy is the
   Ashfold page's own, and the CTA carries the backend's €49.00.
  **The slide runs 13s, not 12.** The finished result still holds untouched for
- ~1.05s. A second data-URI pointer then enters from the composer, travels to
- the now-active “Add to media” button, presses it, and only then hands over to
- the storefront. The added second pays for that action; no earlier typing,
- generation, result hold, or storefront beat was shortened.
+ ~1.05s, after which the pointer leaves the send button for the now-active
+ “Add to media”, presses it, and only then hands over to the storefront. The
+ added second pays for that action; no earlier typing, generation, result
+ hold, or storefront beat was shortened.
 - **Prompt typing is Timeline-owned.** Its recursive 18ms ticks go through
   `tl.timeout()`, so leaving the card stops them and re-entry resets to an empty
   prompt synchronously. Reduced motion opens directly on the storefront, the
   same way card 1 does. `tools/check_editor.py` checks normal motion twice and
   that reduced state; the storefront is pinned inline by `settleSite()` for the
   reason card 1's is.
-- **The backend pointer uses `UPLOADER.cursor` as a data URI.** Card 1 already
-  inlines the same SVG; another inline copy collides on the mask id and renders
-  invisible even though its box and opacity are correct. It rests on the pill's
-  trailing edge, not its middle: the arrow is 44x61 drawn down-right of the
-  tip, so parking it on the label hides the two words the beat exists to show.
+- **One pointer runs the whole card, and it is card 1's 18x25.** It is a child
+  of `.ce-stage`, not of `.ce-backend`, so it crosses the backend → editor
+  handover in the open: fading out with one phase and fading back in for the
+  next reads as two different pointers rather than one hand still working. It
+  seats on Edit with AI, moves to the prompt box as the modal opens and is
+  parked there before the first character lands, reaches the send button as
+  the last words are typed, holds through generation, then goes to Add to
+  media. `settle()` and `settleSite()` take the seat it is standing on so a
+  kill mid-card cannot revert it to an earlier one; reduced motion passes no
+  seat and the pointer stays out of a card with no interaction to show. It was
+  44x61 first, which is wider than the 15px buttons it presses. **The `reach()`
+  helper is the short-move twin of `APPROACH`** — bowed off the straight line,
+  velocity peaking at ~20%, 3% past the mark and back — so every move obeys
+  the same rule: the shape lives in the waypoints, the effect runs `linear`,
+  and offsets are real fractions of elapsed time. The click ripples are 36px,
+  sized to the buttons rather than to the pointer.
+  It uses `UPLOADER.cursor` as a data URI. Card 1 already inlines the same
+  SVG; another inline copy collides on the mask id and renders invisible even
+  though its box and opacity are correct.
 - `encode_logos()` scans `assets/logos/*.svg`; new customer marks require no
   build-script registration. Ecommerce Card 3 now follows frame 234:1237 and
   reuses the inherited Webflow testimonial spread exactly: the 938×465 lime

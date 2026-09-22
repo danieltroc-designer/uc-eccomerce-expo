@@ -1752,18 +1752,28 @@
   .ce-chips span{padding:5px 9px;border-radius:999px;background:#f0f0f0;color:#3a3a3a;
     font-size:13px;line-height:1}
 
-  /* left/top is where the pointer finishes and the score translates it back to
-     its entry point; the tip sits at the element's top-left, so these are tip
-     coordinates. It rests on the pill's trailing edge rather than its middle:
-     the arrow is 44x61 and drawn down-right of the tip, so parking it on the
-     label covers the two words the whole beat exists to show. */
-  .ce-admin-cursor{position:absolute;left:165px;top:352px;width:44px;height:61px;
-    z-index:5;opacity:0;will-change:transform}
+  /* One pointer runs the whole card, so it is a child of .ce-stage rather than
+     of .ce-backend: the backend fades out under it at the handover, and a
+     pointer that fades with its phase and fades back in for the next one reads
+     as two different pointers rather than one hand still working.
+
+     It is card 1's 18x25, not the 44x61 it started at. At 44px the arrow is
+     bigger than the 15px buttons it presses, which makes the UI look like a
+     toy; at card 1's size the two cards' pointers are also the same object.
+
+     left/top is where it first comes to rest and the score translates it back
+     to its entry point; the tip sits at the element's top-left, so every
+     coordinate in the score is a tip coordinate. */
+  .ce-admin-cursor{position:absolute;left:165px;top:352px;width:18px;height:25px;
+    z-index:8;opacity:0;will-change:transform;
+    filter:drop-shadow(1px 0 1px rgba(0,0,0,.3))}
   .ce-admin-cursor img{width:100%;height:100%;display:block}
   /* Centred on the tip. It opens near its full size and clears in 220ms: a
      ripple that starts at a tenth of its size and keeps growing after the
-     press has ended reads as an effect rather than as feedback. */
-  .ce-click-ring{position:absolute;left:139px;top:326px;width:52px;height:52px;
+     press has ended reads as an effect rather than as feedback. 36px is the
+     pill's own height — scaled to the button being pressed rather than to the
+     pointer, which at 18px would make any ripple read as three times its size. */
+  .ce-click-ring{position:absolute;left:147px;top:334px;width:36px;height:36px;
     border:1.5px solid rgba(128,100,216,.85);border-radius:50%;opacity:0;
     transform:scale(.9);z-index:4;pointer-events:none}
 
@@ -1820,12 +1830,8 @@
     background:#f1f1f2;color:#343436;font-size:13px;font-weight:600;line-height:1}
   .ce-cancel{left:12px}
   .ce-done{right:12px;background:#8f8f8f;color:#fff}
-  /* A second pointer closes the editor interaction. Its tip rests inside the
-     active Add to media button; a data URI avoids duplicate SVG mask ids. */
-  .ce-editor-cursor{position:absolute;left:1174px;top:612px;width:44px;height:61px;
-    z-index:7;opacity:0;will-change:transform}
-  .ce-editor-cursor img{width:100%;height:100%;display:block}
-  .ce-done-ring{position:absolute;left:1148px;top:586px;width:52px;height:52px;
+  /* The press feedback for Add to media, centred on the pointer's seat in it. */
+  .ce-done-ring{position:absolute;left:1156px;top:594px;width:36px;height:36px;
     border:1.5px solid rgba(255,207,62,.88);border-radius:50%;opacity:0;
     transform:scale(.9);z-index:6;pointer-events:none}
 
@@ -2855,7 +2861,6 @@ const R = {
               </div>
             </div>
           </div>
-          <i class="ce-admin-cursor"><img src="${UPLOADER.cursor}" alt=""></i>
           <i class="ce-click-ring"></i>
         </div>
 
@@ -2879,9 +2884,9 @@ const R = {
           </div>
           <span class="ce-action ce-cancel">Cancel</span>
           <span class="ce-action ce-done">Add to media</span>
-          <i class="ce-editor-cursor"><img src="${UPLOADER.cursor}" alt=""></i>
           <i class="ce-done-ring"></i>
         </div>
+        <i class="ce-admin-cursor"><img src="${UPLOADER.cursor}" alt=""></i>
       </div>
 
       <div class="ef-site ce-site" aria-hidden="true">
@@ -4282,7 +4287,6 @@ function setupCommerceEditor(slideEl, sd, tl){
   const promptCursor = q('.ce-prompt-cursor');
   const generate = q('.ce-generate');
   const done = q('.ce-done');
-  const editorCursor = q('.ce-editor-cursor');
   const doneRing = q('.ce-done-ring');
   const after = q('.ce-after');
   const veil = q('.ce-veil');
@@ -4291,7 +4295,7 @@ function setupCommerceEditor(slideEl, sd, tl){
   const sitePhoto = q('.ce-site .ef-site-photo');
   const siteInfo = q('.ce-site .ef-site-info');
   if (!backend || !shot || !pill || !cursor || !clickRing || !editor ||
-      !prompt || !done || !editorCursor || !doneRing || !after || !veil ||
+      !prompt || !done || !doneRing || !after || !veil ||
       !shimmer || !site) return;
 
   const SITE_SHUT = 'inset(0 0 93% 0 round 16px)';
@@ -4324,6 +4328,33 @@ function setupCommerceEditor(slideEl, sd, tl){
     {at:1,   x:165,  y:352}                     // and the correction back
   ];
 
+  /* Where the one pointer works, in the same tip coordinates. The editor's
+     seats are measured from the rebuilt UI: FIELD is inside the prompt box on
+     the short second line's empty right side, so the pointer is parked in the
+     field it is typing into without covering a single character of it. */
+  const FIELD = {x:860, y:515};                 // parked in the prompt box
+  const GEN   = {x:970, y:560};                 // on the composer's send button
+  const DONE  = {x:1174, y:612};                // on Add to media
+
+  /* A short reach between two seats. Same contract as the long throw: the
+     shape is in the waypoints so the effect runs `linear`, the velocity peaks
+     at ~20% and decays, and it carries 3% past the mark before correcting —
+     a hand's ballistic move and its own correction, at whatever length the
+     two seats happen to be apart. `bow` offsets the midpoint perpendicular to
+     the travel, which is what keeps it from reading as a ruler line. */
+  const reach = (from, to, bow=0)=>{
+    const dx = to.x-from.x, dy = to.y-from.y;
+    const len = Math.hypot(dx,dy) || 1;
+    const nx = -dy/len, ny = dx/len;
+    const at = [0,.10,.26,.46,.68,.87,1];
+    const f  = [0,.16,.44,.72,.92,1.03,1];
+    const b  = [0,.50,.95,.90,.50,.12,0];
+    return at.map((t,i)=>({
+      offset:t, opacity:1,
+      transform:tr({x:from.x+dx*f[i]+nx*bow*b[i], y:from.y+dy*f[i]+ny*bow*b[i]})
+    }));
+  };
+
   const reset = ()=>{
     Object.assign(backend.style,{opacity:'1',transform:'none'});
     shot.classList.remove('hot');
@@ -4335,9 +4366,6 @@ function setupCommerceEditor(slideEl, sd, tl){
     promptCursor.classList.remove('on');
     Object.assign(generate.style,{opacity:'.35',transform:'none'});
     Object.assign(done.style,{background:'#8f8f8f',transform:'none'});
-    Object.assign(editorCursor.style,{
-      opacity:'0',transform:'translate(-160px,-92px)'
-    });
     Object.assign(doneRing.style,{opacity:'0',transform:'scale(.9)'});
     after.style.opacity = '0';
     veil.style.opacity = '0';
@@ -4349,17 +4377,22 @@ function setupCommerceEditor(slideEl, sd, tl){
   };
   reset();
 
-  const settle = ()=>{
+  /* The finished editor frame, pinned inline. `seat` is where the pointer is
+     standing at that moment: the score passes the send button, because it is
+     still visible and still there, while reduced motion passes nothing and the
+     pointer stays out of a card that has no interaction to show. */
+  const settle = (seat)=>{
     backend.style.opacity = '0';
     shot.classList.add('hot');
-    cursor.style.opacity = '0';
+    Object.assign(cursor.style, seat
+      ? {opacity:'1',transform:tr(seat)}
+      : {opacity:'0'});
     clickRing.style.opacity = '0';
     Object.assign(editor.style,{opacity:'1',transform:'none'});
     prompt.textContent = CE_PROMPT;
     promptCursor.classList.remove('on');
     Object.assign(generate.style,{opacity:'.35',transform:'none'});
     Object.assign(done.style,{background:'#181818',transform:'none'});
-    editorCursor.style.opacity = '0';
     doneRing.style.opacity = '0';
     after.style.opacity = '1';
     veil.style.opacity = '0';
@@ -4370,11 +4403,14 @@ function setupCommerceEditor(slideEl, sd, tl){
   // timeline, and a cancelled WAAPI animation reverts to inline style — which
   // reset() left hidden. The kill happens at the top of the outgoing crossfade,
   // so without this the payoff blinks out while the card is still on screen.
-  const settleSite = ()=>{
+  const settleSite = (seat)=>{
     Object.assign(editor.style,{opacity:'0',transform:'translateY(-18px) scale(.985)'});
     Object.assign(site.style,{opacity:'1',clipPath:SITE_OPEN,transform:'none'});
     [sitePhoto,siteInfo].forEach(el=>el && Object.assign(el.style,
       {opacity:'1',transform:'none'}));
+    // the pointer is left where it last pressed, not faded off: the storefront
+    // page opens over it, which is occlusion rather than a disappearance
+    if (seat) Object.assign(cursor.style,{opacity:'1',transform:tr(seat)});
   };
 
   if (REDUCED){ settle(); settleSite(); return; }
@@ -4417,6 +4453,21 @@ function setupCommerceEditor(slideEl, sd, tl){
     {opacity:0,transform:'scale(1.25)'}
   ],{at:CLICK+.02,dur:.22,ease:EASE.out,fill:'forwards'});
 
+  /* And then it carries on working. The pointer does not fade out with the
+     backend and fade back in for the editor: it crosses the handover in the
+     open, which is the whole reason it lives on .ce-stage. Every move after
+     this one opens on the seat the previous one left, so they must be created
+     in score order — a later animation wins the cascade — and every one of
+     them is fill:'forwards', or its first keyframe would pin the pointer to a
+     seat it has not reached yet from t=0.
+
+     It leaves for the prompt box as the modal opens, which is what a hand does
+     while a dialog animates in, and is parked there before the first character
+     lands at 3.30s. */
+  const FIELD_MOVE = CLICK + .22;
+  tl.to(cursor,reach(APPROACH[APPROACH.length-1],FIELD,-30),
+    {at:FIELD_MOVE,dur:.72,ease:'linear',fill:'forwards'});
+
   // The modal arrives as one object, matching the demo rather than assembling
   // its production controls as separate decorative elements.
   const EDITOR = CLICK + .42;
@@ -4442,6 +4493,11 @@ function setupCommerceEditor(slideEl, sd, tl){
 
   const GENERATE = TYPE + CE_PROMPT.length*.018 + .28;
   tl.at(GENERATE,()=>promptCursor.classList.remove('on'));
+  // The hand goes for send as the last words are typed, not after a pause: the
+  // move starts ~180ms before the prompt is finished and lands just before the
+  // press, so the button is pressed by something that is already on it.
+  tl.to(cursor,reach(FIELD,GEN,-14),
+    {at:GENERATE-.46,dur:.42,ease:'linear',fill:'forwards'});
   // A send button, pressed. .97 for 150ms is what a real one does; the weight
   // of the action is carried by the two seconds of processing that follow it.
   tl.to(generate,[
@@ -4472,27 +4528,15 @@ function setupCommerceEditor(slideEl, sd, tl){
 
   // Pin the finished editor frame: killing WAAPI during the outgoing slide
   // crossfade must not blink back to the source image.
-  tl.at(GENERATE+1.95,settle);
+  tl.at(GENERATE+1.95,()=>settle(GEN));
 
   /* Complete the visible interaction instead of jumping from a finished edit
      to the storefront. The result keeps its original ~1.05s still hold first;
-     only then does a second pointer enter from the composer, travel to Add to
-     media and press it. This extra beat shifts the handover later rather than
-     taking time away from typing, generation, or the completed result.
-
-     The short path has a slight bow and a 4px correction at the end. As with
-     the backend pointer, every keyframe carries opacity so the underlying
-     opacity:0 cannot be synthesised into an accidental fade across the move. */
+     only then does the pointer leave the send button for Add to media and
+     press it. This beat is what the slide's thirteenth second pays for; it
+     takes nothing from typing, generation, or the finished result's hold. */
   const MEDIA_MOVE = GENERATE + 2.60;
-  const MEDIA_PATH = [
-    {offset:0,   transform:'translate(-160px,-92px)',opacity:0},
-    {offset:.10, transform:'translate(-148px,-88px)',opacity:1},
-    {offset:.42, transform:'translate(-92px,-64px)',opacity:1},
-    {offset:.72, transform:'translate(-38px,-28px)',opacity:1},
-    {offset:.92, transform:'translate(4px,2px)',opacity:1},
-    {offset:1,   transform:'translate(0,0)',opacity:1}
-  ];
-  tl.to(editorCursor,MEDIA_PATH,
+  tl.to(cursor,reach(GEN,DONE,-16),
     {at:MEDIA_MOVE,dur:.72,ease:'linear',fill:'forwards'});
   const MEDIA_CLICK = MEDIA_MOVE + .85;
   tl.to(done,[
@@ -4529,7 +4573,7 @@ function setupCommerceEditor(slideEl, sd, tl){
   tl.to(siteInfo,
     [{opacity:0,transform:'translateY(12px)'},{opacity:1,transform:'translateY(0)'}],
     {at:SITE+.38,dur:.40,ease:EASE.out});
-  tl.at(SITE+.80,settleSite);
+  tl.at(SITE+.80,()=>settleSite(DONE));
 }
 
 function setupDropin(slideEl, sd, tl){

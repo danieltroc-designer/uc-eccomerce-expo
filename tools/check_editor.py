@@ -51,8 +51,7 @@ def read(pg):
         backend: opacity(q('.ce-backend')),
         cursor: opacity(q('.ce-admin-cursor')),
         ring: opacity(q('.ce-click-ring')),
-        editorCursor: opacity(q('.ce-editor-cursor')),
-        editorTip: rect(q('.ce-editor-cursor'))?.slice(0, 2) || null,
+        cursorBox: rect(q('.ce-admin-cursor'))?.slice(2) || null,
         doneRing: opacity(q('.ce-done-ring')),
         doneBox: rect(q('.ce-done')),
         hot: !!q('.ce-shot')?.classList.contains('hot'),
@@ -191,18 +190,36 @@ def main():
             check("Add to media resolves active",
                   done_editing["done"] == "rgb(24, 24, 24)", done_editing["done"])
             media_target = [s for s in samples
-                            if s["editorCursor"] > .8 and s["editorTip"]
-                            and s["doneBox"]
-                            and s["doneBox"][0] <= s["editorTip"][0]
+                            if s["cursor"] > .8 and s["tip"] and s["doneBox"]
+                            and s["doneBox"][0] <= s["tip"][0]
                                 <= s["doneBox"][0] + s["doneBox"][2]
-                            and s["doneBox"][1] <= s["editorTip"][1]
+                            and s["doneBox"][1] <= s["tip"][1]
                                 <= s["doneBox"][1] + s["doneBox"][3]]
-            check("editor pointer goes to Add to media",
+            check("pointer goes on to Add to media",
                   bool(media_target),
                   f"{len(media_target)} sample(s) with the tip on the button")
-            check("editor pointer clicks Add to media",
+            check("pointer clicks Add to media",
                   any(s["doneRing"] > .01 for s in samples),
                   "click ring observed")
+
+            # one pointer, one appearance: it is the same element throughout,
+            # it is card 1's size, and once it has arrived it never goes away
+            # again — including across the backend -> editor handover, where it
+            # used to fade out with one phase and fade back in for the next
+            check("pointer is card 1's size",
+                  early["cursorBox"] == [18, 25], str(early["cursorBox"]))
+            shown = [i for i, s in enumerate(samples) if s["cursor"] > .8]
+            blinks = [i for i in range(shown[0], shown[-1] + 1)
+                      if samples[i]["cursor"] <= .8] if shown else []
+            check("pointer stays visible once it has arrived",
+                  bool(shown) and not blinks,
+                  f"visible for {len(shown)} of {len(samples) - shown[0]} samples"
+                  if shown else "never visible")
+            typing_visible = [s for s in samples
+                              if 0 < len(s["prompt"]) < len(PROMPT)
+                              and s["cursor"] > .8]
+            check("pointer is visible while the prompt is typed",
+                  bool(typing_visible), f"{len(typing_visible)} sample(s)")
 
             # the payoff: the generated variant live on the storefront
             hold = [s for s in samples if s["editor"] < .02 and s["site"] > .98]
