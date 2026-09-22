@@ -3426,9 +3426,9 @@ const R = {
       </div>
 
       <!-- Car: framed JPEG upper-right, pipeline log -->
-      <div class="hb-node n3" style="${G.n3[0]}" data-meta="car">
+      <div class="hb-node n3" style="${G.n3[0]}" data-meta="sneaker">
         <div class="hb-inner">
-          <div class="hb-card framed" style="width:${G.n3[1]}px;height:${G.n3[2]}px"><img src="${ASSETS.car}" alt=""></div>
+          <div class="hb-card framed" style="width:${G.n3[1]}px;height:${G.n3[2]}px"><img src="${ASSETS.sneaker}" alt=""></div>
           <div class="hb-led" style="left:${G.n3[3]}px;top:${outro?0:G.n3[4]-12}px"></div>
           <div class="hb-meta" style="left:${G.n3[3]}px;top:${G.n3[4]}px"></div>
         </div>
@@ -3762,7 +3762,7 @@ const BOARD_META = {
     [['SIZE: ',''],['1024X768','b']],
     [['DELIVERED IN: ',''],['67 MS','t']],
   ], keepCursor:false, startAt:900 },
-  car: { lines:[
+  sneaker: { lines:[
     [['FILE RECEIVED.','']],
     [['USER ',''],['J18N88910M','b']],
     [['JPEG · 1 MB','']],
@@ -5668,7 +5668,7 @@ function fieldsFor(s, i){
       <label class="chk"><input type="checkbox" data-f="typing" ${s.typing!==false?'checked':''}> Type in terminal text</label>
       <label class="chk"><input type="checkbox" data-f="qr" ${s.qr?'checked':''}> Show the booth QR (outro only)</label>
       <label class="f"><span>Typing speed (ms per character — lower is faster)</span><input type="number" min="4" max="80" step="1" data-f="typeSpeed" value="${s.typeSpeed||16}"></label>
-      <p style="font-size:12px;color:#7a7a82;margin-top:14px;line-height:1.5">The four floating file cards (tennis, portrait, car, DOCX) are fixed to match the brand layout; the outro pushes them into the corners. The QR destination is CTA_URL in build_simple.py.</p>`;
+      <p style="font-size:12px;color:#7a7a82;margin-top:14px;line-height:1.5">The four floating file cards (tennis, portrait, sneaker, DOCX) are fixed to match the brand layout; the outro pushes them into the corners. The QR destination is CTA_URL in build_simple.py.</p>`;
     }
     case 'reveal': return dur+`
       <label class="f"><span>Kicker (optional)</span><input type="text" data-f="kicker" value="${esc(s.kicker||'')}"></label>

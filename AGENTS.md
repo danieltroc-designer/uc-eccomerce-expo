@@ -794,7 +794,10 @@ editor supports it. Follow `board`/`logoAnim` as the fullest examples.
 
 **Swap a photo:** replace `assets/photos/<name>.png` (keep the filename) and
 rebuild. Sizing/quality knobs: `PHOTO_SPEC` and `JPEG_QUALITY` in `build.py`.
-Photo keys used by the board: `tennis`, `blonde` (portrait.png), `car`, `docx`.
+Photo keys used by the board: `tennis`, `blonde` (portrait.png), `sneaker`, `docx`.
+`sneaker.png` is padded to the framed slot's 1.418 aspect with its own pink so
+the card's cover crop shows the whole shoe; a replacement needs the same
+treatment or the lace loop and sole get trimmed.
 
 **New logo / globe:** replace the SVG under `assets/brand/` and rebuild. The logo
 is made responsive by `prepare_logo()` in `build.py` (it strips the fixed

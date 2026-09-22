@@ -83,7 +83,7 @@ uploadcare-show/
 ├── src/
 │   └── index.template.html    the editable deck: all HTML/CSS/JS logic
 ├── assets/
-│   ├── photos/                tennis.png, portrait.png, car.png, docx.png
+│   ├── photos/                tennis.png, portrait.png, sneaker.png, docx.png
 │   ├── brand/                 uploadcare-logo-lockup.svg, globe.svg
 │   └── fonts/                 commit-mono-400.woff2, commit-mono-500.woff2
 └── dist/

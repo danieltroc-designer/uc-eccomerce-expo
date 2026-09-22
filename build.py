@@ -38,7 +38,7 @@ BG = (9, 9, 9)  # #090909 — matte the photos onto the deck background
 PHOTO_SPEC = {
     "tennis":   ("tennis.png",   560, "jpeg"),
     "blonde":   ("portrait.png", 460, "jpeg"),
-    "car":      ("car.png",      560, "jpeg"),
+    "sneaker":  ("sneaker.png",  560, "jpeg"),
     "docx":     ("docx.png",     300, "png"),
 }
 JPEG_QUALITY = 84
